@@ -11,14 +11,46 @@
     <!-- Library untuk QRCode -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <style>
-        /* Global font family */
         body {
             font-family: 'Space Grotesk', sans-serif;
         }
-        /* Styling minimal yang mungkin sulit dicapai hanya dengan utility class Tailwind,
-           atau untuk state yang dikelola JS jika lebih sederhana di sini.
-           Untuk saat ini, kita usahakan semua styling ada di class HTML.
-        */
+        .feedback-placeholder { /* Digunakan jika belum ada pesan */
+            min-height: 24px; /* Sesuaikan dengan tinggi pesan rata-rata */
+        }
+        /* Style untuk drop zone aktif */
+        .dropzone-active {
+            border-style: solid;
+            border-color: black;
+            background-color: #e0e7ff; /* Indigo-100 */
+        }
+        .preview-img-container {
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .remove-img-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+            border: none;
+        }
     </style>
 </head>
 <body class="bg-white text-zinc-900 flex flex-col min-h-screen">
@@ -37,60 +69,43 @@
                     <a href="index.html" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Beranda</a>
                     <a href="#tools" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Tools</a>
                     <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
-                        GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16">
-                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                          </svg>
+                        GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
                     </a>
                 </nav>
-                <!-- Tombol Menu Mobile -->
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="text-white hover:text-gray-300 focus:outline-none p-2">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                        </svg>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                     </button>
                 </div>
             </div>
         </div>
-        <!-- Navbar Mobile -->
-        <nav id="mobile-menu" class="md:hidden hidden bg-zinc-800"> <!-- Slightly lighter for mobile dropdown -->
+        <nav id="mobile-menu" class="md:hidden hidden bg-zinc-800">
             <a href="index.html" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">Beranda</a>
             <a href="#tools" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">Tools</a>
             <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">
-                GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                  </svg>
+                GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
             </a>
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Hero Section -->
         <section id="hero" class="text-center py-12">
             <img src="https://placehold.co/120x120/1a1a1a/ffffff?text=AW" alt="[Foto Profil Ardi Wijaya]" class="w-32 h-32 mx-auto rounded-full mb-6 border-4 border-black shadow-lg">
             <h1 class="text-4xl md:text-5xl font-bold mb-3 text-zinc-900">Halo, saya Juli Ardi Wijaya</h1>
             <p class="text-lg md:text-xl text-zinc-700 mb-6">Selamat datang di Kumpulan Web Tools Saya!</p>
             <div class="space-x-4">
                 <a href="#tools" class="bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50">Lihat Tools</a>
-                <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50">
-                    Kunjungi GitHub
-                </a>
+                <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50">Kunjungi GitHub</a>
             </div>
         </section>
 
-        <!-- Tools Section with Tabs -->
         <section id="tools" class="py-12 scroll-mt-20">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-zinc-900">Web Tools</h2>
-            
             <div class="mb-0 border-b border-zinc-300">
                 <nav class="-mb-px flex space-x-1 sm:space-x-2 overflow-x-auto pb-px" aria-label="Tabs">
-                    <button class="tab-button active-tab-button px-4 py-3 font-semibold text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">
-                        QRCode Generator
-                    </button>
-                    <button class="tab-button inactive-tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">
-                        Text Formatter
-                    </button>
+                    <button class="tab-button px-4 py-3 font-semibold text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">QRCode Generator</button>
+                    <button class="tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">Text Formatter</button>
+                    <button class="tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">Watermark Gambar</button>
                 </nav>
             </div>
 
@@ -112,7 +127,6 @@
                             <input type="number" id="qr-size" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm" value="200" min="50" max="1000">
                         </div>
                         <button id="generate-qr-btn" class="w-full bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50 mb-4">Buat QRCode</button>
-                        
                         <div class="min-h-[200px] flex justify-center items-center border border-dashed border-zinc-300 rounded-md mt-4 mb-4 p-4 bg-zinc-50">
                             <canvas id="qrcodeCanvas" class="max-w-full h-auto bg-white"></canvas>
                         </div>
@@ -145,48 +159,114 @@
                          <p id="text-formatter-message" class="text-center text-sm py-2 px-3 rounded-md mt-4 feedback-placeholder"></p>
                     </div>
                 </div>
+
+                <!-- Image Watermark Tab -->
+                <div id="watermark-gambar-tab" class="tab-content-panel hidden p-6 border border-zinc-300 border-t-0 rounded-b-lg shadow-lg bg-white">
+                    <h3 class="text-2xl font-semibold mb-6 text-center text-zinc-800">Beri Watermark pada Gambar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Kolom Pengaturan Watermark -->
+                        <div class="space-y-6">
+                            <div>
+                                <label for="watermark-upload" class="block text-sm font-medium text-zinc-700 mb-1">1. Unggah Gambar Watermark:</label>
+                                <input type="file" id="watermark-upload" accept="image/png, image/jpeg" class="mt-1 block w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200 transition-colors">
+                                <div id="watermark-preview-container" class="mt-2 w-32 h-32 border border-dashed border-zinc-300 rounded flex items-center justify-center bg-zinc-50 overflow-hidden">
+                                    <img id="watermark-preview" src="#" alt="[Pratinjau Watermark]" class="hidden max-w-full max-h-full">
+                                    <span id="watermark-preview-placeholder" class="text-xs text-zinc-400">Pratinjau Watermark</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="watermark-opacity" class="block text-sm font-medium text-zinc-700 mb-1">2. Atur Opasitas Watermark: <span id="opacity-value" class="font-normal">100</span>%</label>
+                                <input type="range" id="watermark-opacity" min="0" max="100" value="100" class="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black">
+                            </div>
+                             <div>
+                                <label for="watermark-position" class="block text-sm font-medium text-zinc-700 mb-1">3. Posisi Watermark:</label>
+                                <select id="watermark-position" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
+                                    <option value="bottom-right">Kanan Bawah</option>
+                                    <option value="bottom-left">Kiri Bawah</option>
+                                    <option value="top-right">Kanan Atas</option>
+                                    <option value="top-left">Kiri Atas</option>
+                                    <option value="center">Tengah</option>
+                                    <option value="tile">Ubin (Tile)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="watermark-scale" class="block text-sm font-medium text-zinc-700 mb-1">4. Skala Watermark (relatif thd gambar target): <span id="scale-value" class="font-normal">20</span>%</label>
+                                <input type="range" id="watermark-scale" min="5" max="100" value="20" step="1" class="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black">
+                            </div>
+                        </div>
+
+                        <!-- Kolom Upload Gambar Target & Hasil -->
+                        <div class="space-y-6">
+                            <div>
+                                <label for="target-images-upload" class="block text-sm font-medium text-zinc-700 mb-1">5. Unggah Gambar Target (bisa lebih dari satu):</label>
+                                <div id="target-image-dropzone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-300 border-dashed rounded-md transition-colors">
+                                    <div class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                        <div class="flex text-sm text-zinc-600">
+                                            <label for="target-images-upload-input" class="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-zinc-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-black">
+                                                <span>Unggah file</span>
+                                                <input id="target-images-upload-input" name="target-images-upload-input" type="file" class="sr-only" multiple accept="image/png, image/jpeg, image/webp">
+                                            </label>
+                                            <p class="pl-1">atau seret dan lepas</p>
+                                        </div>
+                                        <p class="text-xs text-zinc-500">PNG, JPG, JPEG, WEBP hingga 5MB per file</p>
+                                        <p class="text-xs text-zinc-500">Anda juga bisa <button type="button" id="paste-target-image-btn" class="font-medium text-black hover:text-zinc-700 underline">tempel dari clipboard</button></p>
+                                    </div>
+                                </div>
+                                <div id="target-images-preview-area" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    <!-- Pratinjau gambar target akan muncul di sini -->
+                                </div>
+                            </div>
+                            <button id="process-watermark-btn" class="w-full bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50" disabled>Beri Watermark & Unduh</button>
+                            <p id="watermark-message" class="text-center text-sm py-2 px-3 rounded-md feedback-placeholder"></p>
+                            <div id="watermarked-results-area" class="mt-4 space-y-4">
+                                <!-- Hasil gambar berwatermark akan muncul di sini -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-zinc-900 text-white py-8 text-center">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-sm">
-                &copy; <span id="currentYear"></span> Ardi Wijaya. Dibuat dengan <span class="text-red-400">&hearts;</span> dan Kode.
-            </p>
-            <p class="text-xs mt-1 opacity-75">
-                GitHub Pages: <a href="https://masardiw.github.io" target="_blank" rel="noopener noreferrer" class="hover:underline">masardiw.github.io</a>
-            </p>
+            <p class="text-sm">&copy; <span id="currentYear"></span> Ardi Wijaya. Dibuat dengan <span class="text-red-400">&hearts;</span> dan Kode.</p>
+            <p class="text-xs mt-1 opacity-75">GitHub Pages: <a href="https://masardiw.github.io" target="_blank" rel="noopener noreferrer" class="hover:underline">masardiw.github.io</a></p>
         </div>
     </footer>
 
     <script>
-        // Script untuk toggle menu mobile
+        // --- Global Helper Functions ---
+        function showMessage(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.textContent = message;
+            el.className = 'text-center text-sm py-2 px-3 rounded-md mt-2'; // Reset classes, add common
+            if (type === 'success') el.classList.add('bg-green-100', 'text-green-700');
+            else if (type === 'error') el.classList.add('bg-red-100', 'text-red-700');
+            else el.classList.add('bg-blue-100', 'text-blue-700'); // Default to info
+        }
+
+        // --- Mobile Menu ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-
         if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
         }
-        
-        // Script untuk smooth scroll dan active nav link
-        const navItemsDesktop = document.querySelectorAll('header nav.hidden.md\\:flex a.nav-item');
-        const navItemsMobile = document.querySelectorAll('header nav#mobile-menu a.nav-item-mobile');
-        const allNavItems = [...navItemsDesktop, ...navItemsMobile];
 
+        // --- Active Nav Link & Smooth Scroll ---
+        const allNavItems = [...document.querySelectorAll('header nav.hidden.md\\:flex a.nav-item'), ...document.querySelectorAll('header nav#mobile-menu a.nav-item-mobile')];
         function setActiveNavLink(targetId) {
             allNavItems.forEach(link => {
                 link.classList.remove('bg-gray-700', 'text-white', 'font-semibold');
-                link.classList.add('text-gray-300'); // Default untuk desktop
-                 if(link.classList.contains('nav-item-mobile')) { // Default untuk mobile
+                link.classList.add('text-gray-300');
+                if(link.classList.contains('nav-item-mobile')) {
                     link.classList.remove('text-white');
                     link.classList.add('text-gray-200');
-                 }
+                }
             });
-
             allNavItems.forEach(link => {
                 if (link.getAttribute('href') === targetId || (targetId === 'index.html' && link.getAttribute('href') === 'index.html')) {
                     link.classList.add('bg-gray-700', 'text-white', 'font-semibold');
@@ -194,46 +274,33 @@
                 }
             });
         }
-
         document.querySelectorAll('a[href^="#"], a[href="index.html"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 const targetId = this.getAttribute('href');
                 if (targetId.startsWith("#")) {
                     e.preventDefault();
-                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                    }
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
                     const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
-                // Untuk link index.html, biarkan default behavior jika bukan di halaman yang sama
-                 else if (targetId === "index.html" && window.location.pathname.endsWith("/index.html") || window.location.pathname === "/") {
+                    if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+                } else if ((targetId === "index.html" && window.location.pathname.endsWith("/index.html")) || (targetId === "index.html" && window.location.pathname === "/")) {
                     e.preventDefault();
-                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                     setActiveNavLink("index.html");
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setActiveNavLink("index.html");
                 }
             });
         });
-        
         function onScroll() {
             let currentSectionId = "index.html"; 
+            const headerHeight = document.querySelector('header')?.offsetHeight || 70;
             document.querySelectorAll('main section[id]').forEach(section => {
-                const sectionTop = section.offsetTop - (document.querySelector('header').offsetHeight + 20);
-                if (window.scrollY >= sectionTop) {
-                    currentSectionId = "#" + section.getAttribute('id');
-                }
+                if (window.scrollY >= section.offsetTop - headerHeight - 20) currentSectionId = "#" + section.getAttribute('id');
             });
-             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) { // Cek jika di paling bawah
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
                 const sections = document.querySelectorAll('main section[id]');
-                if (sections.length > 0) {
-                     currentSectionId = "#" + sections[sections.length -1].getAttribute('id');
-                }
+                if (sections.length > 0) currentSectionId = "#" + sections[sections.length -1].getAttribute('id');
             }
             setActiveNavLink(currentSectionId);
         }
-
         window.addEventListener('scroll', onScroll);
         window.addEventListener('load', () => {
             onScroll(); 
@@ -241,154 +308,99 @@
             if (hash && hash.startsWith("#")) {
                 setActiveNavLink(hash);
                 const targetElement = document.querySelector(hash);
-                if (targetElement) {
-                     setTimeout(() => { 
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                }
+                if (targetElement) setTimeout(() => targetElement.scrollIntoView({ behavior: 'smooth' }), 100);
             } else {
-                 setActiveNavLink("index.html");
+                setActiveNavLink("index.html");
             }
         });
 
+        // --- Footer Year ---
         const currentYearElement = document.getElementById('currentYear');
-        if (currentYearElement) {
-            currentYearElement.textContent = new Date().getFullYear();
-        }
+        if (currentYearElement) currentYearElement.textContent = new Date().getFullYear();
 
-        // Tab Functionality
+        // --- Tab Functionality ---
         const tabButtonElements = document.querySelectorAll('.tab-button');
-        const tabContentPanelElements = document.querySelectorAll('.tab-content-panel');
-        const activeTabClasses = ['bg-black', 'text-white', 'font-semibold', 'border-black'];
-        const inactiveTabClasses = ['text-zinc-600', 'hover:text-black', 'hover:bg-zinc-100', 'font-medium'];
-
+        const activeTabClasses = ['bg-black', 'text-white', 'font-semibold'];
+        const inactiveTabClasses = ['text-zinc-600', 'hover:text-black', 'hover:bg-zinc-100', 'font-medium', 'bg-zinc-50'];
 
         function activateTab(tabButtonToActivate) {
             tabButtonElements.forEach(btn => {
                 btn.classList.remove(...activeTabClasses);
                 btn.classList.add(...inactiveTabClasses);
-                // Ensure correct data-tab-target usage
-                const targetPanelId = btn.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab'; // Derive ID from text
-                const panel = document.getElementById(targetPanelId);
+                const panelId = btn.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
+                const panel = document.getElementById(panelId);
                 if (panel) panel.classList.add('hidden');
             });
-            
             tabButtonToActivate.classList.add(...activeTabClasses);
             tabButtonToActivate.classList.remove(...inactiveTabClasses);
-            
             const activePanelId = tabButtonToActivate.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
             const activePanel = document.getElementById(activePanelId);
-            if (activePanel) {
-                activePanel.classList.remove('hidden');
-            }
+            if (activePanel) activePanel.classList.remove('hidden');
         }
-        
         tabButtonElements.forEach((button, index) => {
-            // Set data-tab-target dynamically based on text content for robustness
-            const panelId = button.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
-            button.dataset.tabTarget = `#${panelId}`;
-
-            button.addEventListener('click', () => {
-                activateTab(button);
-            });
-             // Initialize first tab as active
-            if (index === 0) {
-                activateTab(button); // Activate the first tab by default
-            } else {
-                // Ensure other panels are hidden initially
-                const targetPanel = document.querySelector(button.dataset.tabTarget);
-                if(targetPanel) targetPanel.classList.add('hidden');
+            button.addEventListener('click', () => activateTab(button));
+            if (index === 0) activateTab(button); // Activate first tab by default
+            else {
+                const panelId = button.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
+                const panel = document.getElementById(panelId);
+                if (panel) panel.classList.add('hidden');
             }
         });
 
-
-        // --- QRCode Generator Functionality ---
+        // --- QRCode Generator ---
         const qrTextInput = document.getElementById('qr-text');
         const qrLabelInput = document.getElementById('qr-label');
         const qrSizeInput = document.getElementById('qr-size');
         const generateQrBtn = document.getElementById('generate-qr-btn');
         const downloadQrBtn = document.getElementById('download-qr-btn');
         const qrcodeCanvas = document.getElementById('qrcodeCanvas');
-        const qrMessageEl = document.getElementById('qr-message');
-        
-        let qrCtx = null;
-        if (qrcodeCanvas) qrCtx = qrcodeCanvas.getContext('2d');
+        let qrCtx = qrcodeCanvas ? qrcodeCanvas.getContext('2d') : null;
         let generatedQRDataUrl = null;
-
-        function showQrMessage(message, type = 'info') {
-            if (!qrMessageEl) return;
-            qrMessageEl.textContent = message;
-            qrMessageEl.className = 'text-center text-sm py-2 px-3 rounded-md'; // Reset classes
-            if (type === 'success') qrMessageEl.classList.add('bg-green-100', 'text-green-700');
-            else if (type === 'error') qrMessageEl.classList.add('bg-red-100', 'text-red-700');
-            else qrMessageEl.classList.add('bg-blue-100', 'text-blue-700'); // Default to info
-        }
 
         if (generateQrBtn) {
             generateQrBtn.addEventListener('click', async () => {
+                if (!qrTextInput || !qrLabelInput || !qrSizeInput || !qrCtx || !qrcodeCanvas) return;
                 const text = qrTextInput.value.trim();
                 const label = qrLabelInput.value.trim();
                 const size = parseInt(qrSizeInput.value) || 200;
-
                 if (!text) {
-                    showQrMessage('Masukkan teks atau URL untuk membuat QRCode.', 'error');
-                    downloadQrBtn.disabled = true;
-                    generatedQRDataUrl = null;
-                    if(qrCtx) qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
-                    return;
+                    showMessage('qr-message', 'Masukkan teks atau URL untuk membuat QRCode.', 'error');
+                    downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height); return;
                 }
-                showQrMessage('Membuat QRCode...', 'info');
+                showMessage('qr-message', 'Membuat QRCode...', 'info');
                 try {
                     const tempCanvas = document.createElement('canvas');
                     await QRCode.toCanvas(tempCanvas, text, { width: size, margin: 2, errorCorrectionLevel: 'H' });
-                    const qrImageWidth = tempCanvas.width;
-                    const qrImageHeight = tempCanvas.height;
-                    let totalHeight = qrImageHeight;
-                    const labelHeight = label ? 30 : 0;
-                    const labelPadding = 10;
-
+                    const qrImageWidth = tempCanvas.width; const qrImageHeight = tempCanvas.height;
+                    let totalHeight = qrImageHeight; const labelHeight = label ? 30 : 0; const labelPadding = 10;
                     if (label) totalHeight += labelHeight + labelPadding;
-                    qrcodeCanvas.width = qrImageWidth;
-                    qrcodeCanvas.height = totalHeight;
-                    qrCtx.fillStyle = '#ffffff';
-                    qrCtx.fillRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+                    qrcodeCanvas.width = qrImageWidth; qrcodeCanvas.height = totalHeight;
+                    qrCtx.fillStyle = '#ffffff'; qrCtx.fillRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
                     qrCtx.drawImage(tempCanvas, 0, 0);
                     if (label) {
-                        qrCtx.fillStyle = '#000000';
-                        qrCtx.font = 'bold 16px Space Grotesk';
-                        qrCtx.textAlign = 'center';
+                        qrCtx.fillStyle = '#000000'; qrCtx.font = 'bold 16px Space Grotesk'; qrCtx.textAlign = 'center';
                         qrCtx.fillText(label, qrImageWidth / 2, qrImageHeight + labelPadding + (labelHeight / 2) - 2); 
                     }
                     generatedQRDataUrl = qrcodeCanvas.toDataURL('image/png');
-                    downloadQrBtn.disabled = false;
-                    showQrMessage('QRCode berhasil dibuat!', 'success');
+                    downloadQrBtn.disabled = false; showMessage('qr-message', 'QRCode berhasil dibuat!', 'success');
                 } catch (err) {
-                    console.error('Error generating QR code:', err);
-                    showQrMessage('Gagal membuat QRCode. Coba lagi.', 'error');
-                    downloadQrBtn.disabled = true;
-                    generatedQRDataUrl = null;
-                    if(qrCtx) qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+                    console.error('Error generating QR code:', err); showMessage('qr-message', 'Gagal membuat QRCode. Coba lagi.', 'error');
+                    downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
                 }
             });
         }
-
         if (downloadQrBtn) {
             downloadQrBtn.addEventListener('click', () => {
                 if (generatedQRDataUrl) {
                     const link = document.createElement('a');
-                    link.download = `qrcode_${qrTextInput.value.substring(0,20).replace(/\s/g,'_') || 'ArdiWijaya'}.png`;
-                    link.href = generatedQRDataUrl;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showQrMessage('QRCode telah diunduh.', 'success');
-                } else {
-                    showQrMessage('Buat QRCode terlebih dahulu sebelum mengunduh.', 'error');
-                }
+                    link.download = `qrcode_${(qrTextInput?.value.substring(0,20).replace(/\s/g,'_')) || 'ArdiWijaya'}.png`;
+                    link.href = generatedQRDataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                    showMessage('qr-message', 'QRCode telah diunduh.', 'success');
+                } else { showMessage('qr-message', 'Buat QRCode terlebih dahulu.', 'error'); }
             });
         }
 
-        // --- Text Formatter Functionality ---
+        // --- Text Formatter ---
         const textInput = document.getElementById('text-input');
         const textOutput = document.getElementById('text-output');
         const btnUppercase = document.getElementById('btn-uppercase');
@@ -396,78 +408,346 @@
         const btnTitlecase = document.getElementById('btn-titlecase');
         const copyTextBtn = document.getElementById('copy-text-btn');
         const saveTextBtn = document.getElementById('save-text-btn');
-        const textFormatterMessageEl = document.getElementById('text-formatter-message');
-
-        function showTextFormatterMessage(message, type = 'info') {
-            if (!textFormatterMessageEl) return;
-            textFormatterMessageEl.textContent = message;
-            textFormatterMessageEl.className = 'text-center text-sm py-2 px-3 rounded-md mt-4'; // Reset classes
-            if (type === 'success') textFormatterMessageEl.classList.add('bg-green-100', 'text-green-700');
-            else if (type === 'error') textFormatterMessageEl.classList.add('bg-red-100', 'text-red-700');
-            else textFormatterMessageEl.classList.add('bg-blue-100', 'text-blue-700');
-        }
 
         function formatText(type) {
+            if (!textInput || !textOutput) return;
             const inputText = textInput.value;
-            if (!inputText.trim()) {
-                textOutput.value = '';
-                showTextFormatterMessage('Masukkan teks terlebih dahulu.', 'error');
-                return;
-            }
+            if (!inputText.trim()) { showMessage('text-formatter-message', 'Masukkan teks terlebih dahulu.', 'error'); return; }
             let formattedText = '';
             switch (type) {
                 case 'uppercase': formattedText = inputText.toUpperCase(); break;
                 case 'lowercase': formattedText = inputText.toLowerCase(); break;
                 case 'titlecase': formattedText = inputText.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()); break;
             }
-            textOutput.value = formattedText;
-            showTextFormatterMessage('Teks berhasil diformat!', 'success');
+            textOutput.value = formattedText; showMessage('text-formatter-message', 'Teks berhasil diformat!', 'success');
         }
-
         if (btnUppercase) btnUppercase.addEventListener('click', () => formatText('uppercase'));
         if (btnLowercase) btnLowercase.addEventListener('click', () => formatText('lowercase'));
         if (btnTitlecase) btnTitlecase.addEventListener('click', () => formatText('titlecase'));
-
         if (copyTextBtn) {
             copyTextBtn.addEventListener('click', () => {
-                const outputText = textOutput.value;
-                if (!outputText.trim()) {
-                    showTextFormatterMessage('Tidak ada teks untuk disalin.', 'error'); return;
-                }
+                if (!textOutput) return; const outputText = textOutput.value;
+                if (!outputText.trim()) { showMessage('text-formatter-message', 'Tidak ada teks untuk disalin.', 'error'); return; }
                 try {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = outputText;
+                    const textArea = document.createElement("textarea"); textArea.value = outputText;
                     textArea.style.position = "fixed"; document.body.appendChild(textArea);
                     textArea.focus(); textArea.select(); document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                    showTextFormatterMessage('Teks berhasil disalin ke clipboard!', 'success');
-                } catch (err) {
-                    console.error('Gagal menyalin teks: ', err);
-                    showTextFormatterMessage('Gagal menyalin teks. Coba lagi.', 'error');
+                    document.body.removeChild(textArea); showMessage('text-formatter-message', 'Teks berhasil disalin!', 'success');
+                } catch (err) { console.error('Gagal menyalin: ', err); showMessage('text-formatter-message', 'Gagal menyalin.', 'error'); }
+            });
+        }
+        if (saveTextBtn) {
+            saveTextBtn.addEventListener('click', () => {
+                if (!textOutput) return; const outputText = textOutput.value;
+                if (!outputText.trim()) { showMessage('text-formatter-message', 'Tidak ada teks untuk disimpan.', 'error'); return; }
+                try {
+                    const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                    link.download = 'formatted_text_ArdiWijaya.txt';
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href); showMessage('text-formatter-message', 'Teks berhasil disimpan!', 'success');
+                } catch (err) { console.error('Gagal menyimpan: ', err); showMessage('text-formatter-message', 'Gagal menyimpan.', 'error'); }
+            });
+        }
+
+        // --- Image Watermark Tool ---
+        const watermarkUpload = document.getElementById('watermark-upload');
+        const watermarkPreview = document.getElementById('watermark-preview');
+        const watermarkPreviewPlaceholder = document.getElementById('watermark-preview-placeholder');
+        const watermarkOpacitySlider = document.getElementById('watermark-opacity');
+        const opacityValueDisplay = document.getElementById('opacity-value');
+        const watermarkPositionSelect = document.getElementById('watermark-position');
+        const watermarkScaleSlider = document.getElementById('watermark-scale');
+        const scaleValueDisplay = document.getElementById('scale-value');
+
+        const targetImageDropzone = document.getElementById('target-image-dropzone');
+        const targetImagesUploadInput = document.getElementById('target-images-upload-input');
+        const targetImagesPreviewArea = document.getElementById('target-images-preview-area');
+        const pasteTargetImageBtn = document.getElementById('paste-target-image-btn');
+        const processWatermarkBtn = document.getElementById('process-watermark-btn');
+        const watermarkedResultsArea = document.getElementById('watermarked-results-area');
+
+        let watermarkImage = null;
+        let watermarkOpacity = 1; // 0 to 1
+        let watermarkPosition = 'bottom-right';
+        let watermarkScale = 0.2; // 20%
+        let targetImages = []; // Array to store File objects or data URLs
+
+        function updateProcessButtonState() {
+            if (processWatermarkBtn) {
+                processWatermarkBtn.disabled = !(watermarkImage && targetImages.length > 0);
+            }
+        }
+
+        if (watermarkUpload) {
+            watermarkUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        watermarkImage = new Image();
+                        watermarkImage.onload = () => { // Ensure image is loaded before using its dimensions
+                             updateProcessButtonState();
+                        };
+                        watermarkImage.src = e.target.result;
+                        if (watermarkPreview) {
+                            watermarkPreview.src = e.target.result;
+                            watermarkPreview.classList.remove('hidden');
+                        }
+                        if (watermarkPreviewPlaceholder) watermarkPreviewPlaceholder.classList.add('hidden');
+                        showMessage('watermark-message', 'Gambar watermark dimuat.', 'success');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    watermarkImage = null;
+                    if (watermarkPreview) {
+                         watermarkPreview.src = "#";
+                         watermarkPreview.classList.add('hidden');
+                    }
+                    if (watermarkPreviewPlaceholder) watermarkPreviewPlaceholder.classList.remove('hidden');
+                    showMessage('watermark-message', 'Pilih file gambar untuk watermark.', 'error');
+                    updateProcessButtonState();
                 }
             });
         }
 
-        if (saveTextBtn) {
-            saveTextBtn.addEventListener('click', () => {
-                const outputText = textOutput.value;
-                 if (!outputText.trim()) {
-                    showTextFormatterMessage('Tidak ada teks untuk disimpan.', 'error'); return;
-                }
-                try {
-                    const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'formatted_text_ArdiWijaya.txt';
-                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href); 
-                    showTextFormatterMessage('Teks berhasil disimpan!', 'success');
-                } catch (err) {
-                    console.error('Gagal menyimpan file: ', err);
-                    showTextFormatterMessage('Gagal menyimpan file. Coba lagi.', 'error');
+        if (watermarkOpacitySlider && opacityValueDisplay) {
+            watermarkOpacitySlider.addEventListener('input', (event) => {
+                watermarkOpacity = parseInt(event.target.value) / 100;
+                opacityValueDisplay.textContent = event.target.value;
+            });
+        }
+        
+        if (watermarkScaleSlider && scaleValueDisplay) {
+            watermarkScaleSlider.addEventListener('input', (event) => {
+                watermarkScale = parseInt(event.target.value) / 100;
+                scaleValueDisplay.textContent = event.target.value;
+            });
+        }
+
+
+        if (watermarkPositionSelect) {
+            watermarkPositionSelect.addEventListener('change', (event) => {
+                watermarkPosition = event.target.value;
+            });
+        }
+
+        function addTargetImage(file) {
+            if (!file.type.startsWith('image/')) {
+                showMessage('watermark-message', `File ${file.name} bukan gambar.`, 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                 showMessage('watermark-message', `File ${file.name} terlalu besar (maks 5MB).`, 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageId = `target-${Date.now()}-${Math.random().toString(36).substring(2,7)}`;
+                targetImages.push({ id: imageId, file: file, dataUrl: e.target.result, name: file.name });
+                
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'preview-img-container border border-zinc-300 rounded-md shadow-sm';
+                previewContainer.id = `container-${imageId}`;
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = `[Pratinjau ${file.name}]`;
+                img.className = 'preview-img';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-img-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = () => {
+                    targetImages = targetImages.filter(imgObj => imgObj.id !== imageId);
+                    document.getElementById(`container-${imageId}`)?.remove();
+                    updateProcessButtonState();
+                };
+
+                previewContainer.appendChild(img);
+                previewContainer.appendChild(removeBtn);
+                targetImagesPreviewArea.appendChild(previewContainer);
+                updateProcessButtonState();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        if (targetImagesUploadInput) {
+            targetImagesUploadInput.addEventListener('change', (event) => {
+                Array.from(event.target.files).forEach(addTargetImage);
+                event.target.value = null; // Reset input agar bisa upload file yang sama lagi
+            });
+        }
+
+        if (targetImageDropzone) {
+            targetImageDropzone.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                targetImageDropzone.classList.add('dropzone-active');
+            });
+            targetImageDropzone.addEventListener('dragleave', () => {
+                targetImageDropzone.classList.remove('dropzone-active');
+            });
+            targetImageDropzone.addEventListener('drop', (event) => {
+                event.preventDefault();
+                targetImageDropzone.classList.remove('dropzone-active');
+                if (event.dataTransfer.files) {
+                    Array.from(event.dataTransfer.files).forEach(addTargetImage);
                 }
             });
         }
+        
+        if (pasteTargetImageBtn) {
+            pasteTargetImageBtn.addEventListener('click', async () => {
+                 try {
+                    const clipboardItems = await navigator.clipboard.read();
+                    let foundImage = false;
+                    for (const item of clipboardItems) {
+                        for (const type of item.types) {
+                            if (type.startsWith("image/")) {
+                                const blob = await item.getType(type);
+                                const fileName = `clipboard-image-${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
+                                const file = new File([blob], fileName, { type: blob.type });
+                                addTargetImage(file);
+                                foundImage = true;
+                            }
+                        }
+                    }
+                    if (foundImage) {
+                        showMessage('watermark-message', 'Gambar dari clipboard ditambahkan.', 'success');
+                    } else {
+                        showMessage('watermark-message', 'Tidak ada gambar ditemukan di clipboard.', 'info');
+                    }
+                } catch (err) {
+                    console.error("Error pasting from clipboard:", err);
+                    showMessage('watermark-message', 'Gagal menempel dari clipboard. Browser mungkin tidak mendukung atau izin ditolak.', 'error');
+                }
+            });
+        }
+
+
+        if (processWatermarkBtn) {
+            processWatermarkBtn.addEventListener('click', async () => {
+                if (!watermarkImage || targetImages.length === 0) {
+                    showMessage('watermark-message', 'Unggah gambar watermark dan minimal satu gambar target.', 'error');
+                    return;
+                }
+                processWatermarkBtn.disabled = true;
+                processWatermarkBtn.textContent = 'Memproses...';
+                watermarkedResultsArea.innerHTML = '<p class="text-center text-zinc-500">Sedang memproses gambar...</p>';
+
+                let processedCount = 0;
+                for (const target of targetImages) {
+                    const targetImg = new Image();
+                    targetImg.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = targetImg.naturalWidth;
+                        canvas.height = targetImg.naturalHeight;
+
+                        // 1. Gambar target
+                        ctx.drawImage(targetImg, 0, 0);
+
+                        // 2. Hitung ukuran dan posisi watermark
+                        const wmNaturalWidth = watermarkImage.naturalWidth;
+                        const wmNaturalHeight = watermarkImage.naturalHeight;
+                        
+                        let wmDrawWidth, wmDrawHeight;
+                        // Skala berdasarkan lebar gambar target
+                        wmDrawWidth = canvas.width * watermarkScale;
+                        wmDrawHeight = (wmNaturalHeight / wmNaturalWidth) * wmDrawWidth;
+
+                        // Jika watermark yang diskalakan lebih tinggi dari gambar target, skala ulang berdasarkan tinggi
+                        if (wmDrawHeight > canvas.height * 0.9) { // Batasi max tinggi watermark 90% tinggi gambar
+                             wmDrawHeight = canvas.height * 0.9 * watermarkScale; // Terapkan scale juga
+                             wmDrawWidth = (wmNaturalWidth / wmNaturalHeight) * wmDrawHeight;
+                        }
+
+
+                        let posX, posY;
+                        const padding = canvas.width * 0.02; // 2% padding
+
+                        switch (watermarkPosition) {
+                            case 'top-left': posX = padding; posY = padding; break;
+                            case 'top-right': posX = canvas.width - wmDrawWidth - padding; posY = padding; break;
+                            case 'bottom-left': posX = padding; posY = canvas.height - wmDrawHeight - padding; break;
+                            case 'center': posX = (canvas.width - wmDrawWidth) / 2; posY = (canvas.height - wmDrawHeight) / 2; break;
+                            case 'tile': break; // Ditangani secara khusus
+                            case 'bottom-right':
+                            default:
+                                posX = canvas.width - wmDrawWidth - padding;
+                                posY = canvas.height - wmDrawHeight - padding;
+                                break;
+                        }
+                        
+                        ctx.globalAlpha = watermarkOpacity;
+
+                        if (watermarkPosition === 'tile') {
+                            // Ubin (Tile)
+                            const patternCanvas = document.createElement('canvas');
+                            const patternCtx = patternCanvas.getContext('2d');
+                            
+                            // Skala ubin agar tidak terlalu besar/kecil
+                            let tileWidth = canvas.width * 0.25; // Ubin sekitar 25% lebar gambar
+                            let tileHeight = (wmNaturalHeight / wmNaturalWidth) * tileWidth;
+
+                            patternCanvas.width = tileWidth + padding * 2; // Tambah padding antar ubin
+                            patternCanvas.height = tileHeight + padding * 2;
+                            
+                            patternCtx.drawImage(watermarkImage, padding, padding, tileWidth, tileHeight);
+                            ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        } else {
+                             // Posisi tunggal
+                            ctx.drawImage(watermarkImage, posX, posY, wmDrawWidth, wmDrawHeight);
+                        }
+                        ctx.globalAlpha = 1.0; // Reset alpha
+
+                        // Tampilkan hasil dan tombol unduh
+                        const resultDataUrl = canvas.toDataURL(target.file.type === 'image/png' ? 'image/png' : 'image/jpeg');
+                        
+                        if (processedCount === 0) watermarkedResultsArea.innerHTML = ''; // Bersihkan pesan "memproses"
+
+                        const resultContainer = document.createElement('div');
+                        resultContainer.className = 'p-4 border border-zinc-200 rounded-md shadow-sm bg-zinc-50';
+                        
+                        const resultImg = document.createElement('img');
+                        resultImg.src = resultDataUrl;
+                        resultImg.alt = `[Hasil Watermark ${target.name}]`;
+                        resultImg.className = 'max-w-full h-auto rounded mb-2 mx-auto block max-h-60 object-contain';
+                        
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = resultDataUrl;
+                        downloadLink.download = `watermarked_${target.name}`;
+                        downloadLink.className = 'block w-full text-center bg-black text-white px-4 py-2 rounded-md hover:bg-zinc-800 transition-colors text-sm';
+                        downloadLink.textContent = `Unduh ${target.name}`;
+                        
+                        resultContainer.appendChild(resultImg);
+                        resultContainer.appendChild(downloadLink);
+                        watermarkedResultsArea.appendChild(resultContainer);
+                        
+                        processedCount++;
+                        if (processedCount === targetImages.length) {
+                            processWatermarkBtn.disabled = false;
+                            processWatermarkBtn.textContent = 'Beri Watermark & Unduh';
+                            showMessage('watermark-message', 'Semua gambar berhasil diproses!', 'success');
+                        }
+                    };
+                    targetImg.onerror = () => {
+                         console.error(`Gagal memuat gambar target: ${target.name}`);
+                         showMessage('watermark-message', `Gagal memuat gambar target: ${target.name}`, 'error');
+                         processedCount++;
+                         if (processedCount === targetImages.length) {
+                            processWatermarkBtn.disabled = false;
+                            processWatermarkBtn.textContent = 'Beri Watermark & Unduh';
+                         }
+                    };
+                    targetImg.src = target.dataUrl;
+                }
+            });
+        }
+
     </script>
 </body>
 </html>
