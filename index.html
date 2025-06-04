@@ -3,43 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ardi Wijaya - Beranda</title>
+    <title>Ardi Wijaya - Web Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <!-- Library untuk QRCode -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <style>
+        /* Global font family */
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: #ffffff; /* Dominan Putih */
-            color: #1a1a1a; /* Hitam untuk teks */
         }
-        .header-bg {
-            background-color: #1a1a1a; /* Hitam untuk header */
-            color: #ffffff; /* Putih untuk teks header */
-        }
-        .footer-bg {
-            background-color: #1a1a1a; /* Hitam untuk footer */
-            color: #ffffff; /* Putih untuk teks footer */
-        }
-        .nav-link {
-            @apply px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 hover:text-white transition-colors;
-        }
-        .content-card {
-            @apply bg-white p-6 rounded-lg shadow-md border border-gray-200;
-        }
-        .btn-primary {
-            @apply bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors;
-        }
-        .btn-secondary {
-            @apply bg-transparent text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors;
-        }
+        /* Styling minimal yang mungkin sulit dicapai hanya dengan utility class Tailwind,
+           atau untuk state yang dikelola JS jika lebih sederhana di sini.
+           Untuk saat ini, kita usahakan semua styling ada di class HTML.
+        */
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="bg-white text-zinc-900 flex flex-col min-h-screen">
 
     <!-- Header -->
-    <header class="header-bg shadow-md">
+    <header class="bg-zinc-900 text-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center">
@@ -48,12 +33,10 @@
                     </a>
                 </div>
                 <!-- Navbar Desktop -->
-                <nav class="hidden md:flex space-x-4">
-                    <a href="index.html" class="nav-link bg-gray-700 text-white">Beranda</a>
-                    <a href="#tentang" class="nav-link">Tentang Saya</a>
-                    <a href="#proyek" class="nav-link">Proyek</a>
-                    <a href="#kontak" class="nav-link">Kontak</a>
-                    <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="nav-link">
+                <nav class="hidden md:flex space-x-1">
+                    <a href="index.html" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Beranda</a>
+                    <a href="#tools" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">Tools</a>
+                    <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
                         GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                           </svg>
@@ -61,7 +44,7 @@
                 </nav>
                 <!-- Tombol Menu Mobile -->
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white hover:text-gray-300 focus:outline-none">
+                    <button id="mobile-menu-button" class="text-white hover:text-gray-300 focus:outline-none p-2">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                         </svg>
@@ -70,12 +53,10 @@
             </div>
         </div>
         <!-- Navbar Mobile -->
-        <nav id="mobile-menu" class="md:hidden hidden bg-gray-800">
-            <a href="index.html" class="block px-4 py-3 text-white hover:bg-gray-700">Beranda</a>
-            <a href="#tentang" class="block px-4 py-3 text-white hover:bg-gray-700">Tentang Saya</a>
-            <a href="#proyek" class="block px-4 py-3 text-white hover:bg-gray-700">Proyek</a>
-            <a href="#kontak" class="block px-4 py-3 text-white hover:bg-gray-700">Kontak</a>
-            <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="block px-4 py-3 text-white hover:bg-gray-700">
+        <nav id="mobile-menu" class="md:hidden hidden bg-zinc-800"> <!-- Slightly lighter for mobile dropdown -->
+            <a href="index.html" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">Beranda</a>
+            <a href="#tools" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">Tools</a>
+            <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="nav-item-mobile block px-4 py-3 text-base text-gray-200 hover:bg-gray-700 hover:text-white">
                 GitHub <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="inline-block ml-1" viewBox="0 0 16 16">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                   </svg>
@@ -86,113 +67,95 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Hero Section -->
-        <section id="hero" class="text-center py-16">
-            <img src="https://placehold.co/150x150/1a1a1a/ffffff?text=AW" alt="Foto Profil Ardi Wijaya" class="w-40 h-40 mx-auto rounded-full mb-6 border-4 border-black shadow-lg">
-            <h1 class="text-5xl font-bold mb-4">Halo, saya Juli Ardi Wijaya</h1>
-            <p class="text-xl text-gray-700 mb-8">Seorang pengembang web & penggemar teknologi.</p>
+        <section id="hero" class="text-center py-12">
+            <img src="https://placehold.co/120x120/1a1a1a/ffffff?text=AW" alt="[Foto Profil Ardi Wijaya]" class="w-32 h-32 mx-auto rounded-full mb-6 border-4 border-black shadow-lg">
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 text-zinc-900">Halo, saya Juli Ardi Wijaya</h1>
+            <p class="text-lg md:text-xl text-zinc-700 mb-6">Selamat datang di Kumpulan Web Tools Saya!</p>
             <div class="space-x-4">
-                <a href="#proyek" class="btn-primary">Lihat Proyek Saya</a>
-                <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                <a href="#tools" class="bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50">Lihat Tools</a>
+                <a href="https://github.com/masardiw" target="_blank" rel="noopener noreferrer" class="bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50">
                     Kunjungi GitHub
                 </a>
             </div>
         </section>
 
-        <!-- Tentang Saya Section -->
-        <section id="tentang" class="py-16">
-            <h2 class="text-4xl font-bold text-center mb-12">Tentang Saya</h2>
-            <div class="grid md:grid-cols-2 gap-10 items-center">
-                <div>
-                    <img src="https://placehold.co/600x400/cccccc/1a1a1a?text=Tentang+Saya" alt="[Gambar Ilustrasi Tentang Saya]" class="rounded-lg shadow-xl w-full">
+        <!-- Tools Section with Tabs -->
+        <section id="tools" class="py-12 scroll-mt-20">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 text-zinc-900">Web Tools</h2>
+            
+            <div class="mb-0 border-b border-zinc-300">
+                <nav class="-mb-px flex space-x-1 sm:space-x-2 overflow-x-auto pb-px" aria-label="Tabs">
+                    <button class="tab-button active-tab-button px-4 py-3 font-semibold text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">
+                        QRCode Generator
+                    </button>
+                    <button class="tab-button inactive-tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">
+                        Text Formatter
+                    </button>
+                </nav>
+            </div>
+
+            <div>
+                <!-- QRCode Generator Tab -->
+                <div id="qrcode-generator-tab" class="tab-content-panel p-6 border border-zinc-300 border-t-0 rounded-b-lg shadow-lg bg-white">
+                    <h3 class="text-2xl font-semibold mb-6 text-center text-zinc-800">Buat QRCode Anda</h3>
+                    <div class="max-w-lg mx-auto">
+                        <div class="mb-4">
+                            <label for="qr-text" class="block text-sm font-medium text-zinc-700 mb-1">Teks atau URL untuk QRCode:</label>
+                            <input type="text" id="qr-text" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm" placeholder="Masukkan teks atau URL">
+                        </div>
+                        <div class="mb-4">
+                            <label for="qr-label" class="block text-sm font-medium text-zinc-700 mb-1">Label Opsional (di bawah QRCode):</label>
+                            <input type="text" id="qr-label" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm" placeholder="Contoh: Website Saya">
+                        </div>
+                         <div class="mb-6">
+                            <label for="qr-size" class="block text-sm font-medium text-zinc-700 mb-1">Ukuran QRCode (piksel):</label>
+                            <input type="number" id="qr-size" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm" value="200" min="50" max="1000">
+                        </div>
+                        <button id="generate-qr-btn" class="w-full bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50 mb-4">Buat QRCode</button>
+                        
+                        <div class="min-h-[200px] flex justify-center items-center border border-dashed border-zinc-300 rounded-md mt-4 mb-4 p-4 bg-zinc-50">
+                            <canvas id="qrcodeCanvas" class="max-w-full h-auto bg-white"></canvas>
+                        </div>
+                        <p id="qr-message" class="text-center text-sm py-2 px-3 rounded-md feedback-placeholder"></p>
+                        <button id="download-qr-btn" class="w-full bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50" disabled>Unduh QRCode (PNG)</button>
+                    </div>
                 </div>
-                <div class="content-card">
-                    <p class="text-lg mb-4">
-                        Saya adalah seorang individu yang bersemangat dalam dunia pengembangan web dan selalu antusias untuk mempelajari teknologi baru. Saya memiliki pengalaman dalam membangun aplikasi web yang responsif dan fungsional.
-                    </p>
-                    <p class="text-lg mb-4">
-                        Keahlian utama saya meliputi HTML, CSS, JavaScript, dan beberapa kerangka kerja modern. Saya percaya bahwa kolaborasi yang baik dan kemauan untuk terus belajar adalah kunci kesuksesan dalam setiap proyek.
-                    </p>
-                    <p class="text-lg">
-                        Di luar coding, saya menikmati [Sebutkan hobi atau minat Anda di sini, misal: membaca buku, bermain musik, atau menjelajahi alam].
-                    </p>
+
+                <!-- Text Formatter Tab -->
+                <div id="text-formatter-tab" class="tab-content-panel hidden p-6 border border-zinc-300 border-t-0 rounded-b-lg shadow-lg bg-white">
+                    <h3 class="text-2xl font-semibold mb-6 text-center text-zinc-800">Format Teks Anda</h3>
+                    <div class="max-w-xl mx-auto">
+                        <div class="mb-4">
+                            <label for="text-input" class="block text-sm font-medium text-zinc-700 mb-1">Masukkan Teks:</label>
+                            <textarea id="text-input" rows="5" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm" placeholder="Ketik atau tempel teks di sini..."></textarea>
+                        </div>
+                        <div class="mb-4 flex flex-wrap justify-center gap-2">
+                            <button id="btn-uppercase" class="bg-zinc-200 text-zinc-800 px-4 py-2 rounded-md hover:bg-zinc-300 transition-colors duration-150 ease-in-out font-medium">KAPITAL SEMUA</button>
+                            <button id="btn-lowercase" class="bg-zinc-200 text-zinc-800 px-4 py-2 rounded-md hover:bg-zinc-300 transition-colors duration-150 ease-in-out font-medium">kecil semua</button>
+                            <button id="btn-titlecase" class="bg-zinc-200 text-zinc-800 px-4 py-2 rounded-md hover:bg-zinc-300 transition-colors duration-150 ease-in-out font-medium">Kapital Awal Kata</button>
+                        </div>
+                        <div class="mb-6">
+                            <label for="text-output" class="block text-sm font-medium text-zinc-700 mb-1">Hasil Format:</label>
+                            <textarea id="text-output" rows="5" class="mt-1 block w-full px-3 py-2 bg-zinc-50 border border-zinc-400 rounded-md shadow-sm sm:text-sm text-zinc-700" readonly placeholder="Hasil format akan muncul di sini..."></textarea>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0">
+                            <button id="copy-text-btn" class="flex-1 bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50">Salin Hasil</button>
+                            <button id="save-text-btn" class="flex-1 bg-white text-black border border-black px-6 py-3 rounded-md hover:bg-black hover:text-white transition-colors duration-150 ease-in-out disabled:opacity-50">Simpan ke .txt</button>
+                        </div>
+                         <p id="text-formatter-message" class="text-center text-sm py-2 px-3 rounded-md mt-4 feedback-placeholder"></p>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <!-- Proyek Section -->
-        <section id="proyek" class="py-16 bg-gray-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-center mb-12">Proyek Unggulan</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Contoh Proyek 1 -->
-                <div class="content-card transform hover:scale-105 transition-transform duration-300">
-                    <img src="https://placehold.co/400x250/1a1a1a/ffffff?text=Proyek+1" alt="[Gambar Proyek 1]" class="rounded-md mb-4 w-full h-48 object-cover">
-                    <h3 class="text-2xl font-semibold mb-2">Nama Proyek 1</h3>
-                    <p class="text-gray-600 mb-4">Deskripsi singkat tentang proyek ini. Teknologi yang digunakan: HTML, CSS, JavaScript.</p>
-                    <a href="#" class="text-black font-semibold hover:underline">Lihat Detail &rarr;</a>
-                </div>
-                <!-- Contoh Proyek 2 -->
-                <div class="content-card transform hover:scale-105 transition-transform duration-300">
-                    <img src="https://placehold.co/400x250/1a1a1a/ffffff?text=Proyek+2" alt="[Gambar Proyek 2]" class="rounded-md mb-4 w-full h-48 object-cover">
-                    <h3 class="text-2xl font-semibold mb-2">Nama Proyek 2</h3>
-                    <p class="text-gray-600 mb-4">Deskripsi singkat tentang proyek ini. Teknologi yang digunakan: React, Tailwind CSS.</p>
-                    <a href="#" class="text-black font-semibold hover:underline">Lihat Detail &rarr;</a>
-                </div>
-                <!-- Contoh Proyek 3 -->
-                <div class="content-card transform hover:scale-105 transition-transform duration-300">
-                    <img src="https://placehold.co/400x250/1a1a1a/ffffff?text=Proyek+3" alt="[Gambar Proyek 3]" class="rounded-md mb-4 w-full h-48 object-cover">
-                    <h3 class="text-2xl font-semibold mb-2">Nama Proyek 3</h3>
-                    <p class="text-gray-600 mb-4">Deskripsi singkat tentang proyek ini. Teknologi yang digunakan: Node.js, Express.</p>
-                    <a href="#" class="text-black font-semibold hover:underline">Lihat Detail &rarr;</a>
-                </div>
-                 <!-- Anda bisa menambahkan lebih banyak proyek di sini -->
-            </div>
-        </section>
-
-        <!-- Kontak Section -->
-        <section id="kontak" class="py-16">
-            <h2 class="text-4xl font-bold text-center mb-12">Hubungi Saya</h2>
-            <div class="max-w-xl mx-auto content-card">
-                <p class="text-lg text-center mb-6">
-                    Tertarik untuk berkolaborasi atau memiliki pertanyaan? Jangan ragu untuk menghubungi saya.
-                </p>
-                <form action="#" method="POST" class="space-y-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" name="name" id="name" autocomplete="name" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Alamat Email</label>
-                        <input type="email" name="email" id="email" autocomplete="email" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-700">Pesan</label>
-                        <textarea id="message" name="message" rows="4" required
-                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"></textarea>
-                    </div>
-                    <div>
-                        <button type="submit"
-                                class="w-full flex justify-center btn-primary">
-                            Kirim Pesan
-                        </button>
-                    </div>
-                </form>
-                <p class="text-center mt-6 text-sm text-gray-600">
-                    Atau hubungi saya langsung melalui <a href="mailto:juliardiw@gmail.com" class="text-black hover:underline font-medium">juliardiw@gmail.com</a>
-                </p>
-            </div>
-        </section>
-
     </main>
 
     <!-- Footer -->
-    <footer class="footer-bg py-8 text-center">
+    <footer class="bg-zinc-900 text-white py-8 text-center">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <p class="text-sm">
-                &copy; <span id="currentYear"></span> Ardi Wijaya. Dibuat dengan <span class="text-red-500">&hearts;</span> dan Kode.
+                &copy; <span id="currentYear"></span> Ardi Wijaya. Dibuat dengan <span class="text-red-400">&hearts;</span> dan Kode.
             </p>
-            <p class="text-xs mt-1">
+            <p class="text-xs mt-1 opacity-75">
                 GitHub Pages: <a href="https://masardiw.github.io" target="_blank" rel="noopener noreferrer" class="hover:underline">masardiw.github.io</a>
             </p>
         </div>
@@ -203,27 +166,308 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // Script untuk smooth scroll dan active nav link
+        const navItemsDesktop = document.querySelectorAll('header nav.hidden.md\\:flex a.nav-item');
+        const navItemsMobile = document.querySelectorAll('header nav#mobile-menu a.nav-item-mobile');
+        const allNavItems = [...navItemsDesktop, ...navItemsMobile];
 
-        // Script untuk smooth scroll (opsional, jika menggunakan anchor link #)
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                // Sembunyikan menu mobile setelah link di klik (jika terbuka)
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
+        function setActiveNavLink(targetId) {
+            allNavItems.forEach(link => {
+                link.classList.remove('bg-gray-700', 'text-white', 'font-semibold');
+                link.classList.add('text-gray-300'); // Default untuk desktop
+                 if(link.classList.contains('nav-item-mobile')) { // Default untuk mobile
+                    link.classList.remove('text-white');
+                    link.classList.add('text-gray-200');
+                 }
+            });
+
+            allNavItems.forEach(link => {
+                if (link.getAttribute('href') === targetId || (targetId === 'index.html' && link.getAttribute('href') === 'index.html')) {
+                    link.classList.add('bg-gray-700', 'text-white', 'font-semibold');
+                    link.classList.remove('text-gray-300', 'text-gray-200');
                 }
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+            });
+        }
+
+        document.querySelectorAll('a[href^="#"], a[href="index.html"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId.startsWith("#")) {
+                    e.preventDefault();
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+                // Untuk link index.html, biarkan default behavior jika bukan di halaman yang sama
+                 else if (targetId === "index.html" && window.location.pathname.endsWith("/index.html") || window.location.pathname === "/") {
+                    e.preventDefault();
+                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                     setActiveNavLink("index.html");
+                }
             });
         });
+        
+        function onScroll() {
+            let currentSectionId = "index.html"; 
+            document.querySelectorAll('main section[id]').forEach(section => {
+                const sectionTop = section.offsetTop - (document.querySelector('header').offsetHeight + 20);
+                if (window.scrollY >= sectionTop) {
+                    currentSectionId = "#" + section.getAttribute('id');
+                }
+            });
+             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) { // Cek jika di paling bawah
+                const sections = document.querySelectorAll('main section[id]');
+                if (sections.length > 0) {
+                     currentSectionId = "#" + sections[sections.length -1].getAttribute('id');
+                }
+            }
+            setActiveNavLink(currentSectionId);
+        }
 
-        // Script untuk menampilkan tahun saat ini di footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        window.addEventListener('scroll', onScroll);
+        window.addEventListener('load', () => {
+            onScroll(); 
+            const hash = window.location.hash;
+            if (hash && hash.startsWith("#")) {
+                setActiveNavLink(hash);
+                const targetElement = document.querySelector(hash);
+                if (targetElement) {
+                     setTimeout(() => { 
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            } else {
+                 setActiveNavLink("index.html");
+            }
+        });
+
+        const currentYearElement = document.getElementById('currentYear');
+        if (currentYearElement) {
+            currentYearElement.textContent = new Date().getFullYear();
+        }
+
+        // Tab Functionality
+        const tabButtonElements = document.querySelectorAll('.tab-button');
+        const tabContentPanelElements = document.querySelectorAll('.tab-content-panel');
+        const activeTabClasses = ['bg-black', 'text-white', 'font-semibold', 'border-black'];
+        const inactiveTabClasses = ['text-zinc-600', 'hover:text-black', 'hover:bg-zinc-100', 'font-medium'];
+
+
+        function activateTab(tabButtonToActivate) {
+            tabButtonElements.forEach(btn => {
+                btn.classList.remove(...activeTabClasses);
+                btn.classList.add(...inactiveTabClasses);
+                // Ensure correct data-tab-target usage
+                const targetPanelId = btn.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab'; // Derive ID from text
+                const panel = document.getElementById(targetPanelId);
+                if (panel) panel.classList.add('hidden');
+            });
+            
+            tabButtonToActivate.classList.add(...activeTabClasses);
+            tabButtonToActivate.classList.remove(...inactiveTabClasses);
+            
+            const activePanelId = tabButtonToActivate.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
+            const activePanel = document.getElementById(activePanelId);
+            if (activePanel) {
+                activePanel.classList.remove('hidden');
+            }
+        }
+        
+        tabButtonElements.forEach((button, index) => {
+            // Set data-tab-target dynamically based on text content for robustness
+            const panelId = button.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
+            button.dataset.tabTarget = `#${panelId}`;
+
+            button.addEventListener('click', () => {
+                activateTab(button);
+            });
+             // Initialize first tab as active
+            if (index === 0) {
+                activateTab(button); // Activate the first tab by default
+            } else {
+                // Ensure other panels are hidden initially
+                const targetPanel = document.querySelector(button.dataset.tabTarget);
+                if(targetPanel) targetPanel.classList.add('hidden');
+            }
+        });
+
+
+        // --- QRCode Generator Functionality ---
+        const qrTextInput = document.getElementById('qr-text');
+        const qrLabelInput = document.getElementById('qr-label');
+        const qrSizeInput = document.getElementById('qr-size');
+        const generateQrBtn = document.getElementById('generate-qr-btn');
+        const downloadQrBtn = document.getElementById('download-qr-btn');
+        const qrcodeCanvas = document.getElementById('qrcodeCanvas');
+        const qrMessageEl = document.getElementById('qr-message');
+        
+        let qrCtx = null;
+        if (qrcodeCanvas) qrCtx = qrcodeCanvas.getContext('2d');
+        let generatedQRDataUrl = null;
+
+        function showQrMessage(message, type = 'info') {
+            if (!qrMessageEl) return;
+            qrMessageEl.textContent = message;
+            qrMessageEl.className = 'text-center text-sm py-2 px-3 rounded-md'; // Reset classes
+            if (type === 'success') qrMessageEl.classList.add('bg-green-100', 'text-green-700');
+            else if (type === 'error') qrMessageEl.classList.add('bg-red-100', 'text-red-700');
+            else qrMessageEl.classList.add('bg-blue-100', 'text-blue-700'); // Default to info
+        }
+
+        if (generateQrBtn) {
+            generateQrBtn.addEventListener('click', async () => {
+                const text = qrTextInput.value.trim();
+                const label = qrLabelInput.value.trim();
+                const size = parseInt(qrSizeInput.value) || 200;
+
+                if (!text) {
+                    showQrMessage('Masukkan teks atau URL untuk membuat QRCode.', 'error');
+                    downloadQrBtn.disabled = true;
+                    generatedQRDataUrl = null;
+                    if(qrCtx) qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+                    return;
+                }
+                showQrMessage('Membuat QRCode...', 'info');
+                try {
+                    const tempCanvas = document.createElement('canvas');
+                    await QRCode.toCanvas(tempCanvas, text, { width: size, margin: 2, errorCorrectionLevel: 'H' });
+                    const qrImageWidth = tempCanvas.width;
+                    const qrImageHeight = tempCanvas.height;
+                    let totalHeight = qrImageHeight;
+                    const labelHeight = label ? 30 : 0;
+                    const labelPadding = 10;
+
+                    if (label) totalHeight += labelHeight + labelPadding;
+                    qrcodeCanvas.width = qrImageWidth;
+                    qrcodeCanvas.height = totalHeight;
+                    qrCtx.fillStyle = '#ffffff';
+                    qrCtx.fillRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+                    qrCtx.drawImage(tempCanvas, 0, 0);
+                    if (label) {
+                        qrCtx.fillStyle = '#000000';
+                        qrCtx.font = 'bold 16px Space Grotesk';
+                        qrCtx.textAlign = 'center';
+                        qrCtx.fillText(label, qrImageWidth / 2, qrImageHeight + labelPadding + (labelHeight / 2) - 2); 
+                    }
+                    generatedQRDataUrl = qrcodeCanvas.toDataURL('image/png');
+                    downloadQrBtn.disabled = false;
+                    showQrMessage('QRCode berhasil dibuat!', 'success');
+                } catch (err) {
+                    console.error('Error generating QR code:', err);
+                    showQrMessage('Gagal membuat QRCode. Coba lagi.', 'error');
+                    downloadQrBtn.disabled = true;
+                    generatedQRDataUrl = null;
+                    if(qrCtx) qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
+                }
+            });
+        }
+
+        if (downloadQrBtn) {
+            downloadQrBtn.addEventListener('click', () => {
+                if (generatedQRDataUrl) {
+                    const link = document.createElement('a');
+                    link.download = `qrcode_${qrTextInput.value.substring(0,20).replace(/\s/g,'_') || 'ArdiWijaya'}.png`;
+                    link.href = generatedQRDataUrl;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showQrMessage('QRCode telah diunduh.', 'success');
+                } else {
+                    showQrMessage('Buat QRCode terlebih dahulu sebelum mengunduh.', 'error');
+                }
+            });
+        }
+
+        // --- Text Formatter Functionality ---
+        const textInput = document.getElementById('text-input');
+        const textOutput = document.getElementById('text-output');
+        const btnUppercase = document.getElementById('btn-uppercase');
+        const btnLowercase = document.getElementById('btn-lowercase');
+        const btnTitlecase = document.getElementById('btn-titlecase');
+        const copyTextBtn = document.getElementById('copy-text-btn');
+        const saveTextBtn = document.getElementById('save-text-btn');
+        const textFormatterMessageEl = document.getElementById('text-formatter-message');
+
+        function showTextFormatterMessage(message, type = 'info') {
+            if (!textFormatterMessageEl) return;
+            textFormatterMessageEl.textContent = message;
+            textFormatterMessageEl.className = 'text-center text-sm py-2 px-3 rounded-md mt-4'; // Reset classes
+            if (type === 'success') textFormatterMessageEl.classList.add('bg-green-100', 'text-green-700');
+            else if (type === 'error') textFormatterMessageEl.classList.add('bg-red-100', 'text-red-700');
+            else textFormatterMessageEl.classList.add('bg-blue-100', 'text-blue-700');
+        }
+
+        function formatText(type) {
+            const inputText = textInput.value;
+            if (!inputText.trim()) {
+                textOutput.value = '';
+                showTextFormatterMessage('Masukkan teks terlebih dahulu.', 'error');
+                return;
+            }
+            let formattedText = '';
+            switch (type) {
+                case 'uppercase': formattedText = inputText.toUpperCase(); break;
+                case 'lowercase': formattedText = inputText.toLowerCase(); break;
+                case 'titlecase': formattedText = inputText.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()); break;
+            }
+            textOutput.value = formattedText;
+            showTextFormatterMessage('Teks berhasil diformat!', 'success');
+        }
+
+        if (btnUppercase) btnUppercase.addEventListener('click', () => formatText('uppercase'));
+        if (btnLowercase) btnLowercase.addEventListener('click', () => formatText('lowercase'));
+        if (btnTitlecase) btnTitlecase.addEventListener('click', () => formatText('titlecase'));
+
+        if (copyTextBtn) {
+            copyTextBtn.addEventListener('click', () => {
+                const outputText = textOutput.value;
+                if (!outputText.trim()) {
+                    showTextFormatterMessage('Tidak ada teks untuk disalin.', 'error'); return;
+                }
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = outputText;
+                    textArea.style.position = "fixed"; document.body.appendChild(textArea);
+                    textArea.focus(); textArea.select(); document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showTextFormatterMessage('Teks berhasil disalin ke clipboard!', 'success');
+                } catch (err) {
+                    console.error('Gagal menyalin teks: ', err);
+                    showTextFormatterMessage('Gagal menyalin teks. Coba lagi.', 'error');
+                }
+            });
+        }
+
+        if (saveTextBtn) {
+            saveTextBtn.addEventListener('click', () => {
+                const outputText = textOutput.value;
+                 if (!outputText.trim()) {
+                    showTextFormatterMessage('Tidak ada teks untuk disimpan.', 'error'); return;
+                }
+                try {
+                    const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'formatted_text_ArdiWijaya.txt';
+                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href); 
+                    showTextFormatterMessage('Teks berhasil disimpan!', 'success');
+                } catch (err) {
+                    console.error('Gagal menyimpan file: ', err);
+                    showTextFormatterMessage('Gagal menyimpan file. Coba lagi.', 'error');
+                }
+            });
+        }
     </script>
-
 </body>
 </html>
