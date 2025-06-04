@@ -1,0 +1,337 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Tidak Ditemukan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #ffffff; 
+            color: #000000; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px; 
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 95%; 
+            max-width: 800px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px; 
+        }
+
+        h1 {
+            line-height: 1.1; 
+            margin-top: 0;
+            margin-bottom: 15px; 
+            color: #000000; 
+            position: relative; 
+            word-break: normal; 
+        }
+
+        .digit {
+            display: inline-block;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        #interactive-zero {
+            cursor: pointer;
+            position: relative; 
+        }
+        
+        #interactive-zero:hover {
+            transform: scale(1.05); 
+            color: #2c2c2c; 
+        }
+
+        .message {
+            font-size: clamp(1rem, 2vw, 1.25rem); 
+            font-weight: 400; 
+            margin-top: 0px; 
+            margin-bottom: 30px; 
+            color: #2a2a2a; 
+            letter-spacing: 0.5px;
+            max-width: 90%; 
+        }
+        
+        .hidden-message {
+            position: absolute;
+            bottom: 100%; 
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px); 
+            background-color: #000000;
+            color: #ffffff;
+            padding: 3px 7px; 
+            border-radius: 3px;
+            font-size: 0.7rem; 
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            pointer-events: none; 
+        }
+
+        #interactive-zero:hover .hidden-message {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-8px); 
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 10px 25px; 
+            background-color: #000000; 
+            color: #ffffff; 
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 700; 
+            font-size: clamp(0.85rem, 1.8vw, 1rem); 
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            border: 2px solid #000000; 
+            position: relative; /* Untuk efek ledakan */
+            overflow: hidden; /* Untuk efek ledakan */
+        }
+
+        .home-button:hover {
+            background-color: #ffffff; 
+            color: #000000; 
+            transform: translateY(-3px) scale(1.03); 
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .home-button.is-exploding {
+            animation: explosionEffect 0.4s forwards;
+        }
+
+        @keyframes explosionEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+
+        p, a, div { 
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Game Styling */
+        .game-container {
+            margin-top: 2.5rem; 
+            padding-top: 1.5rem; 
+            border-top-width: 1px;
+            border-color: #d1d5db; 
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative; /* Menjadikan game-container sebagai parent untuk overlay */
+        }
+
+        #gameArea {
+            width: 256px; 
+            height: 256px; 
+            background-color: #f3f4f6; 
+            border-width: 1px;
+            border-color: #9ca3af; 
+            cursor: crosshair; 
+            position: relative; /* Tetap relative untuk penempatan piksel */
+            border-radius: 0.25rem; 
+            overflow: hidden; 
+        }
+
+        #hiddenPixel {
+            position: absolute;
+            width: 9px; 
+            height: 9px; 
+            background-color: #e5e7eb; 
+            transition: background-color 0.2s ease; 
+        }
+        #hiddenPixel:hover{
+             background-color: #9ca3af; 
+        }
+
+        /* Efek layar biru saat piksel ditemukan */
+        .pixel-found-overlay {
+            position: absolute; /* Diubah dari fixed ke absolute */
+            /* top, left, width, height akan diatur oleh JavaScript */
+            background-color: rgba(59, 130, 246, 0.7); 
+            z-index: 10; /* Z-index disesuaikan, tidak perlu setinggi sebelumnya */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease-out;
+            pointer-events: none; 
+            border-radius: 0.25rem; /* Menyamakan border-radius dengan gameArea */
+        }
+        .pixel-found-overlay.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold">
+            <span class="digit">4</span><span class="digit" id="interactive-zero">0<span class="hidden-message">Pssst!</span></span><span class="digit">4</span>
+        </h1>
+        <p class="message">Halaman yang Anda cari sepertinya menguap ke antah berantah.</p>
+        <a href="/" class="home-button" id="homeButton">Kembali ke Stasiun Utama</a>
+
+        <!-- Game Container -->
+        <div class="game-container" id="gameContainer">
+            <p class="text-sm text-gray-700 mb-3 font-medium">Game Mini: Cari Piksel Hilang!</p>
+            <div id="gameArea">
+                <div id="hiddenPixel"></div>
+            </div>
+            <p id="gameMessage" class="text-xs text-gray-600 mt-3 h-4">Klik di area abu-abu untuk menemukan piksel yang hampir tak terlihat.</p> 
+            <p id="gameScore" class="text-sm font-semibold mt-1">Ditemukan: <span id="scoreCount">0</span></p>
+            <!-- Elemen untuk efek layar biru, dipindahkan ke dalam game-container -->
+            <div id="pixelFoundEffect" class="pixel-found-overlay"></div>
+        </div>
+    </div>
+
+
+    <script>
+        // Easter egg untuk angka 0
+        const interactiveZero = document.getElementById('interactive-zero');
+        let originalZeroText = '0';
+        let zeroClickCount = 0; 
+
+        interactiveZero.addEventListener('click', () => {
+            zeroClickCount++;
+            
+            interactiveZero.style.transition = 'transform 0.15s ease-out, color 0.15s ease-out'; 
+            interactiveZero.style.transform = 'scale(0.9) rotate(-5deg)'; 
+            setTimeout(() => {
+                interactiveZero.style.transform = 'scale(1) rotate(0deg)';
+            }, 150);
+
+            if (zeroClickCount === 1) {
+                interactiveZero.childNodes[0].nodeValue = '?'; 
+                console.log("Easter Egg Level 1: Penasaran, ya?");
+            } else if (zeroClickCount === 2) {
+                interactiveZero.childNodes[0].nodeValue = '๏'; 
+                console.log("Easter Egg Level 2: Memasuki dimensi lain?");
+            } else if (zeroClickCount === 3) {
+                interactiveZero.childNodes[0].nodeValue = '👽';
+                console.log("Easter Egg Level 3: Kita tidak sendiri!");
+            }
+            else {
+                interactiveZero.childNodes[0].nodeValue = originalZeroText;
+                zeroClickCount = 0; 
+                console.log("Kembali ke realita... untuk saat ini.");
+            }
+        });
+
+        console.log("%c👾 Kamu menemukan konsol rahasia! 👾", "color: #000000; font-size: 14px; font-weight: bold; background-color: #ffffff; padding: 5px; border-radius: 3px; border: 1px solid #000000;");
+        console.log("Mencari sesuatu yang hilang? Mungkin ada di balik piksel berikutnya...");
+
+        // Game "Cari Piksel Hilang" Logic
+        const gameContainer = document.getElementById('gameContainer'); // Menambahkan referensi ke gameContainer
+        const gameArea = document.getElementById('gameArea');
+        const hiddenPixel = document.getElementById('hiddenPixel');
+        const gameMessage = document.getElementById('gameMessage');
+        const scoreCountDisplay = document.getElementById('scoreCount');
+        const pixelFoundEffectDiv = document.getElementById('pixelFoundEffect');
+        let score = 0;
+        let originalGameMessage = "Klik di area abu-abu untuk menemukan piksel yang hampir tak terlihat.";
+
+        function placePixel() {
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            const maxX = gameAreaRect.width - hiddenPixel.offsetWidth;
+            const maxY = gameAreaRect.height - hiddenPixel.offsetHeight;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            hiddenPixel.style.left = `${randomX}px`;
+            hiddenPixel.style.top = `${randomY}px`;
+            hiddenPixel.style.backgroundColor = '#e5e7eb'; 
+            hiddenPixel.style.visibility = 'visible'; 
+        }
+
+        hiddenPixel.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            score++;
+            scoreCountDisplay.textContent = score;
+            gameMessage.textContent = "Piksel ditemukan! Mencari yang baru...";
+            hiddenPixel.style.visibility = 'hidden'; 
+
+            // Mengatur posisi dan ukuran overlay agar sama dengan gameArea
+            const gameAreaRect = gameArea.getBoundingClientRect();
+            const gameContainerRect = gameContainer.getBoundingClientRect(); // Untuk offset jika gameContainer tidak di top-left body
+
+            pixelFoundEffectDiv.style.top = `${gameAreaRect.top - gameContainerRect.top}px`; // Posisi relatif terhadap gameContainer
+            pixelFoundEffectDiv.style.left = `${gameAreaRect.left - gameContainerRect.left}px`; // Posisi relatif terhadap gameContainer
+            pixelFoundEffectDiv.style.width = `${gameAreaRect.width}px`;
+            pixelFoundEffectDiv.style.height = `${gameAreaRect.height}px`;
+            
+            pixelFoundEffectDiv.classList.add('active');
+
+            setTimeout(() => {
+                pixelFoundEffectDiv.classList.remove('active'); 
+                setTimeout(() => { 
+                    placePixel();
+                    gameMessage.textContent = originalGameMessage;
+                }, 150); 
+            }, 600); 
+        });
+
+        gameArea.addEventListener('click', () => {
+            gameMessage.textContent = "Belum ketemu... Coba lagi!";
+            setTimeout(() => {
+                if (gameMessage.textContent === "Belum ketemu... Coba lagi!") {
+                    gameMessage.textContent = originalGameMessage;
+                }
+            }, 1500); 
+        });
+
+        // Efek ledakan untuk tombol Beranda
+        const homeButton = document.getElementById('homeButton');
+        homeButton.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            this.classList.add('is-exploding');
+            const linkElement = this; 
+
+            linkElement.addEventListener('animationend', function() {
+                const targetHref = linkElement.getAttribute('href'); 
+                if (targetHref) {
+                    window.location.href = targetHref; 
+                } else {
+                    console.error("Atribut href tombol Beranda tidak ditemukan atau kosong.");
+                }
+            }, { once: true }); 
+        });
+
+
+        // Initial placement of the pixel
+        placePixel();
+        gameMessage.textContent = originalGameMessage; 
+
+    </script>
+</body>
+</html>
