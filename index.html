@@ -28,6 +28,8 @@
             height: 100px;
             overflow: hidden;
             position: relative;
+            display: inline-flex; /* Agar bisa di-wrap */
+            margin: 4px;
         }
         .preview-img {
             width: 100%;
@@ -106,6 +108,7 @@
                     <button class="tab-button px-4 py-3 font-semibold text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">QRCode Generator</button>
                     <button class="tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">Text Formatter</button>
                     <button class="tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">Watermark Gambar</button>
+                    <button class="tab-button px-4 py-3 font-medium text-sm rounded-t-lg whitespace-nowrap transition-colors duration-150 ease-in-out focus:outline-none">Konverter Gambar</button>
                 </nav>
             </div>
 
@@ -164,7 +167,6 @@
                 <div id="watermark-gambar-tab" class="tab-content-panel hidden p-6 border border-zinc-300 border-t-0 rounded-b-lg shadow-lg bg-white">
                     <h3 class="text-2xl font-semibold mb-6 text-center text-zinc-800">Beri Watermark pada Gambar</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Kolom Pengaturan Watermark -->
                         <div class="space-y-6">
                             <div>
                                 <label for="watermark-upload" class="block text-sm font-medium text-zinc-700 mb-1">1. Unggah Gambar Watermark:</label>
@@ -181,12 +183,7 @@
                              <div>
                                 <label for="watermark-position" class="block text-sm font-medium text-zinc-700 mb-1">3. Posisi Watermark:</label>
                                 <select id="watermark-position" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
-                                    <option value="bottom-right">Kanan Bawah</option>
-                                    <option value="bottom-left">Kiri Bawah</option>
-                                    <option value="top-right">Kanan Atas</option>
-                                    <option value="top-left">Kiri Atas</option>
-                                    <option value="center">Tengah</option>
-                                    <option value="tile">Ubin (Tile)</option>
+                                    <option value="bottom-right">Kanan Bawah</option> <option value="bottom-left">Kiri Bawah</option> <option value="top-right">Kanan Atas</option> <option value="top-left">Kiri Atas</option> <option value="center">Tengah</option> <option value="tile">Ubin (Tile)</option>
                                 </select>
                             </div>
                             <div>
@@ -194,34 +191,65 @@
                                 <input type="range" id="watermark-scale" min="5" max="100" value="20" step="1" class="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black">
                             </div>
                         </div>
-
-                        <!-- Kolom Upload Gambar Target & Hasil -->
                         <div class="space-y-6">
                             <div>
-                                <label for="target-images-upload" class="block text-sm font-medium text-zinc-700 mb-1">5. Unggah Gambar Target (bisa lebih dari satu):</label>
+                                <label class="block text-sm font-medium text-zinc-700 mb-1">5. Unggah Gambar Target (bisa lebih dari satu):</label>
                                 <div id="target-image-dropzone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-300 border-dashed rounded-md transition-colors">
                                     <div class="space-y-1 text-center">
                                         <svg class="mx-auto h-12 w-12 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                        <div class="flex text-sm text-zinc-600">
-                                            <label for="target-images-upload-input" class="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-zinc-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-black">
-                                                <span>Unggah file</span>
-                                                <input id="target-images-upload-input" name="target-images-upload-input" type="file" class="sr-only" multiple accept="image/png, image/jpeg, image/webp">
-                                            </label>
-                                            <p class="pl-1">atau seret dan lepas</p>
-                                        </div>
+                                        <div class="flex text-sm text-zinc-600"><label for="target-images-upload-input" class="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-zinc-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-black"><span>Unggah file</span><input id="target-images-upload-input" name="target-images-upload-input" type="file" class="sr-only" multiple accept="image/png, image/jpeg, image/webp"></label><p class="pl-1">atau seret dan lepas</p></div>
                                         <p class="text-xs text-zinc-500">PNG, JPG, JPEG, WEBP hingga 5MB per file</p>
                                         <p class="text-xs text-zinc-500">Anda juga bisa <button type="button" id="paste-target-image-btn" class="font-medium text-black hover:text-zinc-700 underline">tempel dari clipboard</button></p>
                                     </div>
                                 </div>
-                                <div id="target-images-preview-area" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    <!-- Pratinjau gambar target akan muncul di sini -->
-                                </div>
+                                <div id="target-images-preview-area" class="mt-4 flex flex-wrap gap-4"></div>
                             </div>
                             <button id="process-watermark-btn" class="w-full bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50" disabled>Beri Watermark & Unduh</button>
                             <p id="watermark-message" class="text-center text-sm py-2 px-3 rounded-md feedback-placeholder"></p>
-                            <div id="watermarked-results-area" class="mt-4 space-y-4">
-                                <!-- Hasil gambar berwatermark akan muncul di sini -->
+                            <div id="watermarked-results-area" class="mt-4 space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Converter Tab -->
+                <div id="konverter-gambar-tab" class="tab-content-panel hidden p-6 border border-zinc-300 border-t-0 rounded-b-lg shadow-lg bg-white">
+                    <h3 class="text-2xl font-semibold mb-6 text-center text-zinc-800">Konversi Format Gambar</h3>
+                    <div class="max-w-2xl mx-auto space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-700 mb-1">1. Unggah Gambar (bisa lebih dari satu):</label>
+                            <div id="converter-image-dropzone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-300 border-dashed rounded-md transition-colors">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                    <div class="flex text-sm text-zinc-600"><label for="converter-images-upload-input" class="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-zinc-700 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-black"><span>Unggah file</span><input id="converter-images-upload-input" type="file" class="sr-only" multiple accept="image/png, image/jpeg, image/webp, image/gif, image/bmp"></label><p class="pl-1">atau seret dan lepas</p></div>
+                                    <p class="text-xs text-zinc-500">PNG, JPG, WEBP, GIF, BMP hingga 5MB per file</p>
+                                    <p class="text-xs text-zinc-500">Anda juga bisa <button type="button" id="paste-converter-image-btn" class="font-medium text-black hover:text-zinc-700 underline">tempel dari clipboard</button></p>
+                                </div>
                             </div>
+                            <div id="converter-images-preview-area" class="mt-4 flex flex-wrap gap-4">
+                                <!-- Pratinjau gambar yang akan dikonversi -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="converter-output-format" class="block text-sm font-medium text-zinc-700 mb-1">2. Pilih Format Output:</label>
+                            <select id="converter-output-format" class="mt-1 block w-full px-3 py-2 bg-white border border-zinc-400 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm">
+                                <option value="png">PNG</option>
+                                <option value="jpeg">JPG/JPEG</option>
+                                <option value="webp">WEBP</option>
+                                <!-- <option value="gif">GIF</option> --> <!-- GIF conversion can be tricky with animations -->
+                                <!-- <option value="bmp">BMP</option> -->
+                            </select>
+                        </div>
+
+                        <div id="converter-jpg-quality-container" class="hidden"> <!-- Awalnya disembunyikan -->
+                            <label for="converter-jpg-quality" class="block text-sm font-medium text-zinc-700 mb-1">Kualitas JPG: <span id="jpg-quality-value" class="font-normal">90</span>%</label>
+                            <input type="range" id="converter-jpg-quality" min="10" max="100" value="90" class="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-black">
+                        </div>
+                        
+                        <button id="process-conversion-btn" class="w-full bg-black text-white px-6 py-3 rounded-md hover:bg-zinc-800 transition-colors duration-150 ease-in-out disabled:opacity-50" disabled>Konversi & Unduh</button>
+                        <p id="converter-message" class="text-center text-sm py-2 px-3 rounded-md feedback-placeholder"></p>
+                        <div id="converted-results-area" class="mt-4 space-y-4">
+                            <!-- Hasil gambar terkonversi -->
                         </div>
                     </div>
                 </div>
@@ -243,10 +271,10 @@
             const el = document.getElementById(elementId);
             if (!el) return;
             el.textContent = message;
-            el.className = 'text-center text-sm py-2 px-3 rounded-md mt-2'; // Reset classes, add common
+            el.className = 'text-center text-sm py-2 px-3 rounded-md mt-2'; 
             if (type === 'success') el.classList.add('bg-green-100', 'text-green-700');
             else if (type === 'error') el.classList.add('bg-red-100', 'text-red-700');
-            else el.classList.add('bg-blue-100', 'text-blue-700'); // Default to info
+            else el.classList.add('bg-blue-100', 'text-blue-700');
         }
 
         // --- Mobile Menu ---
@@ -263,8 +291,7 @@
                 link.classList.remove('bg-gray-700', 'text-white', 'font-semibold');
                 link.classList.add('text-gray-300');
                 if(link.classList.contains('nav-item-mobile')) {
-                    link.classList.remove('text-white');
-                    link.classList.add('text-gray-200');
+                    link.classList.remove('text-white'); link.classList.add('text-gray-200');
                 }
             });
             allNavItems.forEach(link => {
@@ -283,9 +310,7 @@
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
                 } else if ((targetId === "index.html" && window.location.pathname.endsWith("/index.html")) || (targetId === "index.html" && window.location.pathname === "/")) {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setActiveNavLink("index.html");
+                    e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); setActiveNavLink("index.html");
                 }
             });
         });
@@ -309,9 +334,7 @@
                 setActiveNavLink(hash);
                 const targetElement = document.querySelector(hash);
                 if (targetElement) setTimeout(() => targetElement.scrollIntoView({ behavior: 'smooth' }), 100);
-            } else {
-                setActiveNavLink("index.html");
-            }
+            } else { setActiveNavLink("index.html"); }
         });
 
         // --- Footer Year ---
@@ -325,8 +348,7 @@
 
         function activateTab(tabButtonToActivate) {
             tabButtonElements.forEach(btn => {
-                btn.classList.remove(...activeTabClasses);
-                btn.classList.add(...inactiveTabClasses);
+                btn.classList.remove(...activeTabClasses); btn.classList.add(...inactiveTabClasses);
                 const panelId = btn.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
                 const panel = document.getElementById(panelId);
                 if (panel) panel.classList.add('hidden');
@@ -339,7 +361,7 @@
         }
         tabButtonElements.forEach((button, index) => {
             button.addEventListener('click', () => activateTab(button));
-            if (index === 0) activateTab(button); // Activate first tab by default
+            if (index === 0) activateTab(button);
             else {
                 const panelId = button.textContent.trim().toLowerCase().replace(/\s+/g, '-') + '-tab';
                 const panel = document.getElementById(panelId);
@@ -347,7 +369,7 @@
             }
         });
 
-        // --- QRCode Generator ---
+        // --- QRCode Generator (Existing Code) ---
         const qrTextInput = document.getElementById('qr-text');
         const qrLabelInput = document.getElementById('qr-label');
         const qrSizeInput = document.getElementById('qr-size');
@@ -360,47 +382,32 @@
         if (generateQrBtn) {
             generateQrBtn.addEventListener('click', async () => {
                 if (!qrTextInput || !qrLabelInput || !qrSizeInput || !qrCtx || !qrcodeCanvas) return;
-                const text = qrTextInput.value.trim();
-                const label = qrLabelInput.value.trim();
-                const size = parseInt(qrSizeInput.value) || 200;
-                if (!text) {
-                    showMessage('qr-message', 'Masukkan teks atau URL untuk membuat QRCode.', 'error');
-                    downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height); return;
-                }
+                const text = qrTextInput.value.trim(); const label = qrLabelInput.value.trim(); const size = parseInt(qrSizeInput.value) || 200;
+                if (!text) { showMessage('qr-message', 'Masukkan teks atau URL.', 'error'); downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height); return; }
                 showMessage('qr-message', 'Membuat QRCode...', 'info');
                 try {
-                    const tempCanvas = document.createElement('canvas');
-                    await QRCode.toCanvas(tempCanvas, text, { width: size, margin: 2, errorCorrectionLevel: 'H' });
+                    const tempCanvas = document.createElement('canvas'); await QRCode.toCanvas(tempCanvas, text, { width: size, margin: 2, errorCorrectionLevel: 'H' });
                     const qrImageWidth = tempCanvas.width; const qrImageHeight = tempCanvas.height;
                     let totalHeight = qrImageHeight; const labelHeight = label ? 30 : 0; const labelPadding = 10;
                     if (label) totalHeight += labelHeight + labelPadding;
                     qrcodeCanvas.width = qrImageWidth; qrcodeCanvas.height = totalHeight;
-                    qrCtx.fillStyle = '#ffffff'; qrCtx.fillRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
-                    qrCtx.drawImage(tempCanvas, 0, 0);
-                    if (label) {
-                        qrCtx.fillStyle = '#000000'; qrCtx.font = 'bold 16px Space Grotesk'; qrCtx.textAlign = 'center';
-                        qrCtx.fillText(label, qrImageWidth / 2, qrImageHeight + labelPadding + (labelHeight / 2) - 2); 
-                    }
-                    generatedQRDataUrl = qrcodeCanvas.toDataURL('image/png');
-                    downloadQrBtn.disabled = false; showMessage('qr-message', 'QRCode berhasil dibuat!', 'success');
-                } catch (err) {
-                    console.error('Error generating QR code:', err); showMessage('qr-message', 'Gagal membuat QRCode. Coba lagi.', 'error');
-                    downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height);
-                }
+                    qrCtx.fillStyle = '#ffffff'; qrCtx.fillRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height); qrCtx.drawImage(tempCanvas, 0, 0);
+                    if (label) { qrCtx.fillStyle = '#000000'; qrCtx.font = 'bold 16px Space Grotesk'; qrCtx.textAlign = 'center'; qrCtx.fillText(label, qrImageWidth / 2, qrImageHeight + labelPadding + (labelHeight / 2) - 2); }
+                    generatedQRDataUrl = qrcodeCanvas.toDataURL('image/png'); downloadQrBtn.disabled = false; showMessage('qr-message', 'QRCode berhasil dibuat!', 'success');
+                } catch (err) { console.error('Error QR:', err); showMessage('qr-message', 'Gagal membuat QRCode.', 'error'); downloadQrBtn.disabled = true; generatedQRDataUrl = null; qrCtx.clearRect(0, 0, qrcodeCanvas.width, qrcodeCanvas.height); }
             });
         }
         if (downloadQrBtn) {
             downloadQrBtn.addEventListener('click', () => {
                 if (generatedQRDataUrl) {
-                    const link = document.createElement('a');
-                    link.download = `qrcode_${(qrTextInput?.value.substring(0,20).replace(/\s/g,'_')) || 'ArdiWijaya'}.png`;
+                    const link = document.createElement('a'); link.download = `qrcode_${(qrTextInput?.value.substring(0,20).replace(/\s/g,'_')) || 'ArdiWijaya'}.png`;
                     link.href = generatedQRDataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    showMessage('qr-message', 'QRCode telah diunduh.', 'success');
-                } else { showMessage('qr-message', 'Buat QRCode terlebih dahulu.', 'error'); }
+                    showMessage('qr-message', 'QRCode diunduh.', 'success');
+                } else { showMessage('qr-message', 'Buat QRCode dulu.', 'error'); }
             });
         }
 
-        // --- Text Formatter ---
+        // --- Text Formatter (Existing Code) ---
         const textInput = document.getElementById('text-input');
         const textOutput = document.getElementById('text-output');
         const btnUppercase = document.getElementById('btn-uppercase');
@@ -410,47 +417,30 @@
         const saveTextBtn = document.getElementById('save-text-btn');
 
         function formatText(type) {
-            if (!textInput || !textOutput) return;
-            const inputText = textInput.value;
-            if (!inputText.trim()) { showMessage('text-formatter-message', 'Masukkan teks terlebih dahulu.', 'error'); return; }
-            let formattedText = '';
-            switch (type) {
-                case 'uppercase': formattedText = inputText.toUpperCase(); break;
-                case 'lowercase': formattedText = inputText.toLowerCase(); break;
-                case 'titlecase': formattedText = inputText.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()); break;
-            }
-            textOutput.value = formattedText; showMessage('text-formatter-message', 'Teks berhasil diformat!', 'success');
+            if (!textInput || !textOutput) return; const inputText = textInput.value;
+            if (!inputText.trim()) { showMessage('text-formatter-message', 'Masukkan teks.', 'error'); return; }
+            let ft = ''; switch (type) { case 'uppercase': ft = inputText.toUpperCase(); break; case 'lowercase': ft = inputText.toLowerCase(); break; case 'titlecase': ft = inputText.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()); break; }
+            textOutput.value = ft; showMessage('text-formatter-message', 'Teks diformat!', 'success');
         }
         if (btnUppercase) btnUppercase.addEventListener('click', () => formatText('uppercase'));
         if (btnLowercase) btnLowercase.addEventListener('click', () => formatText('lowercase'));
         if (btnTitlecase) btnTitlecase.addEventListener('click', () => formatText('titlecase'));
         if (copyTextBtn) {
             copyTextBtn.addEventListener('click', () => {
-                if (!textOutput) return; const outputText = textOutput.value;
-                if (!outputText.trim()) { showMessage('text-formatter-message', 'Tidak ada teks untuk disalin.', 'error'); return; }
-                try {
-                    const textArea = document.createElement("textarea"); textArea.value = outputText;
-                    textArea.style.position = "fixed"; document.body.appendChild(textArea);
-                    textArea.focus(); textArea.select(); document.execCommand('copy');
-                    document.body.removeChild(textArea); showMessage('text-formatter-message', 'Teks berhasil disalin!', 'success');
-                } catch (err) { console.error('Gagal menyalin: ', err); showMessage('text-formatter-message', 'Gagal menyalin.', 'error'); }
+                if (!textOutput) return; const ot = textOutput.value; if (!ot.trim()) { showMessage('text-formatter-message', 'Tidak ada teks.', 'error'); return; }
+                try { const ta = document.createElement("textarea"); ta.value = ot; ta.style.position = "fixed"; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showMessage('text-formatter-message', 'Teks disalin!', 'success');
+                } catch (err) { console.error('Gagal salin:', err); showMessage('text-formatter-message', 'Gagal menyalin.', 'error'); }
             });
         }
         if (saveTextBtn) {
             saveTextBtn.addEventListener('click', () => {
-                if (!textOutput) return; const outputText = textOutput.value;
-                if (!outputText.trim()) { showMessage('text-formatter-message', 'Tidak ada teks untuk disimpan.', 'error'); return; }
-                try {
-                    const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
-                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
-                    link.download = 'formatted_text_ArdiWijaya.txt';
-                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href); showMessage('text-formatter-message', 'Teks berhasil disimpan!', 'success');
-                } catch (err) { console.error('Gagal menyimpan: ', err); showMessage('text-formatter-message', 'Gagal menyimpan.', 'error'); }
+                if (!textOutput) return; const ot = textOutput.value; if (!ot.trim()) { showMessage('text-formatter-message', 'Tidak ada teks.', 'error'); return; }
+                try { const blob = new Blob([ot],{type:'text/plain;charset=utf-8'}); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download='formatted_text_ArdiWijaya.txt'; document.body.appendChild(link);link.click();document.body.removeChild(link); URL.revokeObjectURL(link.href); showMessage('text-formatter-message', 'Teks disimpan!', 'success');
+                } catch (err) { console.error('Gagal simpan:', err); showMessage('text-formatter-message', 'Gagal menyimpan.', 'error'); }
             });
         }
 
-        // --- Image Watermark Tool ---
+        // --- Image Watermark Tool (Existing Code) ---
         const watermarkUpload = document.getElementById('watermark-upload');
         const watermarkPreview = document.getElementById('watermark-preview');
         const watermarkPreviewPlaceholder = document.getElementById('watermark-preview-placeholder');
@@ -459,93 +449,142 @@
         const watermarkPositionSelect = document.getElementById('watermark-position');
         const watermarkScaleSlider = document.getElementById('watermark-scale');
         const scaleValueDisplay = document.getElementById('scale-value');
-
         const targetImageDropzone = document.getElementById('target-image-dropzone');
         const targetImagesUploadInput = document.getElementById('target-images-upload-input');
         const targetImagesPreviewArea = document.getElementById('target-images-preview-area');
         const pasteTargetImageBtn = document.getElementById('paste-target-image-btn');
         const processWatermarkBtn = document.getElementById('process-watermark-btn');
         const watermarkedResultsArea = document.getElementById('watermarked-results-area');
+        let watermarkImage = null; let watermarkOpacity = 1; let watermarkPosition = 'bottom-right'; let watermarkScale = 0.2; let targetImages = [];
 
-        let watermarkImage = null;
-        let watermarkOpacity = 1; // 0 to 1
-        let watermarkPosition = 'bottom-right';
-        let watermarkScale = 0.2; // 20%
-        let targetImages = []; // Array to store File objects or data URLs
-
-        function updateProcessButtonState() {
-            if (processWatermarkBtn) {
-                processWatermarkBtn.disabled = !(watermarkImage && targetImages.length > 0);
-            }
-        }
-
+        function updateWatermarkProcessButtonState() { if (processWatermarkBtn) processWatermarkBtn.disabled = !(watermarkImage && targetImages.length > 0); }
         if (watermarkUpload) {
             watermarkUpload.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file && file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        watermarkImage = new Image();
-                        watermarkImage.onload = () => { // Ensure image is loaded before using its dimensions
-                             updateProcessButtonState();
-                        };
-                        watermarkImage.src = e.target.result;
-                        if (watermarkPreview) {
-                            watermarkPreview.src = e.target.result;
-                            watermarkPreview.classList.remove('hidden');
-                        }
+                        watermarkImage = new Image(); watermarkImage.onload = () => updateWatermarkProcessButtonState(); watermarkImage.src = e.target.result;
+                        if (watermarkPreview) { watermarkPreview.src = e.target.result; watermarkPreview.classList.remove('hidden'); }
                         if (watermarkPreviewPlaceholder) watermarkPreviewPlaceholder.classList.add('hidden');
-                        showMessage('watermark-message', 'Gambar watermark dimuat.', 'success');
-                    }
-                    reader.readAsDataURL(file);
+                        showMessage('watermark-message', 'Watermark dimuat.', 'success');
+                    }; reader.readAsDataURL(file);
                 } else {
-                    watermarkImage = null;
-                    if (watermarkPreview) {
-                         watermarkPreview.src = "#";
-                         watermarkPreview.classList.add('hidden');
-                    }
+                    watermarkImage = null; if (watermarkPreview) { watermarkPreview.src = "#"; watermarkPreview.classList.add('hidden'); }
                     if (watermarkPreviewPlaceholder) watermarkPreviewPlaceholder.classList.remove('hidden');
-                    showMessage('watermark-message', 'Pilih file gambar untuk watermark.', 'error');
-                    updateProcessButtonState();
+                    showMessage('watermark-message', 'Pilih file gambar.', 'error'); updateWatermarkProcessButtonState();
                 }
             });
         }
-
-        if (watermarkOpacitySlider && opacityValueDisplay) {
-            watermarkOpacitySlider.addEventListener('input', (event) => {
-                watermarkOpacity = parseInt(event.target.value) / 100;
-                opacityValueDisplay.textContent = event.target.value;
+        if (watermarkOpacitySlider && opacityValueDisplay) { watermarkOpacitySlider.addEventListener('input', (event) => { watermarkOpacity = parseInt(event.target.value) / 100; opacityValueDisplay.textContent = event.target.value; });}
+        if (watermarkScaleSlider && scaleValueDisplay) { watermarkScaleSlider.addEventListener('input', (event) => { watermarkScale = parseInt(event.target.value) / 100; scaleValueDisplay.textContent = event.target.value; });}
+        if (watermarkPositionSelect) { watermarkPositionSelect.addEventListener('change', (event) => { watermarkPosition = event.target.value; });}
+        
+        function addWatermarkTargetImage(file, source = 'upload') {
+            if (!file.type.startsWith('image/')) { showMessage('watermark-message', `File ${file.name} bukan gambar.`, 'error'); return; }
+            if (file.size > 5 * 1024 * 1024) { showMessage('watermark-message', `File ${file.name} > 5MB.`, 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageId = `target-${Date.now()}-${Math.random().toString(36).substring(2,7)}`;
+                targetImages.push({ id: imageId, file: file, dataUrl: e.target.result, name: file.name });
+                const pContainer = document.createElement('div'); pContainer.className = 'preview-img-container border border-zinc-300 rounded-md shadow-sm'; pContainer.id = `container-${imageId}`;
+                const img = document.createElement('img'); img.src = e.target.result; img.alt = `[Pratinjau ${file.name}]`; img.className = 'preview-img';
+                const rmvBtn = document.createElement('button'); rmvBtn.className = 'remove-img-btn'; rmvBtn.innerHTML = '&times;';
+                rmvBtn.onclick = () => { targetImages = targetImages.filter(imgObj => imgObj.id !== imageId); document.getElementById(`container-${imageId}`)?.remove(); updateWatermarkProcessButtonState(); };
+                pContainer.appendChild(img); pContainer.appendChild(rmvBtn);
+                if(targetImagesPreviewArea) targetImagesPreviewArea.appendChild(pContainer);
+                updateWatermarkProcessButtonState();
+            }; reader.readAsDataURL(file);
+        }
+        if (targetImagesUploadInput) { targetImagesUploadInput.addEventListener('change', (event) => { Array.from(event.target.files).forEach(f => addWatermarkTargetImage(f)); event.target.value = null; });}
+        if (targetImageDropzone) {
+            targetImageDropzone.addEventListener('dragover', (event) => { event.preventDefault(); targetImageDropzone.classList.add('dropzone-active'); });
+            targetImageDropzone.addEventListener('dragleave', () => targetImageDropzone.classList.remove('dropzone-active'));
+            targetImageDropzone.addEventListener('drop', (event) => { event.preventDefault(); targetImageDropzone.classList.remove('dropzone-active'); if (event.dataTransfer.files) Array.from(event.dataTransfer.files).forEach(f => addWatermarkTargetImage(f, 'drop')); });
+        }
+        if (pasteTargetImageBtn) {
+            pasteTargetImageBtn.addEventListener('click', async () => {
+                 try {
+                    const clipboardItems = await navigator.clipboard.read(); let found = false;
+                    for (const item of clipboardItems) { for (const type of item.types) { if (type.startsWith("image/")) { const blob = await item.getType(type); const fileName = `clipboard-${Date.now()}.${blob.type.split('/')[1]||'png'}`; addWatermarkTargetImage(new File([blob],fileName,{type:blob.type}), 'paste'); found=true;}}}
+                    if(found) showMessage('watermark-message', 'Gambar dari clipboard ditambah.', 'success'); else showMessage('watermark-message', 'Tidak ada gambar di clipboard.', 'info');
+                } catch (err) { console.error("Error paste:", err); showMessage('watermark-message', 'Gagal tempel dari clipboard.', 'error');}
+            });
+        }
+        if (processWatermarkBtn) {
+            processWatermarkBtn.addEventListener('click', async () => {
+                if (!watermarkImage || targetImages.length === 0) { showMessage('watermark-message', 'Unggah watermark & gambar target.', 'error'); return; }
+                processWatermarkBtn.disabled = true; processWatermarkBtn.textContent = 'Memproses...';
+                if(watermarkedResultsArea) watermarkedResultsArea.innerHTML = '<p class="text-center text-zinc-500">Memproses...</p>';
+                let processedCount = 0;
+                for (const target of targetImages) {
+                    const targetImg = new Image();
+                    targetImg.onload = () => {
+                        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); canvas.width = targetImg.naturalWidth; canvas.height = targetImg.naturalHeight; ctx.drawImage(targetImg, 0, 0);
+                        const wmNW = watermarkImage.naturalWidth; const wmNH = watermarkImage.naturalHeight; let wmDW, wmDH;
+                        wmDW = canvas.width * watermarkScale; wmDH = (wmNH / wmNW) * wmDW;
+                        if (wmDH > canvas.height * 0.9) { wmDH = canvas.height * 0.9 * watermarkScale; wmDW = (wmNW / wmNH) * wmDH; }
+                        let pX, pY; const pad = canvas.width * 0.02;
+                        switch (watermarkPosition) {
+                            case 'top-left': pX=pad; pY=pad; break; case 'top-right': pX=canvas.width-wmDW-pad; pY=pad; break;
+                            case 'bottom-left': pX=pad; pY=canvas.height-wmDH-pad; break; case 'center': pX=(canvas.width-wmDW)/2; pY=(canvas.height-wmDH)/2; break;
+                            case 'tile': break; default: pX=canvas.width-wmDW-pad; pY=canvas.height-wmDH-pad; break;
+                        }
+                        ctx.globalAlpha = watermarkOpacity;
+                        if (watermarkPosition === 'tile') {
+                            const pCan = document.createElement('canvas'); const pCtx = pCan.getContext('2d'); let tileW = canvas.width*0.25; let tileH=(wmNH/wmNW)*tileW;
+                            pCan.width=tileW+pad*2; pCan.height=tileH+pad*2; pCtx.drawImage(watermarkImage,pad,pad,tileW,tileH); ctx.fillStyle=ctx.createPattern(pCan,'repeat'); ctx.fillRect(0,0,canvas.width,canvas.height);
+                        } else { ctx.drawImage(watermarkImage, pX, pY, wmDW, wmDH); }
+                        ctx.globalAlpha = 1.0;
+                        const resUrl = canvas.toDataURL(target.file.type==='image/png'?'image/png':'image/jpeg');
+                        if (processedCount === 0 && watermarkedResultsArea) watermarkedResultsArea.innerHTML = '';
+                        const resCont = document.createElement('div'); resCont.className='p-4 border border-zinc-200 rounded-md shadow-sm bg-zinc-50';
+                        const resImg = document.createElement('img'); resImg.src=resUrl; resImg.alt=`[Hasil ${target.name}]`; resImg.className='max-w-full h-auto rounded mb-2 mx-auto block max-h-60 object-contain';
+                        const dlLink = document.createElement('a'); dlLink.href=resUrl; dlLink.download=`watermarked_${target.name}`; dlLink.className='block w-full text-center bg-black text-white px-4 py-2 rounded-md hover:bg-zinc-800 transition-colors text-sm'; dlLink.textContent=`Unduh ${target.name}`;
+                        resCont.appendChild(resImg); resCont.appendChild(dlLink); if(watermarkedResultsArea) watermarkedResultsArea.appendChild(resCont);
+                        processedCount++; if (processedCount === targetImages.length) { processWatermarkBtn.disabled = false; processWatermarkBtn.textContent = 'Beri Watermark & Unduh'; showMessage('watermark-message', 'Semua gambar diproses!', 'success'); }
+                    };
+                    targetImg.onerror = () => { console.error(`Gagal muat: ${target.name}`); showMessage('watermark-message', `Gagal muat ${target.name}`, 'error'); processedCount++; if (processedCount === targetImages.length) { processWatermarkBtn.disabled = false; processWatermarkBtn.textContent = 'Beri Watermark & Unduh'; }};
+                    targetImg.src = target.dataUrl;
+                }
             });
         }
         
-        if (watermarkScaleSlider && scaleValueDisplay) {
-            watermarkScaleSlider.addEventListener('input', (event) => {
-                watermarkScale = parseInt(event.target.value) / 100;
-                scaleValueDisplay.textContent = event.target.value;
-            });
+        // --- Image Converter Tool ---
+        const converterImageDropzone = document.getElementById('converter-image-dropzone');
+        const converterImagesUploadInput = document.getElementById('converter-images-upload-input');
+        const converterImagesPreviewArea = document.getElementById('converter-images-preview-area');
+        const pasteConverterImageBtn = document.getElementById('paste-converter-image-btn');
+        const converterOutputFormatSelect = document.getElementById('converter-output-format');
+        const converterJpgQualityContainer = document.getElementById('converter-jpg-quality-container');
+        const converterJpgQualitySlider = document.getElementById('converter-jpg-quality');
+        const jpgQualityValueDisplay = document.getElementById('jpg-quality-value');
+        const processConversionBtn = document.getElementById('process-conversion-btn');
+        const convertedResultsArea = document.getElementById('converted-results-area');
+
+        let converterTargetImages = []; // Array for images to be converted
+
+        function updateConversionProcessButtonState() {
+            if (processConversionBtn) {
+                processConversionBtn.disabled = !(converterTargetImages.length > 0);
+            }
         }
 
-
-        if (watermarkPositionSelect) {
-            watermarkPositionSelect.addEventListener('change', (event) => {
-                watermarkPosition = event.target.value;
-            });
-        }
-
-        function addTargetImage(file) {
+        function addConverterTargetImage(file, source = 'upload') {
             if (!file.type.startsWith('image/')) {
-                showMessage('watermark-message', `File ${file.name} bukan gambar.`, 'error');
+                showMessage('converter-message', `File ${file.name} bukan gambar.`, 'error');
                 return;
             }
             if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                 showMessage('watermark-message', `File ${file.name} terlalu besar (maks 5MB).`, 'error');
+                 showMessage('converter-message', `File ${file.name} terlalu besar (maks 5MB).`, 'error');
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                const imageId = `target-${Date.now()}-${Math.random().toString(36).substring(2,7)}`;
-                targetImages.push({ id: imageId, file: file, dataUrl: e.target.result, name: file.name });
+                const imageId = `converter-target-${Date.now()}-${Math.random().toString(36).substring(2,7)}`;
+                // Simpan file asli untuk konversi, dan dataUrl untuk preview
+                converterTargetImages.push({ id: imageId, file: file, dataUrl: e.target.result, name: file.name });
                 
                 const previewContainer = document.createElement('div');
                 previewContainer.className = 'preview-img-container border border-zinc-300 rounded-md shadow-sm';
@@ -560,190 +599,142 @@
                 removeBtn.className = 'remove-img-btn';
                 removeBtn.innerHTML = '&times;';
                 removeBtn.onclick = () => {
-                    targetImages = targetImages.filter(imgObj => imgObj.id !== imageId);
+                    converterTargetImages = converterTargetImages.filter(imgObj => imgObj.id !== imageId);
                     document.getElementById(`container-${imageId}`)?.remove();
-                    updateProcessButtonState();
+                    updateConversionProcessButtonState();
                 };
 
                 previewContainer.appendChild(img);
                 previewContainer.appendChild(removeBtn);
-                targetImagesPreviewArea.appendChild(previewContainer);
-                updateProcessButtonState();
+                if(converterImagesPreviewArea) converterImagesPreviewArea.appendChild(previewContainer);
+                updateConversionProcessButtonState();
             };
             reader.readAsDataURL(file);
         }
 
-        if (targetImagesUploadInput) {
-            targetImagesUploadInput.addEventListener('change', (event) => {
-                Array.from(event.target.files).forEach(addTargetImage);
-                event.target.value = null; // Reset input agar bisa upload file yang sama lagi
+        if (converterImagesUploadInput) {
+            converterImagesUploadInput.addEventListener('change', (event) => {
+                Array.from(event.target.files).forEach(f => addConverterTargetImage(f));
+                event.target.value = null; // Reset input
             });
         }
 
-        if (targetImageDropzone) {
-            targetImageDropzone.addEventListener('dragover', (event) => {
-                event.preventDefault();
-                targetImageDropzone.classList.add('dropzone-active');
+        if (converterImageDropzone) {
+            converterImageDropzone.addEventListener('dragover', (event) => { event.preventDefault(); converterImageDropzone.classList.add('dropzone-active'); });
+            converterImageDropzone.addEventListener('dragleave', () => converterImageDropzone.classList.remove('dropzone-active'));
+            converterImageDropzone.addEventListener('drop', (event) => {
+                event.preventDefault(); converterImageDropzone.classList.remove('dropzone-active');
+                if (event.dataTransfer.files) Array.from(event.dataTransfer.files).forEach(f => addConverterTargetImage(f, 'drop'));
             });
-            targetImageDropzone.addEventListener('dragleave', () => {
-                targetImageDropzone.classList.remove('dropzone-active');
-            });
-            targetImageDropzone.addEventListener('drop', (event) => {
-                event.preventDefault();
-                targetImageDropzone.classList.remove('dropzone-active');
-                if (event.dataTransfer.files) {
-                    Array.from(event.dataTransfer.files).forEach(addTargetImage);
-                }
+        }
+
+        if (pasteConverterImageBtn) {
+            pasteConverterImageBtn.addEventListener('click', async () => {
+                 try {
+                    const clipboardItems = await navigator.clipboard.read(); let found = false;
+                    for (const item of clipboardItems) { for (const type of item.types) { if (type.startsWith("image/")) { const blob = await item.getType(type); const fileName = `clipboard-${Date.now()}.${blob.type.split('/')[1]||'png'}`; addConverterTargetImage(new File([blob],fileName,{type:blob.type}), 'paste'); found=true;}}}
+                    if(found) showMessage('converter-message', 'Gambar dari clipboard ditambah.', 'success'); else showMessage('converter-message', 'Tidak ada gambar di clipboard.', 'info');
+                } catch (err) { console.error("Error paste converter:", err); showMessage('converter-message', 'Gagal tempel dari clipboard.', 'error');}
             });
         }
         
-        if (pasteTargetImageBtn) {
-            pasteTargetImageBtn.addEventListener('click', async () => {
-                 try {
-                    const clipboardItems = await navigator.clipboard.read();
-                    let foundImage = false;
-                    for (const item of clipboardItems) {
-                        for (const type of item.types) {
-                            if (type.startsWith("image/")) {
-                                const blob = await item.getType(type);
-                                const fileName = `clipboard-image-${Date.now()}.${blob.type.split('/')[1] || 'png'}`;
-                                const file = new File([blob], fileName, { type: blob.type });
-                                addTargetImage(file);
-                                foundImage = true;
-                            }
-                        }
-                    }
-                    if (foundImage) {
-                        showMessage('watermark-message', 'Gambar dari clipboard ditambahkan.', 'success');
-                    } else {
-                        showMessage('watermark-message', 'Tidak ada gambar ditemukan di clipboard.', 'info');
-                    }
-                } catch (err) {
-                    console.error("Error pasting from clipboard:", err);
-                    showMessage('watermark-message', 'Gagal menempel dari clipboard. Browser mungkin tidak mendukung atau izin ditolak.', 'error');
+        if (converterOutputFormatSelect && converterJpgQualityContainer) {
+            converterOutputFormatSelect.addEventListener('change', (event) => {
+                if (event.target.value === 'jpeg') {
+                    converterJpgQualityContainer.classList.remove('hidden');
+                } else {
+                    converterJpgQualityContainer.classList.add('hidden');
                 }
             });
         }
+        if (converterJpgQualitySlider && jpgQualityValueDisplay) {
+            converterJpgQualitySlider.addEventListener('input', (event) => {
+                jpgQualityValueDisplay.textContent = event.target.value;
+            });
+        }
 
-
-        if (processWatermarkBtn) {
-            processWatermarkBtn.addEventListener('click', async () => {
-                if (!watermarkImage || targetImages.length === 0) {
-                    showMessage('watermark-message', 'Unggah gambar watermark dan minimal satu gambar target.', 'error');
+        if (processConversionBtn) {
+            processConversionBtn.addEventListener('click', async () => {
+                if (converterTargetImages.length === 0) {
+                    showMessage('converter-message', 'Unggah minimal satu gambar untuk dikonversi.', 'error');
                     return;
                 }
-                processWatermarkBtn.disabled = true;
-                processWatermarkBtn.textContent = 'Memproses...';
-                watermarkedResultsArea.innerHTML = '<p class="text-center text-zinc-500">Sedang memproses gambar...</p>';
+                processConversionBtn.disabled = true;
+                processConversionBtn.textContent = 'Mengkonversi...';
+                if(convertedResultsArea) convertedResultsArea.innerHTML = '<p class="text-center text-zinc-500">Sedang mengkonversi gambar...</p>';
+
+                const outputFormat = converterOutputFormatSelect ? converterOutputFormatSelect.value : 'png';
+                const jpgQuality = converterJpgQualitySlider ? parseInt(converterJpgQualitySlider.value) / 100 : 0.9;
+                let mimeType = `image/${outputFormat}`;
+                if (outputFormat === 'jpg') mimeType = 'image/jpeg'; // common practice
 
                 let processedCount = 0;
-                for (const target of targetImages) {
-                    const targetImg = new Image();
-                    targetImg.onload = () => {
+                for (const imgObject of converterTargetImages) {
+                    const originalImage = new Image();
+                    originalImage.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        canvas.width = targetImg.naturalWidth;
-                        canvas.height = targetImg.naturalHeight;
-
-                        // 1. Gambar target
-                        ctx.drawImage(targetImg, 0, 0);
-
-                        // 2. Hitung ukuran dan posisi watermark
-                        const wmNaturalWidth = watermarkImage.naturalWidth;
-                        const wmNaturalHeight = watermarkImage.naturalHeight;
+                        canvas.width = originalImage.naturalWidth;
+                        canvas.height = originalImage.naturalHeight;
                         
-                        let wmDrawWidth, wmDrawHeight;
-                        // Skala berdasarkan lebar gambar target
-                        wmDrawWidth = canvas.width * watermarkScale;
-                        wmDrawHeight = (wmNaturalHeight / wmNaturalWidth) * wmDrawWidth;
-
-                        // Jika watermark yang diskalakan lebih tinggi dari gambar target, skala ulang berdasarkan tinggi
-                        if (wmDrawHeight > canvas.height * 0.9) { // Batasi max tinggi watermark 90% tinggi gambar
-                             wmDrawHeight = canvas.height * 0.9 * watermarkScale; // Terapkan scale juga
-                             wmDrawWidth = (wmNaturalWidth / wmNaturalHeight) * wmDrawHeight;
-                        }
-
-
-                        let posX, posY;
-                        const padding = canvas.width * 0.02; // 2% padding
-
-                        switch (watermarkPosition) {
-                            case 'top-left': posX = padding; posY = padding; break;
-                            case 'top-right': posX = canvas.width - wmDrawWidth - padding; posY = padding; break;
-                            case 'bottom-left': posX = padding; posY = canvas.height - wmDrawHeight - padding; break;
-                            case 'center': posX = (canvas.width - wmDrawWidth) / 2; posY = (canvas.height - wmDrawHeight) / 2; break;
-                            case 'tile': break; // Ditangani secara khusus
-                            case 'bottom-right':
-                            default:
-                                posX = canvas.width - wmDrawWidth - padding;
-                                posY = canvas.height - wmDrawHeight - padding;
-                                break;
-                        }
-                        
-                        ctx.globalAlpha = watermarkOpacity;
-
-                        if (watermarkPosition === 'tile') {
-                            // Ubin (Tile)
-                            const patternCanvas = document.createElement('canvas');
-                            const patternCtx = patternCanvas.getContext('2d');
-                            
-                            // Skala ubin agar tidak terlalu besar/kecil
-                            let tileWidth = canvas.width * 0.25; // Ubin sekitar 25% lebar gambar
-                            let tileHeight = (wmNaturalHeight / wmNaturalWidth) * tileWidth;
-
-                            patternCanvas.width = tileWidth + padding * 2; // Tambah padding antar ubin
-                            patternCanvas.height = tileHeight + padding * 2;
-                            
-                            patternCtx.drawImage(watermarkImage, padding, padding, tileWidth, tileHeight);
-                            ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
+                        // Jika format asli adalah PNG dan outputnya JPG, kita perlu mengisi background putih
+                        // karena JPG tidak mendukung transparansi.
+                        if ((imgObject.file.type === 'image/png' || imgObject.file.type === 'image/webp') && outputFormat === 'jpeg') {
+                            ctx.fillStyle = '#FFFFFF'; // Putih
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        } else {
-                             // Posisi tunggal
-                            ctx.drawImage(watermarkImage, posX, posY, wmDrawWidth, wmDrawHeight);
                         }
-                        ctx.globalAlpha = 1.0; // Reset alpha
-
-                        // Tampilkan hasil dan tombol unduh
-                        const resultDataUrl = canvas.toDataURL(target.file.type === 'image/png' ? 'image/png' : 'image/jpeg');
                         
-                        if (processedCount === 0) watermarkedResultsArea.innerHTML = ''; // Bersihkan pesan "memproses"
+                        ctx.drawImage(originalImage, 0, 0);
+
+                        let convertedDataUrl;
+                        if (outputFormat === 'jpeg') {
+                            convertedDataUrl = canvas.toDataURL(mimeType, jpgQuality);
+                        } else {
+                            convertedDataUrl = canvas.toDataURL(mimeType);
+                        }
+                        
+                        if (processedCount === 0 && convertedResultsArea) convertedResultsArea.innerHTML = ''; 
 
                         const resultContainer = document.createElement('div');
                         resultContainer.className = 'p-4 border border-zinc-200 rounded-md shadow-sm bg-zinc-50';
                         
                         const resultImg = document.createElement('img');
-                        resultImg.src = resultDataUrl;
-                        resultImg.alt = `[Hasil Watermark ${target.name}]`;
+                        resultImg.src = convertedDataUrl;
+                        resultImg.alt = `[Hasil Konversi ${imgObject.name}]`;
                         resultImg.className = 'max-w-full h-auto rounded mb-2 mx-auto block max-h-60 object-contain';
                         
+                        const originalFileNameParts = imgObject.name.split('.');
+                        originalFileNameParts.pop(); // Hapus ekstensi lama
+                        const baseName = originalFileNameParts.join('.');
+                        const newFileName = `${baseName}.${outputFormat}`;
+
                         const downloadLink = document.createElement('a');
-                        downloadLink.href = resultDataUrl;
-                        downloadLink.download = `watermarked_${target.name}`;
+                        downloadLink.href = convertedDataUrl;
+                        downloadLink.download = newFileName;
                         downloadLink.className = 'block w-full text-center bg-black text-white px-4 py-2 rounded-md hover:bg-zinc-800 transition-colors text-sm';
-                        downloadLink.textContent = `Unduh ${target.name}`;
+                        downloadLink.textContent = `Unduh ${newFileName}`;
                         
                         resultContainer.appendChild(resultImg);
                         resultContainer.appendChild(downloadLink);
-                        watermarkedResultsArea.appendChild(resultContainer);
+                        if(convertedResultsArea) convertedResultsArea.appendChild(resultContainer);
                         
                         processedCount++;
-                        if (processedCount === targetImages.length) {
-                            processWatermarkBtn.disabled = false;
-                            processWatermarkBtn.textContent = 'Beri Watermark & Unduh';
-                            showMessage('watermark-message', 'Semua gambar berhasil diproses!', 'success');
+                        if (processedCount === converterTargetImages.length) {
+                            processConversionBtn.disabled = false;
+                            processConversionBtn.textContent = 'Konversi & Unduh';
+                            showMessage('converter-message', 'Semua gambar berhasil dikonversi!', 'success');
                         }
                     };
-                    targetImg.onerror = () => {
-                         console.error(`Gagal memuat gambar target: ${target.name}`);
-                         showMessage('watermark-message', `Gagal memuat gambar target: ${target.name}`, 'error');
+                    originalImage.onerror = () => {
+                         console.error(`Gagal memuat gambar untuk konversi: ${imgObject.name}`);
+                         showMessage('converter-message', `Gagal memuat gambar: ${imgObject.name}`, 'error');
                          processedCount++;
-                         if (processedCount === targetImages.length) {
-                            processWatermarkBtn.disabled = false;
-                            processWatermarkBtn.textContent = 'Beri Watermark & Unduh';
+                         if (processedCount === converterTargetImages.length) {
+                            processConversionBtn.disabled = false;
+                            processConversionBtn.textContent = 'Konversi & Unduh';
                          }
                     };
-                    targetImg.src = target.dataUrl;
+                    originalImage.src = imgObject.dataUrl; // Gunakan dataUrl untuk menggambar ke canvas
                 }
             });
         }
