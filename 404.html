@@ -3,335 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Tidak Ditemukan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Useless Page - Nothing There</title>
+    <!-- Impor Font Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: #ffffff; 
-            color: #000000; 
+            background-color: #0d0d0d;
+            color: #a0a0a0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
-            text-align: center;
-            padding: 20px; 
-            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
         }
 
-        .container {
-            width: 95%; 
-            max-width: 800px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0 10px; 
-        }
-
-        h1 {
-            line-height: 1.1; 
-            margin-top: 0;
-            margin-bottom: 15px; 
-            color: #000000; 
-            position: relative; 
-            word-break: normal; 
-        }
-
-        .digit {
-            display: inline-block;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        #interactive-zero {
-            cursor: pointer;
-            position: relative; 
-        }
-        
-        #interactive-zero:hover {
-            transform: scale(1.05); 
-            color: #2c2c2c; 
-        }
-
-        .message {
-            font-size: clamp(1rem, 2vw, 1.25rem); 
-            font-weight: 400; 
-            margin-top: 0px; 
-            margin-bottom: 30px; 
-            color: #2a2a2a; 
-            letter-spacing: 0.5px;
-            max-width: 90%; 
-        }
-        
-        .hidden-message {
+        .background-alien-text {
             position: absolute;
-            bottom: 100%; 
-            left: 50%;
-            transform: translateX(-50%) translateY(-5px); 
-            background-color: #000000;
-            color: #ffffff;
-            padding: 3px 7px; 
-            border-radius: 3px;
-            font-size: 0.7rem; 
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-            pointer-events: none; 
-        }
-
-        #interactive-zero:hover .hidden-message {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(-8px); 
-        }
-
-        .home-button {
-            display: inline-block;
-            padding: 10px 25px; 
-            background-color: #000000; 
-            color: #ffffff; 
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 700; 
-            font-size: clamp(0.85rem, 1.8vw, 1rem); 
-            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            border: 2px solid #000000; 
-            position: relative; /* Untuk efek ledakan */
-            overflow: hidden; /* Untuk efek ledakan */
-        }
-
-        .home-button:hover {
-            background-color: #ffffff; 
-            color: #000000; 
-            transform: translateY(-3px) scale(1.03); 
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .home-button.is-exploding {
-            animation: explosionEffect 0.4s forwards;
-        }
-
-        @keyframes explosionEffect {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.2);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
-        }
-
-
-        p, a, div { 
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        /* Game Styling */
-        .game-container {
-            margin-top: 2.5rem; 
-            padding-top: 1.5rem; 
-            border-top-width: 1px;
-            border-color: #d1d5db; 
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            font-size: 10px;
+            line-height: 1.2;
+            color: #1a1a1a;
+            overflow: hidden;
+            z-index: -1;
+            user-select: none;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: justify;
+            opacity: 0.7;
+        }
+
+        .background-alien-text .keyword {
+            color: #2c2c2c;
+            font-weight: bold;
+        }
+
+        .content-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative; /* Menjadikan game-container sebagai parent untuk overlay */
+            position: relative;
+            z-index: 1;
         }
 
-        #gameArea {
-            width: 256px; 
-            height: 256px; 
-            background-color: #f3f4f6; 
-            border-width: 1px;
-            border-color: #9ca3af; 
-            cursor: crosshair; 
-            position: relative; /* Tetap relative untuk penempatan piksel */
-            border-radius: 0.25rem; 
-            overflow: hidden; 
+        .static-clock {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #00ff99;
+            background-color: rgba(10, 30, 20, 0.75);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid #00cc77;
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.4), 0 0 30px rgba(0, 255, 153, 0.3);
+            white-space: nowrap;
+            user-select: none;
+            cursor: default;
+            margin-bottom: 20px;
         }
 
-        #hiddenPixel {
+        .static-clock.pulse {
+            animation: clockPulse 0.5s ease-out;
+        }
+
+        @keyframes clockPulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 153, 0.4), 0 0 30px rgba(0, 255, 153, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 153, 0.6), 0 0 45px rgba(0, 255, 153, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 255, 153, 0.4), 0 0 30px rgba(0, 255, 153, 0.3); }
+        }
+
+        .nothing-there {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #00ff99;
+            user-select: none;
+        }
+
+        .back-to-earth-text-link { /* Menggantikan .back-to-earth-button */
+            margin-top: 25px; /* Sedikit lebih banyak ruang */
+            font-size: 1.1rem; /* Sedikit lebih besar */
+            font-weight: 500;
+            color: #00ff99;
+            text-decoration: none;
+            padding: 5px 10px; /* Sedikit padding agar mudah diklik */
+            border-radius: 4px;
+            transition: color 0.3s, background-color 0.3s, text-shadow 0.3s;
+        }
+
+        .back-to-earth-text-link:hover {
+            color: #1a1a1a; /* Warna teks lebih gelap saat hover */
+            background-color: #00ff99; /* Latar hijau neon */
+            text-shadow: 0 0 5px #00ff99;
+        }
+
+        .floating-alien-head {
             position: absolute;
-            width: 9px; 
-            height: 9px; 
-            background-color: #e5e7eb; 
-            transition: background-color 0.2s ease; 
+            z-index: 5;
+            user-select: none;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 10px #00e676);
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: transform 0.2s ease-out;
         }
-        #hiddenPixel:hover{
-             background-color: #9ca3af; 
-        }
-
-        /* Efek layar biru saat piksel ditemukan */
-        .pixel-found-overlay {
-            position: absolute; /* Diubah dari fixed ke absolute */
-            /* top, left, width, height akan diatur oleh JavaScript */
-            background-color: rgba(59, 130, 246, 0.7); 
-            z-index: 10; /* Z-index disesuaikan, tidak perlu setinggi sebelumnya */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: scale(0.5);
-            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease-out;
-            pointer-events: none; 
-            border-radius: 0.25rem; /* Menyamakan border-radius dengan gameArea */
-        }
-        .pixel-found-overlay.active {
-            opacity: 1;
-            transform: scale(1);
+        .floating-alien-head.kaboom-active {
+            animation: alienHeadKaboomEffect 0.5s ease-out forwards;
         }
 
+        @keyframes alienHeadKaboomEffect {
+            0% { transform: scale(1); opacity: 0.7; filter: drop-shadow(0 0 10px #00e676); }
+            25% { transform: scale(1.3) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 20px #ff3300); }
+            50% { transform: scale(0.8) rotate(-10deg); opacity: 0.5; }
+            75% { transform: scale(1.5) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 30px #ff9933); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .alien-signal-beacon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 25px;
+            height: 25px;
+            background-color: #4a007a;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse-beacon 2s infinite ease-in-out;
+            box-shadow: 0 0 10px #7f00ff, 0 0 20px #7f00ff;
+        }
+        .alien-signal-beacon:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 15px #ab47bc, 0 0 30px #ab47bc;
+            animation-play-state: paused;
+        }
+
+        @keyframes pulse-beacon {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        .alien-transmission-message {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1a0033;
+            color: #cc99ff;
+            padding: 25px 35px;
+            border-radius: 10px;
+            border: 2px solid #6a0099;
+            box-shadow: 0 0 20px rgba(128, 0, 255, 0.5), 0 0 30px rgba(128, 0, 255, 0.3);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            z-index: 1001;
+            text-align: center;
+            max-width: 85%;
+            user-select: none;
+        }
+        
+        .alien-transmission-message.show {
+            display: block;
+            animation: fadeInTransmission 0.7s ease-out forwards;
+        }
+
+        .alien-transmission-message.explode {
+            animation: explodeTransmission 0.5s ease-out forwards;
+        }
+
+        .alien-transmission-message strong {
+            color: #e6ccff;
+            font-weight: 700;
+        }
+
+        @keyframes fadeInTransmission {
+            from { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @keyframes explodeTransmission {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+
+        #alienHeadExplosionMessage {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 60%;
+            transform: translateX(-50%);
+            padding: 20px 30px;
+            background-color: #ff3d00;
+            color: #fff;
+            border: 2px solid #dd2c00;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1005;
+            box-shadow: 0 0 25px rgba(255, 61, 0, 0.7), 0 0 40px rgba(255, 61, 0, 0.5);
+            /* Animasi akan di-trigger oleh JavaScript untuk memastikan replay */
+        }
+
+        #alienHeadExplosionMessage.show-explosion-message {
+             animation: fadeInExplosionMessage 0.3s ease-out forwards,
+                         fadeOutExplosionMessage 0.5s ease-in 3.5s forwards;
+        }
+
+
+        @keyframes fadeInExplosionMessage {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOutExplosionMessage {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        @media (max-width: 768px) {
+            .static-clock {
+                font-size: 2rem;
+                padding: 10px 15px;
+            }
+            .nothing-there {
+                font-size: 2.5rem;
+            }
+            .back-to-earth-text-link {
+                font-size: 1rem;
+            }
+            .floating-alien-head {
+                width: 45px;
+                height: 45px;
+            }
+             #alienHeadExplosionMessage {
+                font-size: 1rem;
+                padding: 15px 20px;
+                max-width: 80%;
+             }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold">
-            <span class="digit">4</span><span class="digit" id="interactive-zero">0<span class="hidden-message">Pssst!</span></span><span class="digit">4</span>
-        </h1>
-        <p class="message">Halaman yang Anda cari sepertinya menguap ke antah berantah.</p>
-        <a href="/" class="home-button" id="homeButton">Kembali ke Stasiun Utama</a>
-
-        <!-- Game Container -->
-        <div class="game-container" id="gameContainer">
-            <p class="text-sm text-gray-700 mb-3 font-medium">Game Mini: Cari Piksel Hilang!</p>
-            <div id="gameArea">
-                <div id="hiddenPixel"></div>
-            </div>
-            <p id="gameMessage" class="text-xs text-gray-600 mt-3 h-4">Klik di area abu-abu untuk menemukan piksel yang hampir tak terlihat.</p> 
-            <p id="gameScore" class="text-sm font-semibold mt-1">Ditemukan: <span id="scoreCount">0</span></p>
-            <!-- Elemen untuk efek layar biru, dipindahkan ke dalam game-container -->
-            <div id="pixelFoundEffect" class="pixel-found-overlay"></div>
-        </div>
+    <div class="background-alien-text" id="backgroundAlienTextContainer">
+        <!-- Teks akan diisi oleh JavaScript -->
     </div>
+
+    <div class="content-wrapper">
+        <div id="staticClock" class="static-clock">Memuat...</div>
+        <div class="nothing-there">Nothing There</div>
+        <!-- Tombol diubah menjadi teks link biasa -->
+        <a href="/" id="backToEarthLink" class="back-to-earth-text-link">Back to Earth</a>
+    </div>
+
+    <svg id="floatingAlienHead" class="floating-alien-head" width="60" height="60" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#76ff03" d="M50,5 A20,28 0 0,0 50,61 A20,28 0 0,0 50,5 M35,25 A5,8 0 1,1 25,25 A5,8 0 1,1 35,25 M75,25 A5,8 0 1,1 65,25 A5,8 0 1,1 75,25 M20,50 C20,65 30,75 50,75 C70,75 80,65 80,50 C80,40 75,30 70,25 C65,30 60,40 60,50 C60,55 55,60 50,60 C45,60 40,55 40,50 C40,40 35,30 30,25 C25,30 20,40 20,50Z"/>
+        <path fill="#000" d="M30,30 A3,5 0 1,1 24,30 A3,5 0 1,1 30,30 M70,30 A3,5 0 1,1 64,30 A3,5 0 1,1 70,30"/>
+    </svg>
+
+    <div id="alienBeacon" class="alien-signal-beacon" title="Sinyal Tak Dikenal..."></div>
+    <div id="alienMessage" class="alien-transmission-message">
+        <strong>-- TRANSMISI INTERGALAKTIK DITERIMA --</strong><br><br>
+        Unit 734 melaporkan: Planet 'Bumi' terdeteksi. Mayoritas penghuni terobsesi dengan layar bercahaya persegi dan cairan pahit berwarna gelap.<br>
+        Eksplorasi lebih lanjut... mungkin tidak diperlukan. Data sudah cukup 'tidak berguna'.<br><br>
+        <em>Sinyal berakhir. Kembali ke kehampaan.</em>
+    </div>
+
+    <div id="alienHeadExplosionMessage">Pesan acak akan muncul di sini!</div>
 
 
     <script>
-        // Easter egg untuk angka 0
-        const interactiveZero = document.getElementById('interactive-zero');
-        let originalZeroText = '0';
-        let zeroClickCount = 0; 
+        const staticClockElement = document.getElementById('staticClock');
+        const alienHeadElement = document.getElementById('floatingAlienHead');
+        const backgroundTextContainer = document.getElementById('backgroundAlienTextContainer');
+        // const backToEarthBtn = document.getElementById('backToEarthBtn'); // Tidak lagi digunakan
+        const alienHeadExplosionMessageElement = document.getElementById('alienHeadExplosionMessage');
 
-        interactiveZero.addEventListener('click', () => {
-            zeroClickCount++;
+        const randomAlienMessages = [
+            "Zzzt! Sinyal terganggu oleh pikiranmu!",
+            "KABOOM! Itu tadi kepala suku kami!",
+            "Ups... kamu menemukan tombol penghancur diri.",
+            "Selamat! Anda memenangkan perjalanan sekali jalan ke Sektor Gamma!",
+            "Mereka tahu kamu di sini sekarang...",
+            "Energi aneh terdeteksi. Mungkin sisa sarapanmu?",
+            "Pesan ini akan hancur sendiri dalam 3... 2... 1...",
+            "Apakah kamu benar-benar mengklik kepala alien hijau yang melayang?",
+            "Untuk informasi lebih lanjut, silakan hubungi agen antar-galaksi terdekat (jika ada).",
+            "Jangan sentuh itu lagi! Itu sensitif!"
+        ];
+
+        // Event listener untuk backToEarthBtn tidak lagi diperlukan karena tautan HTML biasa
+        // backToEarthBtn.addEventListener('click', (e) => { ... });
+
+        function generateAlienBackgroundText() {
+            const keywords = ["sinyal", "kosmos", "eksplorasi", "spesies tak dikenal", "artefak kuno", "dimensi lain", "hyperdrive", "galaksi Andromeda", "kode terenkripsi", "peradaban hilang", "rahasia alam semesta", "UFO", "alien", "portal antarbintang", "anomali", "probe", "cryosleep", "terraform", "bintang neutron", "lubang cacing", "frekuensi misterius", "pesan dari bintang", "teknologi canggih", "jejak kosmik", "entitas", "singularitas", "nebula", "quasar", "eksoplanet", "zona huni"];
+            let text = "";
+            const repetitions = Math.ceil((window.innerWidth * window.innerHeight) / 1200);
+            for (let i = 0; i < repetitions; i++) {
+                text += "Transmisi terdeteksi... menganalisis data... ";
+                text += "Pola energi tidak biasa dari sektor 7G. ";
+                text += `Mungkinkah ini <span class="keyword">${keywords[Math.floor(Math.random() * keywords.length)]}</span>? `;
+                text += "Koordinat terkunci. Memulai pemindaian mendalam. ";
+                text += `Sebuah <span class="keyword">${keywords[Math.floor(Math.random() * keywords.length)]}</span> ditemukan dekat anomali gravitasi. `;
+                text += "Data terfragmentasi... mencoba rekonstruksi... ";
+                text += `Ini adalah <span class="keyword">${keywords[Math.floor(Math.random() * keywords.length)]}</span>, bukan buatan manusia. `;
+                text += "Log kapal mencatat perjalanan melalui <span class=\"keyword\">lubang cacing</span> menuju <span class=\"keyword\">galaksi Andromeda</span>. ";
+                text += "Pesan terenkripsi... <span class=\"keyword\">kode</span> terlalu kompleks. ";
+                text += "Mereka mencari <span class=\"keyword\">rahasia alam semesta</span>. ";
+            }
+            backgroundTextContainer.innerHTML = text;
+        }
+        generateAlienBackgroundText();
+
+        let lastSecond = -1;
+        function updateLiveTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            staticClockElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+            if (seconds !== lastSecond) {
+                staticClockElement.classList.remove('pulse');
+                void staticClockElement.offsetWidth; 
+                staticClockElement.classList.add('pulse');
+                lastSecond = seconds;
+            }
+        }
+        setInterval(updateLiveTime, 200);
+        updateLiveTime();
+
+        function createFloatingObject(element, initialSpeedMultiplier = 1, isAlienHead = false) {
+            if (!element || !(element instanceof Element)) {
+                console.error("Elemen untuk animasi melayang tidak valid atau bukan instance dari Element:", element);
+                return { updateOnResize: () => {}, explodeAndReset: () => {} };
+            }
             
-            interactiveZero.style.transition = 'transform 0.15s ease-out, color 0.15s ease-out'; 
-            interactiveZero.style.transform = 'scale(0.9) rotate(-5deg)'; 
-            setTimeout(() => {
-                interactiveZero.style.transform = 'scale(1) rotate(0deg)';
-            }, 150);
+            let x, y, dx, dy;
+            let isVisible = true;
 
-            if (zeroClickCount === 1) {
-                interactiveZero.childNodes[0].nodeValue = '?'; 
-                console.log("Easter Egg Level 1: Penasaran, ya?");
-            } else if (zeroClickCount === 2) {
-                interactiveZero.childNodes[0].nodeValue = '๏'; 
-                console.log("Easter Egg Level 2: Memasuki dimensi lain?");
-            } else if (zeroClickCount === 3) {
-                interactiveZero.childNodes[0].nodeValue = '👽';
-                console.log("Easter Egg Level 3: Kita tidak sendiri!");
+            function initializePositionAndSpeed() {
+                const elWidth = element.offsetWidth || parseInt(element.getAttribute('width')) || 50;
+                const elHeight = element.offsetHeight || parseInt(element.getAttribute('height')) || 50;
+                x = Math.random() * (window.innerWidth - elWidth);
+                y = Math.random() * (window.innerHeight - elHeight);
+                dx = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 0.8 + 0.2) * initialSpeedMultiplier;
+                dy = (Math.random() < 0.5 ? -1 : 1) * (Math.random() * 0.8 + 0.2) * initialSpeedMultiplier;
+                element.style.opacity = isAlienHead ? '0.7' : '1';
+                element.style.transform = 'scale(1)';
+                isVisible = true;
             }
-            else {
-                interactiveZero.childNodes[0].nodeValue = originalZeroText;
-                zeroClickCount = 0; 
-                console.log("Kembali ke realita... untuk saat ini.");
+            
+            function move() {
+                if (!isVisible) {
+                    requestAnimationFrame(move);
+                    return;
+                }
+                const elWidth = element.offsetWidth || parseInt(element.getAttribute('width')) || 50;
+                const elHeight = element.offsetHeight || parseInt(element.getAttribute('height')) || 50;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+
+                if (typeof x === 'undefined') { 
+                    initializePositionAndSpeed();
+                }
+
+                x += dx;
+                y += dy;
+
+                if (x + elWidth >= windowWidth || x <= 0) {
+                    dx *= -1;
+                    x = Math.max(0, Math.min(x, windowWidth - elWidth));
+                }
+                if (y + elHeight >= windowHeight || y <= 0) {
+                    dy *= -1;
+                    y = Math.max(0, Math.min(y, windowHeight - elHeight));
+                }
+
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
+                requestAnimationFrame(move);
             }
-        });
+            
+            function startMovingWhenReady() {
+                const hasDimensions = (element.offsetWidth > 0 && element.offsetHeight > 0) || 
+                                      (element.tagName.toLowerCase() === 'svg' && element.getAttribute('width') && element.getAttribute('height'));
+                if (hasDimensions) {
+                    initializePositionAndSpeed();
+                    move();
+                } else {
+                    setTimeout(startMovingWhenReady, 150);
+                }
+            }
+            startMovingWhenReady();
+            
+            return {
+                updateOnResize: () => {
+                    if (typeof x === 'undefined') return;
+                    const elWidth = element.offsetWidth || parseInt(element.getAttribute('width')) || 50;
+                    const elHeight = element.offsetHeight || parseInt(element.getAttribute('height')) || 50;
+                    const windowWidth = window.innerWidth;
+                    const windowHeight = window.innerHeight;
+                    x = Math.max(0, Math.min(x, windowWidth - elWidth));
+                    y = Math.max(0, Math.min(y, windowHeight - elHeight));
+                    if (x + elWidth > windowWidth || x < 0) dx *= -1;
+                    if (y + elHeight > windowHeight || y < 0) dy *= -1;
+                },
+                explodeAndReset: () => {
+                    if (!isAlienHead) return;
+                    isVisible = false;
+                    element.classList.add('kaboom-active');
+                    
+                    const randomIndex = Math.floor(Math.random() * randomAlienMessages.length);
+                    alienHeadExplosionMessageElement.textContent = randomAlienMessages[randomIndex];
+                    
+                    // Memastikan animasi pesan diputar ulang dengan benar
+                    alienHeadExplosionMessageElement.classList.remove('show-explosion-message');
+                    void alienHeadExplosionMessageElement.offsetWidth; // Paksa reflow
+                    alienHeadExplosionMessageElement.style.display = 'block'; // Tampilkan dulu
+                    alienHeadExplosionMessageElement.classList.add('show-explosion-message'); // Tambahkan kelas untuk animasi
 
-        console.log("%c👾 Kamu menemukan konsol rahasia! 👾", "color: #000000; font-size: 14px; font-weight: bold; background-color: #ffffff; padding: 5px; border-radius: 3px; border: 1px solid #000000;");
-        console.log("Mencari sesuatu yang hilang? Mungkin ada di balik piksel berikutnya...");
 
-        // Game "Cari Piksel Hilang" Logic
-        const gameContainer = document.getElementById('gameContainer'); // Menambahkan referensi ke gameContainer
-        const gameArea = document.getElementById('gameArea');
-        const hiddenPixel = document.getElementById('hiddenPixel');
-        const gameMessage = document.getElementById('gameMessage');
-        const scoreCountDisplay = document.getElementById('scoreCount');
-        const pixelFoundEffectDiv = document.getElementById('pixelFoundEffect');
-        let score = 0;
-        let originalGameMessage = "Klik di area abu-abu untuk menemukan piksel yang hampir tak terlihat.";
-
-        function placePixel() {
-            const gameAreaRect = gameArea.getBoundingClientRect();
-            const maxX = gameAreaRect.width - hiddenPixel.offsetWidth;
-            const maxY = gameAreaRect.height - hiddenPixel.offsetHeight;
-
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY);
-
-            hiddenPixel.style.left = `${randomX}px`;
-            hiddenPixel.style.top = `${randomY}px`;
-            hiddenPixel.style.backgroundColor = '#e5e7eb'; 
-            hiddenPixel.style.visibility = 'visible'; 
+                    setTimeout(() => {
+                        element.classList.remove('kaboom-active');
+                        setTimeout(() => {
+                           initializePositionAndSpeed();
+                        }, 1000); 
+                    }, 500); // Durasi animasi kaboom-active
+                }
+            };
         }
 
-        hiddenPixel.addEventListener('click', (event) => {
-            event.stopPropagation(); 
-            score++;
-            scoreCountDisplay.textContent = score;
-            gameMessage.textContent = "Piksel ditemukan! Mencari yang baru...";
-            hiddenPixel.style.visibility = 'hidden'; 
+        const alienHeadController = createFloatingObject(alienHeadElement, 0.7, true);
 
-            // Mengatur posisi dan ukuran overlay agar sama dengan gameArea
-            const gameAreaRect = gameArea.getBoundingClientRect();
-            const gameContainerRect = gameContainer.getBoundingClientRect(); // Untuk offset jika gameContainer tidak di top-left body
+        let isAlienHeadExploding = false;
+        alienHeadElement.addEventListener('click', () => {
+            if (!isAlienHeadExploding) {
+                isAlienHeadExploding = true;
+                alienHeadController.explodeAndReset();
+                setTimeout(() => {
+                    isAlienHeadExploding = false;
+                     // Sembunyikan pesan setelah selesai animasi (jika belum hilang oleh CSS)
+                    if (!alienHeadExplosionMessageElement.classList.contains('show-explosion-message')) {
+                        // Ini mungkin tidak perlu jika animasi CSS menangani penghilangan display
+                    } else {
+                        // Jika animasi CSS fadeOut tidak menyembunyikan display, lakukan di sini
+                        // Namun, fadeOutExplosionMessage sudah seharusnya menghilangkan opacity.
+                        // Kita pastikan kelas dihapus agar siap untuk klik berikutnya.
+                         setTimeout(() => {
+                            alienHeadExplosionMessageElement.classList.remove('show-explosion-message');
+                            alienHeadExplosionMessageElement.style.display = 'none';
+                         }, 4000); // Total durasi animasi pesan (0.3s + 3.5s + 0.5s)
+                    }
+                }, 1800); // Durasi untuk mencegah klik beruntun
+            }
+        });
 
-            pixelFoundEffectDiv.style.top = `${gameAreaRect.top - gameContainerRect.top}px`; // Posisi relatif terhadap gameContainer
-            pixelFoundEffectDiv.style.left = `${gameAreaRect.left - gameContainerRect.left}px`; // Posisi relatif terhadap gameContainer
-            pixelFoundEffectDiv.style.width = `${gameAreaRect.width}px`;
-            pixelFoundEffectDiv.style.height = `${gameAreaRect.height}px`;
+        const alienBeacon = document.getElementById('alienBeacon');
+        const alienMessage = document.getElementById('alienMessage');
+        let alienMessageTimeout;
+        let isMessageClosing = false; 
+
+        function showAlienMessage() {
+            if (isMessageClosing) return;
+            alienMessage.classList.remove('explode'); 
+            alienMessage.classList.add('show'); 
             
-            pixelFoundEffectDiv.classList.add('active');
+            if (alienMessageTimeout) clearTimeout(alienMessageTimeout);
+            alienMessageTimeout = setTimeout(hideAlienMessage, 10000); 
+        }
+
+        function hideAlienMessage() {
+            if (isMessageClosing || alienMessage.style.display === 'none' && !alienMessage.classList.contains('show')) return;
+            isMessageClosing = true;
+            alienMessage.classList.remove('show');
+            alienMessage.classList.add('explode'); 
 
             setTimeout(() => {
-                pixelFoundEffectDiv.classList.remove('active'); 
-                setTimeout(() => { 
-                    placePixel();
-                    gameMessage.textContent = originalGameMessage;
-                }, 150); 
-            }, 600); 
+                alienMessage.style.display = 'none'; 
+                alienMessage.classList.remove('explode'); 
+                isMessageClosing = false;
+            }, 500); 
+            if (alienMessageTimeout) clearTimeout(alienMessageTimeout);
+        }
+
+        alienBeacon.addEventListener('click', (event) => {
+            event.stopPropagation(); 
+            if (alienMessage.classList.contains('show') || alienMessage.classList.contains('explode')) {
+                hideAlienMessage();
+            } else {
+                alienMessage.style.display = 'block'; 
+                showAlienMessage();
+            }
         });
 
-        gameArea.addEventListener('click', () => {
-            gameMessage.textContent = "Belum ketemu... Coba lagi!";
-            setTimeout(() => {
-                if (gameMessage.textContent === "Belum ketemu... Coba lagi!") {
-                    gameMessage.textContent = originalGameMessage;
-                }
-            }, 1500); 
+        document.addEventListener('click', function(event) {
+            const isClickInsideBeacon = alienBeacon.contains(event.target);
+            if ( (alienMessage.classList.contains('show') || alienMessage.style.display === 'block') && 
+                 !alienMessage.contains(event.target) && 
+                 !isClickInsideBeacon) {
+                hideAlienMessage();
+            }
         });
 
-        // Efek ledakan untuk tombol Beranda
-        const homeButton = document.getElementById('homeButton');
-        homeButton.addEventListener('click', function(event) {
-            event.preventDefault(); 
-            this.classList.add('is-exploding');
-            const linkElement = this; 
-
-            linkElement.addEventListener('animationend', function() {
-                const targetHref = linkElement.getAttribute('href'); 
-                if (targetHref) {
-                    window.location.href = targetHref; 
-                } else {
-                    console.error("Atribut href tombol Beranda tidak ditemukan atau kosong.");
-                }
-            }, { once: true }); 
+        window.addEventListener('resize', () => {
+            if (alienHeadController && typeof alienHeadController.updateOnResize === 'function') {
+                 alienHeadController.updateOnResize();
+            }
+            generateAlienBackgroundText(); 
         });
-
-
-        // Initial placement of the pixel
-        placePixel();
-        gameMessage.textContent = originalGameMessage; 
 
     </script>
+
 </body>
 </html>
