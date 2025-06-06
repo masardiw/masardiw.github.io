@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pengeluaran Biaya Qurban</title>
+    <title>Laporan Keuangan Qurban</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF Libraries for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -16,27 +19,21 @@
         main {
             flex-grow: 1;
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        /* Hide number input spinners */
         .number-input::-webkit-outer-spin-button,
-        .number-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .number-input {
-            -moz-appearance: textfield;
+        .number-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .number-input { -moz-appearance: textfield; }
+
+        /* Tab styles */
+        .tab-btn.active {
+            border-color: #16a34a; /* green-600 */
+            background-color: #16a34a;
+            color: white;
         }
     </style>
 </head>
@@ -45,67 +42,78 @@
     <main class="container mx-auto max-w-4xl p-4 sm:p-6 md:p-8">
         
         <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-green-700">Aplikasi Laporan Pengeluaran Qurban</h1>
-            <p class="text-gray-500 mt-2">Catat dan kelola semua pengeluaran. Data akan tersimpan otomatis di browser Anda.</p>
+        <header class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-green-700">Aplikasi Keuangan Qurban</h1>
+            <p class="text-gray-500 mt-2">Catat pemasukan, pengeluaran, dan unduh laporan dalam format PDF.</p>
         </header>
 
-        <!-- Form Input -->
-        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
-            <h2 id="form-title" class="text-2xl font-semibold mb-6 border-b pb-3 text-gray-700">Formulir Pengeluaran</h2>
-            <form id="expense-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <input type="hidden" id="editing-row-id">
-                <div class="lg:col-span-2">
-                    <label for="item-name" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang/Keperluan</label>
-                    <input type="text" id="item-name" placeholder="Cth: Hewan Qurban, Plastik, dll." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200" required>
-                </div>
-                <div>
-                    <label for="item-quantity" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label>
-                    <input type="number" id="item-quantity" placeholder="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 number-input" min="1" required>
-                </div>
-                <div>
-                    <label for="item-price" class="block text-sm font-medium text-gray-600 mb-1">Harga Satuan (Rp)</label>
-                    <input type="number" id="item-price" placeholder="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 number-input" min="0" required>
-                </div>
-                <div class="lg:col-span-2 md:col-span-1">
-                    <label for="item-total" class="block text-sm font-medium text-gray-600 mb-1">Total Biaya (Rp)</label>
-                    <input type="text" id="item-total" class="w-full px-4 py-2 border border-gray-200 bg-gray-100 rounded-lg font-bold" readonly>
-                </div>
-                <div class="md:col-span-2 lg:col-span-5">
-                    <button type="submit" id="submit-button" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 shadow-md">
-                        + Tambahkan ke Laporan
-                    </button>
-                </div>
-            </form>
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-100 p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold text-blue-800">TOTAL PEMASUKAN</h3>
+                <p id="summary-income" class="text-2xl font-bold text-blue-900">Rp 0</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold text-red-800">TOTAL PENGELUARAN</h3>
+                <p id="summary-expense" class="text-2xl font-bold text-red-900">Rp 0</p>
+            </div>
+            <div class="bg-green-100 p-4 rounded-lg shadow">
+                <h3 class="text-sm font-semibold text-green-800">SALDO AKHIR</h3>
+                <p id="summary-balance" class="text-2xl font-bold text-green-900">Rp 0</p>
+            </div>
         </div>
 
-        <!-- Tabel Laporan -->
-        <div class="bg-white p-6 rounded-xl shadow-lg">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-700">Rincian Laporan Pengeluaran</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 border-b-2 border-gray-200">
-                        <tr>
-                            <th class="p-4 text-sm font-semibold tracking-wide">No.</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide">Nama Barang</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-right">Jumlah</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-right">Harga Satuan</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-right">Total Biaya</th>
-                            <th class="p-4 text-sm font-semibold tracking-wide text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expense-list">
-                        <!-- Data dari Local Storage akan dimuat di sini -->
-                    </tbody>
-                    <tfoot class="bg-gray-100 font-bold">
-                        <tr>
-                            <td colspan="4" class="p-4 text-right text-lg">TOTAL KESELURUHAN</td>
-                            <td id="grand-total" class="p-4 text-right text-lg text-green-700">Rp 0</td>
-                            <td class="p-4"></td>
-                        </tr>
-                    </tfoot>
-                </table>
+        <!-- Tab Controls -->
+        <div class="mb-6 flex justify-center border-b border-gray-200">
+            <button id="tab-expense-btn" class="tab-btn active text-lg font-semibold py-3 px-6 border-b-4 transition-colors duration-300">Pengeluaran</button>
+            <button id="tab-income-btn" class="tab-btn text-lg font-semibold py-3 px-6 border-b-4 border-transparent text-gray-500 hover:text-gray-700 transition-colors duration-300">Pemasukan</button>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area">
+            <!-- Expense Section (Default) -->
+            <div id="expense-section">
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <h2 id="expense-form-title" class="text-2xl font-semibold mb-6 border-b pb-3 text-gray-700">Formulir Pengeluaran</h2>
+                    <form id="expense-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                        <input type="hidden" id="editing-expense-id">
+                        <div class="lg:col-span-2"><label for="item-name" class="block text-sm font-medium text-gray-600 mb-1">Nama Barang</label><input type="text" id="item-name" placeholder="Cth: Hewan Qurban" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required></div>
+                        <div><label for="item-quantity" class="block text-sm font-medium text-gray-600 mb-1">Jumlah</label><input type="number" id="item-quantity" placeholder="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 number-input" min="1" required></div>
+                        <div><label for="item-price" class="block text-sm font-medium text-gray-600 mb-1">Harga Satuan (Rp)</label><input type="number" id="item-price" placeholder="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 number-input" min="0" required></div>
+                        <div class="lg:col-span-2 md:col-span-1"><label for="item-total" class="block text-sm font-medium text-gray-600 mb-1">Total Biaya (Rp)</label><input type="text" id="item-total" class="w-full px-4 py-2 border-gray-200 bg-gray-100 rounded-lg font-bold" readonly></div>
+                        <div class="md:col-span-2 lg:col-span-5"><button type="submit" id="expense-submit-button" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 shadow-md">+ Tambah Pengeluaran</button></div>
+                    </form>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg"><h2 class="text-2xl font-semibold mb-4 text-gray-700">Rincian Pengeluaran</h2><div class="overflow-x-auto"><table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b-2"><tr><th class="p-4 text-sm font-semibold">No.</th><th class="p-4 text-sm font-semibold">Nama Barang</th><th class="p-4 text-sm font-semibold text-right">Jumlah</th><th class="p-4 text-sm font-semibold text-right">Harga Satuan</th><th class="p-4 text-sm font-semibold text-right">Total Biaya</th><th class="p-4 text-sm font-semibold text-center">Aksi</th></tr></thead>
+                    <tbody id="expense-list"></tbody>
+                </table></div></div>
             </div>
+
+            <!-- Income Section (Hidden) -->
+            <div id="income-section" class="hidden">
+                 <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <h2 id="income-form-title" class="text-2xl font-semibold mb-6 border-b pb-3 text-gray-700">Formulir Pemasukan</h2>
+                    <form id="income-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <input type="hidden" id="editing-income-id">
+                        <div class="md:col-span-2"><label for="income-name" class="block text-sm font-medium text-gray-600 mb-1">Sumber Pemasukan</label><input type="text" id="income-name" placeholder="Cth: Donasi Bpk. Fulan" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required></div>
+                        <div><label for="income-amount" class="block text-sm font-medium text-gray-600 mb-1">Nominal (Rp)</label><input type="number" id="income-amount" placeholder="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 number-input" min="0" required></div>
+                        <div class="md:col-span-3"><button type="submit" id="income-submit-button" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 shadow-md">+ Tambah Pemasukan</button></div>
+                    </form>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-lg"><h2 class="text-2xl font-semibold mb-4 text-gray-700">Rincian Pemasukan</h2><div class="overflow-x-auto"><table class="w-full text-left">
+                    <thead class="bg-gray-50 border-b-2"><tr><th class="p-4 text-sm font-semibold">No.</th><th class="p-4 text-sm font-semibold">Sumber Pemasukan</th><th class="p-4 text-sm font-semibold text-right">Nominal</th><th class="p-4 text-sm font-semibold text-center">Aksi</th></tr></thead>
+                    <tbody id="income-list"></tbody>
+                </table></div></div>
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="mt-8 text-center">
+             <button id="download-pdf-btn" class="bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black shadow-lg transition-transform transform hover:scale-105">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                Download Laporan PDF
+            </button>
         </div>
     </main>
 
@@ -116,227 +124,353 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // KONSTANTA DAN ELEMEN DOM
-            const STORAGE_KEY = 'qurbanExpenseData';
+            // Deklarasi global agar jsPDF bisa diakses
+            const { jsPDF } = window.jspdf;
+            
+            // --- KONSTANTA & ELEMEN DOM ---
+            const EXPENSE_STORAGE_KEY = 'qurbanExpenseData';
+            const INCOME_STORAGE_KEY = 'qurbanIncomeData';
+
+            // Elemen Umum
+            const clockElement = document.getElementById('realtime-clock');
+            const summaryIncomeEl = document.getElementById('summary-income');
+            const summaryExpenseEl = document.getElementById('summary-expense');
+            const summaryBalanceEl = document.getElementById('summary-balance');
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
+
+            // Elemen Tab
+            const tabExpenseBtn = document.getElementById('tab-expense-btn');
+            const tabIncomeBtn = document.getElementById('tab-income-btn');
+            const expenseSection = document.getElementById('expense-section');
+            const incomeSection = document.getElementById('income-section');
+
+            // Elemen Form & List Pengeluaran
             const expenseForm = document.getElementById('expense-form');
             const itemNameInput = document.getElementById('item-name');
             const itemQuantityInput = document.getElementById('item-quantity');
             const itemPriceInput = document.getElementById('item-price');
             const itemTotalInput = document.getElementById('item-total');
             const expenseList = document.getElementById('expense-list');
-            const grandTotalElement = document.getElementById('grand-total');
-            const clockElement = document.getElementById('realtime-clock');
-            const submitButton = document.getElementById('submit-button');
-            const editingRowIdInput = document.getElementById('editing-row-id');
-            const formTitle = document.getElementById('form-title');
+            const expenseSubmitButton = document.getElementById('expense-submit-button');
+            const editingExpenseIdInput = document.getElementById('editing-expense-id');
+            const expenseFormTitle = document.getElementById('expense-form-title');
 
-            // --- FUNGSI LOCAL STORAGE ---
-            
-            function getExpensesFromStorage() {
-                const expensesJSON = localStorage.getItem(STORAGE_KEY);
+            // Elemen Form & List Pemasukan
+            const incomeForm = document.getElementById('income-form');
+            const incomeNameInput = document.getElementById('income-name');
+            const incomeAmountInput = document.getElementById('income-amount');
+            const incomeList = document.getElementById('income-list');
+            const incomeSubmitButton = document.getElementById('income-submit-button');
+            const editingIncomeIdInput = document.getElementById('editing-income-id');
+            const incomeFormTitle = document.getElementById('income-form-title');
+
+            // --- FUNGSI GENERIC (Storage, Format, Waktu) ---
+
+            const getFromStorage = (key) => {
                 try {
-                    return expensesJSON ? JSON.parse(expensesJSON) : [];
-                } catch (e) {
-                    console.error("Error parsing expenses from localStorage", e);
-                    return [];
+                    const data = localStorage.getItem(key);
+                    return data ? JSON.parse(data) : [];
+                } catch (e) { console.error(`Error parsing from localStorage key "${key}"`, e); return []; }
+            };
+
+            const saveToStorage = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+            const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
+            
+            const displayTime = () => {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                clockElement.textContent = now.toLocaleDateString('id-ID', options);
+            };
+
+            // --- FUNGSI RENDER DAN UPDATE TAMPILAN ---
+
+            function renderAll() {
+                renderExpenses();
+                renderIncomes();
+                updateSummaries();
+            }
+            
+            function updateSummaries() {
+                const expenses = getFromStorage(EXPENSE_STORAGE_KEY);
+                const incomes = getFromStorage(INCOME_STORAGE_KEY);
+
+                const totalExpense = expenses.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+                const balance = totalIncome - totalExpense;
+
+                summaryExpenseEl.textContent = formatRupiah(totalExpense);
+                summaryIncomeEl.textContent = formatRupiah(totalIncome);
+                summaryBalanceEl.textContent = formatRupiah(balance);
+                summaryBalanceEl.classList.toggle('text-red-900', balance < 0);
+                summaryBalanceEl.classList.toggle('bg-red-100', balance < 0);
+                summaryBalanceEl.classList.toggle('text-green-900', balance >= 0);
+                summaryBalanceEl.classList.toggle('bg-green-100', balance >= 0);
+            }
+
+            // --- LOGIKA PENGELUARAN (EXPENSE) ---
+
+            function renderExpenses() {
+                const expenses = getFromStorage(EXPENSE_STORAGE_KEY);
+                expenseList.innerHTML = '';
+                if (expenses.length === 0) {
+                    expenseList.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-gray-500">Belum ada data pengeluaran.</td></tr>`;
+                } else {
+                    expenses.forEach((expense, index) => {
+                        const row = expenseList.insertRow();
+                        row.id = expense.id;
+                        row.className = 'border-b hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="p-3 align-middle">${index + 1}</td>
+                            <td class="p-3 align-middle">${expense.name}</td>
+                            <td class="p-3 align-middle text-right">${expense.quantity}</td>
+                            <td class="p-3 align-middle text-right">${formatRupiah(expense.price)}</td>
+                            <td class="p-3 align-middle text-right font-medium">${formatRupiah(expense.quantity * expense.price)}</td>
+                            <td class="p-3 align-middle text-center"><div class="flex justify-center items-center gap-2">
+                                <button class="edit-expense-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm">Edit</button>
+                                <button class="delete-expense-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm">Hapus</button>
+                            </div></td>`;
+                    });
                 }
             }
+            
+            function handleExpenseSubmit(e) {
+                e.preventDefault();
+                const name = itemNameInput.value.trim();
+                const quantity = parseFloat(itemQuantityInput.value);
+                const price = parseFloat(itemPriceInput.value);
+                const id = editingExpenseIdInput.value;
 
-            function saveExpensesToStorage(expenses) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+                if (!name || isNaN(quantity) || quantity <= 0 || isNaN(price) || price < 0) {
+                    alert('Mohon isi semua kolom pengeluaran dengan benar.');
+                    return;
+                }
+
+                let expenses = getFromStorage(EXPENSE_STORAGE_KEY);
+                if (id) { // Update
+                    const index = expenses.findIndex(exp => exp.id === id);
+                    if (index > -1) expenses[index] = { id, name, quantity, price };
+                } else { // Add
+                    expenses.push({ id: `exp-${Date.now()}`, name, quantity, price });
+                }
+                saveToStorage(EXPENSE_STORAGE_KEY, expenses);
+                switchToExpenseAddMode();
+                renderAll();
             }
 
-            // --- FUNGSI FORMAT DAN KALKULASI ---
-
-            function formatRupiah(angka) {
-                if(isNaN(angka)) return "Rp 0";
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0
-                }).format(angka);
+            function switchToExpenseAddMode() {
+                editingExpenseIdInput.value = '';
+                expenseForm.reset();
+                expenseFormTitle.textContent = 'Formulir Pengeluaran';
+                expenseSubmitButton.textContent = '+ Tambah Pengeluaran';
+                expenseSubmitButton.className = 'w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 shadow-md';
             }
 
             function calculateItemTotal() {
                 const quantity = parseFloat(itemQuantityInput.value) || 0;
                 const price = parseFloat(itemPriceInput.value) || 0;
-                const total = quantity * price;
-                itemTotalInput.value = formatRupiah(total).replace('Rp', '').trim().replace(/\./g, ',');
+                itemTotalInput.value = formatRupiah(quantity * price).replace('Rp', '').trim();
             }
             
-            // --- FUNGSI RENDER DAN UPDATE TAMPILAN ---
-
-            function renderExpenses() {
-                const expenses = getExpensesFromStorage();
-                expenseList.innerHTML = ''; // Kosongkan list sebelum render ulang
-
-                if (expenses.length === 0) {
-                    expenseList.innerHTML = `
-                        <tr id="empty-row">
-                           <td colspan="6" class="text-center p-8 text-gray-500">
-                               Belum ada data pengeluaran.
-                           </td> 
-                        </tr>`;
+            // --- LOGIKA PEMASUKAN (INCOME) ---
+            
+            function renderIncomes() {
+                const incomes = getFromStorage(INCOME_STORAGE_KEY);
+                incomeList.innerHTML = '';
+                 if (incomes.length === 0) {
+                    incomeList.innerHTML = `<tr><td colspan="4" class="text-center p-8 text-gray-500">Belum ada data pemasukan.</td></tr>`;
                 } else {
-                    expenses.forEach(expense => {
-                        const newRow = document.createElement('tr');
-                        newRow.className = 'border-b hover:bg-green-50 transition duration-200';
-                        newRow.id = expense.id;
-                        const total = expense.quantity * expense.price;
-
-                        newRow.innerHTML = `
-                            <td class="p-4 align-middle"></td>
-                            <td class="p-4 align-middle">${expense.name}</td>
-                            <td class="p-4 text-right align-middle" data-quantity="${expense.quantity}">${expense.quantity}</td>
-                            <td class="p-4 text-right align-middle" data-price="${expense.price}">${formatRupiah(expense.price)}</td>
-                            <td class="p-4 text-right font-medium item-total-cell align-middle" data-value="${total}">${formatRupiah(total)}</td>
-                            <td class="p-4 text-center align-middle">
-                                <div class="flex justify-center items-center gap-2">
-                                    <button class="edit-btn bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 text-sm">Edit</button>
-                                    <button class="delete-btn bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-sm">Hapus</button>
-                                </div>
-                            </td>
-                        `;
-                        expenseList.appendChild(newRow);
+                    incomes.forEach((income, index) => {
+                         const row = incomeList.insertRow();
+                        row.id = income.id;
+                        row.className = 'border-b hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="p-3 align-middle">${index + 1}</td>
+                            <td class="p-3 align-middle">${income.name}</td>
+                            <td class="p-3 align-middle text-right font-medium">${formatRupiah(income.amount)}</td>
+                            <td class="p-3 align-middle text-center"><div class="flex justify-center items-center gap-2">
+                                <button class="edit-income-btn bg-blue-500 text-white px-3 py-1 rounded-md text-sm">Edit</button>
+                                <button class="delete-income-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm">Hapus</button>
+                            </div></td>`;
                     });
                 }
-                updateRowNumbers();
-                updateGrandTotal();
             }
 
-            function updateGrandTotal() {
-                const expenses = getExpensesFromStorage();
-                const grandTotal = expenses.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-                grandTotalElement.textContent = formatRupiah(grandTotal);
-            }
-            
-            function updateRowNumbers() {
-                const rows = expenseList.querySelectorAll('tr:not(#empty-row)');
-                rows.forEach((row, index) => {
-                    row.cells[0].textContent = index + 1;
-                });
-            }
+            function handleIncomeSubmit(e) {
+                e.preventDefault();
+                const name = incomeNameInput.value.trim();
+                const amount = parseFloat(incomeAmountInput.value);
+                const id = editingIncomeIdInput.value;
 
-            // --- FUNGSI MODE EDIT ---
-            
-            function switchToAddMode() {
-                editingRowIdInput.value = '';
-                formTitle.textContent = 'Formulir Pengeluaran';
-                submitButton.textContent = '+ Tambahkan ke Laporan';
-                submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                submitButton.classList.add('bg-green-600', 'hover:bg-green-700');
-                expenseForm.reset();
-                calculateItemTotal();
-            }
-
-            function switchToEditMode(row) {
-                const expenses = getExpensesFromStorage();
-                const expense = expenses.find(e => e.id === row.id);
-                if (!expense) return;
-                
-                editingRowIdInput.value = expense.id;
-                itemNameInput.value = expense.name;
-                itemQuantityInput.value = expense.quantity;
-                itemPriceInput.value = expense.price;
-                
-                calculateItemTotal();
-                
-                formTitle.textContent = 'Edit Data Pengeluaran';
-                submitButton.textContent = 'Simpan Perubahan';
-                submitButton.classList.remove('bg-green-600', 'hover:bg-green-700');
-                submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                
-                itemNameInput.focus();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-
-            // --- FUNGSI CRUD (Create, Read, Update, Delete) ---
-
-            function addItem(name, quantity, price) {
-                const expenses = getExpensesFromStorage();
-                const newExpense = {
-                    id: `item-${Date.now()}`,
-                    name: name,
-                    quantity: quantity,
-                    price: price
-                };
-                expenses.push(newExpense);
-                saveExpensesToStorage(expenses);
-                renderExpenses();
-                switchToAddMode();
-            }
-
-            function updateItem(id, name, quantity, price) {
-                const expenses = getExpensesFromStorage();
-                const expenseIndex = expenses.findIndex(e => e.id === id);
-                if (expenseIndex > -1) {
-                    expenses[expenseIndex] = { id, name, quantity, price };
-                    saveExpensesToStorage(expenses);
-                    renderExpenses();
-                    switchToAddMode();
+                if (!name || isNaN(amount) || amount <= 0) {
+                    alert('Mohon isi semua kolom pemasukan dengan benar.');
+                    return;
                 }
+                
+                let incomes = getFromStorage(INCOME_STORAGE_KEY);
+                if (id) { // Update
+                     const index = incomes.findIndex(inc => inc.id === id);
+                    if (index > -1) incomes[index] = { id, name, amount };
+                } else { // Add
+                    incomes.push({ id: `inc-${Date.now()}`, name, amount });
+                }
+                saveToStorage(INCOME_STORAGE_KEY, incomes);
+                switchToIncomeAddMode();
+                renderAll();
+            }
+            
+             function switchToIncomeAddMode() {
+                editingIncomeIdInput.value = '';
+                incomeForm.reset();
+                incomeFormTitle.textContent = 'Formulir Pemasukan';
+                incomeSubmitButton.textContent = '+ Tambah Pemasukan';
+                incomeSubmitButton.className = 'w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 shadow-md';
             }
 
-            function deleteItem(id) {
-                let expenses = getExpensesFromStorage();
-                expenses = expenses.filter(e => e.id !== id);
-                saveExpensesToStorage(expenses);
-                renderExpenses();
-                switchToAddMode();
-            }
+            // --- EVENT HANDLING ---
             
-            // --- FUNGSI WAKTU ---
-            function displayTime() {
-                const now = new Date();
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                clockElement.textContent = now.toLocaleDateString('id-ID', options);
-            }
+            // Tab switching
+            tabExpenseBtn.addEventListener('click', () => {
+                tabExpenseBtn.classList.add('active');
+                tabIncomeBtn.classList.remove('active');
+                expenseSection.classList.remove('hidden');
+                incomeSection.classList.add('hidden');
+            });
+            tabIncomeBtn.addEventListener('click', () => {
+                tabIncomeBtn.classList.add('active');
+                tabExpenseBtn.classList.remove('active');
+                incomeSection.classList.remove('hidden');
+                expenseSection.classList.add('hidden');
+            });
             
-            // --- EVENT LISTENERS ---
+            // Form Submissions
+            expenseForm.addEventListener('submit', handleExpenseSubmit);
+            incomeForm.addEventListener('submit', handleIncomeSubmit);
             itemQuantityInput.addEventListener('input', calculateItemTotal);
             itemPriceInput.addEventListener('input', calculateItemTotal);
 
-            expenseForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const name = itemNameInput.value.trim();
-                const quantity = parseFloat(itemQuantityInput.value);
-                const price = parseFloat(itemPriceInput.value);
-                const editingId = editingRowIdInput.value;
+            // List Clicks (Edit/Delete)
+            expenseList.addEventListener('click', (e) => {
+                const id = e.target.closest('tr')?.id;
+                if (!id) return;
 
-                if (!name || isNaN(quantity) || quantity <= 0 || isNaN(price) || price < 0) {
-                    alert('Mohon isi semua kolom dengan benar.');
-                    return;
-                }
-
-                if (editingId) {
-                    updateItem(editingId, name, quantity, price);
-                } else {
-                    addItem(name, quantity, price);
-                }
-            });
-            
-            expenseList.addEventListener('click', (event) => {
-                const target = event.target;
-                const row = target.closest('tr');
-                if (!row || !row.id) return;
-
-                if (target.classList.contains('edit-btn')) {
-                    switchToEditMode(row);
-                }
-
-                if (target.classList.contains('delete-btn')) {
-                    const itemName = row.cells[1].textContent;
-                    const confirmation = confirm(`Apakah Anda yakin ingin menghapus "${itemName}"?`);
-                    if (confirmation) {
-                        deleteItem(row.id);
+                if (e.target.matches('.delete-expense-btn')) {
+                    if (confirm('Anda yakin ingin menghapus pengeluaran ini?')) {
+                        let expenses = getFromStorage(EXPENSE_STORAGE_KEY).filter(exp => exp.id !== id);
+                        saveToStorage(EXPENSE_STORAGE_KEY, expenses);
+                        renderAll();
                     }
+                } else if (e.target.matches('.edit-expense-btn')) {
+                    const expense = getFromStorage(EXPENSE_STORAGE_KEY).find(exp => exp.id === id);
+                    editingExpenseIdInput.value = expense.id;
+                    itemNameInput.value = expense.name;
+                    itemQuantityInput.value = expense.quantity;
+                    itemPriceInput.value = expense.price;
+                    calculateItemTotal();
+                    expenseFormTitle.textContent = 'Edit Data Pengeluaran';
+                    expenseSubmitButton.textContent = 'Simpan Perubahan';
+                    expenseSubmitButton.className = 'w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 shadow-md';
+                    window.scrollTo({top: expenseSection.offsetTop, behavior: 'smooth'});
                 }
             });
-            
+
+            incomeList.addEventListener('click', (e) => {
+                const id = e.target.closest('tr')?.id;
+                if (!id) return;
+
+                if (e.target.matches('.delete-income-btn')) {
+                     if (confirm('Anda yakin ingin menghapus pemasukan ini?')) {
+                        let incomes = getFromStorage(INCOME_STORAGE_KEY).filter(inc => inc.id !== id);
+                        saveToStorage(INCOME_STORAGE_KEY, incomes);
+                        renderAll();
+                    }
+                } else if (e.target.matches('.edit-income-btn')) {
+                    const income = getFromStorage(INCOME_STORAGE_KEY).find(inc => inc.id === id);
+                    editingIncomeIdInput.value = income.id;
+                    incomeNameInput.value = income.name;
+                    incomeAmountInput.value = income.amount;
+                    incomeFormTitle.textContent = 'Edit Data Pemasukan';
+                    incomeSubmitButton.textContent = 'Simpan Perubahan';
+                    incomeSubmitButton.className = 'w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 shadow-md';
+                     window.scrollTo({top: incomeSection.offsetTop, behavior: 'smooth'});
+                }
+            });
+
+            // --- PDF GENERATION ---
+            downloadPdfBtn.addEventListener('click', () => {
+                const doc = new jsPDF();
+                const incomes = getFromStorage(INCOME_STORAGE_KEY);
+                const expenses = getFromStorage(EXPENSE_STORAGE_KEY);
+                
+                const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+                const totalExpense = expenses.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+                const balance = totalIncome - totalExpense;
+
+                // Title
+                doc.setFontSize(18);
+                doc.text('Laporan Keuangan Qurban', 14, 22);
+                doc.setFontSize(11);
+                doc.setTextColor(100);
+                doc.text(`Laporan dibuat pada: ${new Date().toLocaleString('id-ID')}`, 14, 29);
+                
+                // Income Table
+                if (incomes.length > 0) {
+                    doc.autoTable({
+                        startY: 40,
+                        head: [['No.', 'Sumber Pemasukan', 'Nominal']],
+                        body: incomes.map((inc, i) => [i + 1, inc.name, formatRupiah(inc.amount)]),
+                        theme: 'striped',
+                        headStyles: { fillColor: [22, 163, 74] }, // Green
+                        didDrawPage: (data) => {
+                            doc.setFontSize(14);
+                            doc.text('Rincian Pemasukan', data.settings.margin.left, 35);
+                        }
+                    });
+                }
+
+                // Expense Table
+                 if (expenses.length > 0) {
+                    doc.autoTable({
+                        startY: doc.previousAutoTable.finalY + 15,
+                        head: [['No.', 'Nama Barang', 'Jumlah', 'Harga Satuan', 'Total Biaya']],
+                        body: expenses.map((exp, i) => [i + 1, exp.name, exp.quantity, formatRupiah(exp.price), formatRupiah(exp.quantity * exp.price)]),
+                        theme: 'striped',
+                        headStyles: { fillColor: [22, 163, 74] }, // Green
+                         didDrawPage: (data) => {
+                            doc.setFontSize(14);
+                            doc.text('Rincian Pengeluaran', data.settings.margin.left, doc.previousAutoTable.finalY + 10);
+                        }
+                    });
+                }
+                
+                // Summary
+                let finalY = (doc.previousAutoTable.finalY || 40) + 15;
+                doc.setFontSize(12);
+                doc.text('Ringkasan Keuangan:', 14, finalY);
+                finalY += 7;
+                doc.autoTable({
+                    startY: finalY,
+                    theme: 'plain',
+                    body: [
+                        ['Total Pemasukan', ':', formatRupiah(totalIncome)],
+                        ['Total Pengeluaran', ':', formatRupiah(totalExpense)],
+                        ['Saldo Akhir', ':', formatRupiah(balance)],
+                    ],
+                    columnStyles: {
+                        0: { fontStyle: 'bold' },
+                        2: { halign: 'right' }
+                    }
+                });
+
+                // Save PDF
+                const date = new Date().toISOString().slice(0, 10);
+                doc.save(`laporan-keuangan-qurban-${date}.pdf`);
+            });
+
             // --- INISIALISASI ---
-            renderExpenses();
+            renderAll();
             displayTime();
-            setInterval(displayTime, 1000);
+            setInterval(displayTime, 1000 * 60); // Update tiap menit
         });
     </script>
 </body>
