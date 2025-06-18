@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Anniversary, Cintaku ❤️</title>
-    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
     
+    <!-- Favicon -->
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+
     <!-- Google Fonts: Playfair Display for headings, Montserrat for body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,17 +17,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        /* * ========================================
-         * FONT BARU: Playfair Display (lebih jelas)
-         * ========================================
-        */
         :root {
             --primary-color: #881337;   /* Red Velvet */
             --secondary-color: #f9a8d4; /* Soft Pink */
             --background-color: #fff1f2;/* Lightest Pink/Rose */
             --text-color: #44403c;      /* Dark Gray */
             --card-bg: #ffffff;
-            --heading-font: 'Playfair Display', serif; /* FONT DIUBAH */
+            --heading-font: 'Playfair Display', serif;
             --body-font: 'Montserrat', sans-serif;
         }
 
@@ -43,10 +41,66 @@
         h1, h2, h3, h4, h5, h6 {
              font-family: var(--heading-font);
              color: var(--primary-color);
-             font-weight: 700; /* Memberi ketegasan pada judul */
+             font-weight: 700;
         }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 3rem 1rem; }
+
+        /* --- Intro/Preloader Screen --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1.5s ease, visibility 1.5s ease;
+        }
+        #preloader.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .preloader-content {
+            text-align: center;
+            animation: fadeIn 2s ease;
+        }
+        .preloader-content h1 {
+            font-size: clamp(3rem, 15vw, 6rem);
+        }
+        #enter-btn {
+            background: linear-gradient(145deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            font-family: var(--body-font);
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(136, 19, 55, 0.4);
+            animation: pulse 2s infinite 2s;
+        }
+        #enter-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Main Content Wrapper --- */
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease 0.5s; /* Delay fade-in */
+        }
+        #main-content.visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
         /* --- Animations --- */
         .reveal {
@@ -56,6 +110,7 @@
         .reveal.active { transform: translateY(0); opacity: 1; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         /* --- Hero Section with Falling Hearts --- */
         .hero {
@@ -65,58 +120,37 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('https://placehold.co/1200x800/f9a8d4/ffffff?text=Foto+Ardi+%26+Elisa') no-repeat center center/cover;
             color: white; padding: 1rem; overflow: hidden;
         }
-        
         .hero-content {
             background-color: rgba(0,0,0,0.55);
-            padding: 2rem 1.5rem; border-radius: 20px;
-            animation: fadeIn 2s ease-in-out; z-index: 2;
+            padding: 2rem 1.5rem; border-radius: 20px; z-index: 2;
         }
-
-        .hero h1 {
-            font-size: clamp(3rem, 15vw, 6rem); /* Sedikit disesuaikan untuk font baru */
-            margin-bottom: 0.5rem;
-            color: white;
-        }
-
+        .hero h1 { font-size: clamp(3rem, 15vw, 6rem); margin-bottom: 0.5rem; color: white; }
         .hero h2 {
             font-size: clamp(1.5rem, 7vw, 2.5rem);
             font-weight: 400; margin-bottom: 1rem;
-            font-family: var(--body-font); /* Subjudul menggunakan font body agar lebih kontras */
-            color: white;
+            font-family: var(--body-font); color: white;
         }
-
         .hero p { font-size: clamp(1rem, 4vw, 1.2rem); font-weight: 300; }
-
         .heart-container {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             pointer-events: none; z-index: 1;
         }
-
         .heart-container .heart {
             position: absolute; color: rgba(255, 255, 255, 0.5);
             font-size: 1.5rem; animation: fall linear infinite;
         }
+        @keyframes fall { to { transform: translateY(105vh) rotate(360deg); } }
 
-        @keyframes fall {
-            to { transform: translateY(105vh) rotate(360deg); }
-        }
-
-        /* --- Countdown Section --- */
+        /* --- Other sections remain the same --- */
         .countdown-section {
             background-color: var(--card-bg); padding: 3rem 1rem;
             text-align: center; border-radius: 0 0 40px 40px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             margin-top: -40px; position: relative; z-index: 10;
         }
-
-        .countdown-section h2 {
-            font-size: clamp(2.5rem, 10vw, 3.5rem);
-            margin-bottom: 2.5rem;
-        }
-        
+        .countdown-section h2 { font-size: clamp(2.5rem, 10vw, 3.5rem); margin-bottom: 2.5rem; }
         #countdown { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; }
-
         .time-box {
             background: linear-gradient(145deg, var(--secondary-color), var(--primary-color));
             color: white; padding: 1rem; border-radius: 15px;
@@ -127,50 +161,28 @@
         .time-box:hover { transform: translateY(-5px); }
         .time-box span { display: block; font-size: 2rem; font-weight: 600; font-family: var(--body-font); }
         .time-box p { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* --- Story & Hanan Section --- */
         .story-section { padding: 4rem 0; }
         .story-card, .hanan-card {
             background: var(--card-bg); padding: 2rem;
             border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.06);
             margin-bottom: 3rem; text-align: center;
         }
-        
-        .story-card h3, .hanan-card h3 {
-            font-size: clamp(2rem, 8vw, 3rem);
-            margin-bottom: 1.5rem;
-        }
-
+        .story-card h3, .hanan-card h3 { font-size: clamp(2rem, 8vw, 3rem); margin-bottom: 1.5rem; }
         .story-card img, .hanan-card img {
-            width: 150px; height: 150px;
-            border-radius: 50%; object-fit: cover;
-            margin-bottom: 1.5rem;
-            border: 6px solid var(--secondary-color);
+            width: 150px; height: 150px; border-radius: 50%; object-fit: cover;
+            margin-bottom: 1.5rem; border: 6px solid var(--secondary-color);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
         .icon { color: var(--secondary-color); margin: 0 0.5rem; }
-
-        /* --- Gallery Section --- */
         .gallery-section { padding-bottom: 4rem; text-align: center; }
-        .gallery-section h2 { 
-            font-size: clamp(2.5rem, 10vw, 3.5rem);
-            margin-bottom: 2.5rem;
-        }
+        .gallery-section h2 { font-size: clamp(2.5rem, 10vw, 3.5rem); margin-bottom: 2.5rem; }
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
         .gallery-item {
             overflow: hidden; border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            aspect-ratio: 4 / 3;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); aspect-ratio: 4 / 3;
         }
-        .gallery-item img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
         .gallery-item:hover img { transform: scale(1.1); }
-
-        /* --- Surprise Button & Modals --- */
         .surprise-section { text-align: center; padding: 2rem 0 4rem 0; }
         .surprise-btn {
             background: linear-gradient(145deg, var(--secondary-color), var(--primary-color));
@@ -182,32 +194,24 @@
             margin-left: auto; margin-right: auto;
         }
         .surprise-btn:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(136, 19, 55, 0.6); }
-
         .modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0;
             width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.75);
             align-items: center; justify-content: center; padding: 1rem;
         }
-
         .modal-content {
             background-color: var(--background-color); margin: auto; padding: 1.5rem;
             border-radius: 20px; width: 95%; max-width: 550px; text-align: center;
             position: relative; animation: zoomIn 0.5s ease;
         }
-        
         #letterContent { padding: 1rem; max-height: 60vh; overflow-y: auto; text-align: left; }
-        
         .close-btn {
             color: #aaa; position: absolute; top: 10px; right: 20px;
             font-size: 32px; font-weight: bold; cursor: pointer;
         }
-        
         .modal-content h3 { font-size: clamp(2rem, 8vw, 2.8rem); margin-bottom: 1rem; }
         #heart-icon { color: var(--primary-color); font-size: 4rem; animation: heartBeat 1.3s infinite; }
-
         @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* --- Footer --- */
         footer {
             text-align: center; padding: 2rem 1rem;
             background-color: #fce7f3; color: var(--primary-color);
@@ -216,74 +220,78 @@
 </head>
 <body>
 
-    <div class="heart-container" id="heart-container"></div>
-
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Happy 3rd Anniversary</h1>
-            <!-- Subjudul menggunakan font body agar lebih jelas -->
-            <h2>Ardi <i class="fas fa-heart" style="font-size: clamp(1.5rem, 5vw, 2rem); color: var(--secondary-color);"></i> Elisa</h2>
-            <p>22 Juli 2022 - Selamanya</p>
+    <!-- Intro Screen -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <h1>Hi, Sayang</h1>
+            <button id="enter-btn"><i class="fas fa-gift"></i> Klik Disini</button>
         </div>
-    </header>
+    </div>
 
-    <main>
-        <section class="countdown-section reveal">
-            <div class="container">
-                <h2>Menuju Hari Bahagia Kita</h2>
-                <div id="countdown">
-                    <!-- Countdown boxes filled by JS -->
-                </div>
+    <!-- Main Page Content (Initially Hidden) -->
+    <div id="main-content">
+        <div class="heart-container" id="heart-container"></div>
+
+        <header class="hero">
+            <div class="hero-content">
+                <h1>Happy 3rd Anniversary</h1>
+                <h2>Ardi <i class="fas fa-heart" style="font-size: clamp(1.5rem, 5vw, 2rem); color: var(--secondary-color);"></i> Elisa</h2>
+                <p>22 Juli 2022 - Selamanya</p>
             </div>
-        </section>
+        </header>
 
-        <section class="story-section">
-            <div class="container">
-                <div class="story-card reveal">
-                    <img src="https://placehold.co/400x400/f9a8d4/ffffff?text=Foto+Elisa" alt="Foto Elisa">
-                    <h3>Untuk Istriku Tercinta, Elisa</h3>
-                    <p>
-                        Sayang, tiga tahun yang penuh warna telah kita lewati. Dari kita berdua, hingga kini menjadi bertiga. Setiap detik bersamamu adalah pelajaran tentang cinta, kesabaran, dan kebahagiaan. Terima kasih telah menjadi istri yang hebat dan ibu yang luar biasa untuk Hanan. Aku tidak bisa membayangkan hidupku tanpamu. Mari kita terus membangun istana cinta kita sampai Jannah-Nya.
-                    </p>
-                    <p style="margin-top: 1.5rem; font-weight: 600;">Dengan segenap cinta,<br/>Suamimu, Ardi</p>
+        <main>
+            <section class="countdown-section reveal">
+                <div class="container">
+                    <h2>Menuju Hari Bahagia Kita</h2>
+                    <div id="countdown"></div>
                 </div>
+            </section>
 
-                <div class="hanan-card reveal">
-                    <img src="https://placehold.co/400x400/881337/ffffff?text=Foto+Hanan" alt="Foto Hanan">
-                    <h3>Pelita Hati Kita <i class="fas fa-star icon"></i> Hanan</h3>
-                    <p>
-                        Kehadiran Hanan Adhya Wijaya (Lahir 4 Mei 2023) menjadikan keluarga kecil kita semakin sempurna. Tawa dan tangisnya adalah melodi terindah dalam hidup kita. Di usianya yang ke-2 tahun, ia adalah sumber kebahagiaan dan pengikat cinta kita yang tak ternilai.
-                    </p>
+            <section class="story-section">
+                <div class="container">
+                    <div class="story-card reveal">
+                        <img src="https://placehold.co/400x400/f9a8d4/ffffff?text=Foto+Elisa" alt="Foto Elisa">
+                        <h3>Untuk Istriku Tercinta, Elisa</h3>
+                        <p>Sayang, tiga tahun yang penuh warna telah kita lewati...</p>
+                        <p style="margin-top: 1.5rem; font-weight: 600;">Dengan segenap cinta,<br/>Suamimu, Ardi</p>
+                    </div>
+
+                    <div class="hanan-card reveal">
+                        <img src="https://placehold.co/400x400/881337/ffffff?text=Foto+Hanan" alt="Foto Hanan">
+                        <h3>Pelita Hati Kita <i class="fas fa-star icon"></i> Hanan</h3>
+                        <p>Kehadiran Hanan Adhya Wijaya...</p>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="gallery-section">
-            <div class="container">
-                <h2>Album Kisah Kita</h2>
-                <div class="gallery-grid">
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/f472b6/ffffff?text=Kenangan+Indah+1" alt="Kenangan 1"></div>
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/881337/ffffff?text=Momen+Bahagia+2" alt="Kenangan 2"></div>
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/facc15/ffffff?text=Liburan+Bersama+3" alt="Kenangan 3"></div>
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/4ade80/ffffff?text=Hanan+Tersenyum+4" alt="Kenangan 4"></div>
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/38bdf8/ffffff?text=Cinta+Kita+5" alt="Kenangan 5"></div>
-                    <div class="gallery-item reveal"><img src="https://placehold.co/600x400/fb923c/ffffff?text=Keluarga+Kecil+6" alt="Kenangan 6"></div>
+            <section class="gallery-section">
+                <div class="container">
+                    <h2>Album Kisah Kita</h2>
+                    <div class="gallery-grid">
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/f472b6/ffffff?text=Kenangan+1" alt="Kenangan 1"></div>
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/881337/ffffff?text=Kenangan+2" alt="Kenangan 2"></div>
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/facc15/ffffff?text=Kenangan+3" alt="Kenangan 3"></div>
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/4ade80/ffffff?text=Kenangan+4" alt="Kenangan 4"></div>
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/38bdf8/ffffff?text=Kenangan+5" alt="Kenangan 5"></div>
+                        <div class="gallery-item reveal"><img src="https://placehold.co/600x400/fb923c/ffffff?text=Kenangan+6" alt="Kenangan 6"></div>
+                    </div>
                 </div>
-            </div>
-        </section>
-        
-        <section class="surprise-section">
-            <div class="container reveal">
-                 <button id="letterBtn" class="surprise-btn"><i class="fas fa-envelope-open-text"></i> Buka Surat Cinta</button>
-                 <button id="surpriseBtn" class="surprise-btn"><i class="fas fa-gift"></i> Klik Kejutan Ini!</button>
-            </div>
-        </section>
-    </main>
+            </section>
+            
+            <section class="surprise-section">
+                <div class="container reveal">
+                     <button id="letterBtn" class="surprise-btn"><i class="fas fa-envelope-open-text"></i> Buka Surat Cinta</button>
+                     <button id="surpriseBtn" class="surprise-btn"><i class="fas fa-gift"></i> Klik Kejutan Ini!</button>
+                </div>
+            </section>
+        </main>
 
-    <footer>
-        <p>Ardi <i class="fas fa-heart"></i> Elisa <i class="fas fa-heart"></i> Hanan</p>
-        <p>Est. 2022</p>
-    </footer>
+        <footer>
+            <p>Ardi <i class="fas fa-heart"></i> Elisa <i class="fas fa-heart"></i> Hanan</p>
+            <p>Est. 2022</p>
+        </footer>
+    </div>
 
     <!-- Modals -->
     <div id="surpriseModal" class="modal">
@@ -300,39 +308,61 @@
             <span class="close-btn" data-modal="letterModal">&times;</span>
             <h3>Surat Cinta Untukmu...</h3>
             <div id="letterContent">
-                <p>Elisa sayang,</p>
-                <p>Jika aku bisa kembali ke masa lalu, aku akan tetap memilih jalan yang sama, jalan yang membawaku kepadamu. Tiga tahun ini terasa begitu singkat karena setiap harinya dipenuhi oleh kebahagiaan.</p>
-                <p>Melihatmu menjadi seorang ibu adalah hal terindah yang pernah kusaksikan. Caramu merawat Hanan, caramu mencintaiku, caramu mengelola rumah tangga kita, semuanya membuatku semakin jatuh cinta setiap hari.</p>
-                <p>Mungkin aku tidak selalu bisa mengucapkan kata-kata manis, tapi percayalah, di dalam hati ini, namamu dan Hanan terukir abadi. Kalian adalah alasan aku bekerja keras, alasan aku ingin selalu pulang, dan alasan hidupku terasa lengkap.</p>
-                <p>Terima kasih untuk segalanya, sayang. Aku berjanji akan selalu berusaha menjadi suami dan ayah terbaik untukmu dan Hanan.</p>
-                <p>Selamat ulang tahun pernikahan yang ke-3, cintaku.</p>
-                <br/>
+                <p>Elisa sayang...</p>
                 <p>Dari yang selalu mencintaimu,</p>
                 <p><strong>Ardi</strong></p>
             </div>
         </div>
     </div>
 
+    <!-- Background Music -->
+    <audio id="background-music" loop>
+        <!-- GANTI SUMBER MUSIK DI SINI -->
+        <source src="ganti-dengan-link-musik.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
 
     <script>
+        // --- Preloader and Music Logic ---
+        const preloader = document.getElementById('preloader');
+        const mainContent = document.getElementById('main-content');
+        const enterBtn = document.getElementById('enter-btn');
+        const music = document.getElementById('background-music');
+
+        if (enterBtn) {
+            enterBtn.addEventListener('click', () => {
+                if (preloader) {
+                    preloader.classList.add('loaded');
+                }
+                if (mainContent) {
+                    mainContent.classList.add('visible');
+                }
+                if (music) {
+                    music.play().catch(error => console.log("Autoplay dicegah oleh browser. Interaksi pengguna berhasil memutar musik."));
+                }
+                // Check for revealed items once content is visible
+                setTimeout(reveal, 500);
+            });
+        }
+
         // --- Falling Hearts ---
         const heartContainer = document.getElementById('heart-container');
         if(heartContainer){
-            const heartCount = window.innerWidth < 768 ? 20 : 35; // Less hearts on mobile
+            const heartCount = window.innerWidth < 768 ? 20 : 35;
             for (let i = 0; i < heartCount; i++) {
                 const heart = document.createElement('div');
                 heart.classList.add('heart');
                 heart.innerHTML = '<i class="fas fa-heart"></i>';
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = Math.random() * 3 + 4 + 's'; // 4-7 seconds
+                heart.style.animationDuration = Math.random() * 3 + 4 + 's';
                 heart.style.animationDelay = Math.random() * 3 + 's';
-                heart.style.fontSize = Math.random() * 1 + 0.5 + 'rem'; // 0.5rem - 1.5rem
+                heart.style.fontSize = Math.random() * 1 + 0.5 + 'rem';
                 heartContainer.appendChild(heart);
             }
         }
         
         // --- Countdown Timer Logic ---
-        // 3rd Anniversary: 22 Juli 2025
         const anniversaryDate = new Date("Jul 22, 2025 00:00:00").getTime();
         const countdownEl = document.getElementById("countdown");
 
@@ -362,14 +392,12 @@
         // --- Modal Logic ---
         const surpriseModal = document.getElementById("surpriseModal");
         const letterModal = document.getElementById("letterModal");
-        
         const surpriseBtn = document.getElementById("surpriseBtn");
         const letterBtn = document.getElementById("letterBtn");
-
         const closeBtns = document.querySelectorAll(".close-btn");
 
-        surpriseBtn.onclick = () => { surpriseModal.style.display = "flex"; }
-        letterBtn.onclick = () => { letterModal.style.display = "flex"; }
+        if(surpriseBtn) { surpriseBtn.onclick = () => { surpriseModal.style.display = "flex"; } }
+        if(letterBtn) { letterBtn.onclick = () => { letterModal.style.display = "flex"; } }
         
         closeBtns.forEach(btn => {
             btn.onclick = () => {
@@ -377,7 +405,6 @@
                 document.getElementById(modalId).style.display = "none";
             }
         });
-
         window.onclick = (event) => {
             if (event.target == surpriseModal) surpriseModal.style.display = "none";
             if (event.target == letterModal) letterModal.style.display = "none";
@@ -389,13 +416,13 @@
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
-                if (elementTop < windowHeight - 80) { // Trigger reveal a bit sooner
+                if (elementTop < windowHeight - 80) {
                     reveals[i].classList.add("active");
                 }
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal(); // Initial check on page load
+        // We call reveal() after the enter button is clicked
     </script>
 </body>
 </html>
