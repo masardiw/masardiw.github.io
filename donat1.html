@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebuah Kejutan untuk Elisa...</title>
+    <!-- Import Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Import Tone.js untuk efek suara -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+    <style>
+        :root {
+            --bg-start: #fff0f5; /* Soft Pink */
+            --bg-end: #ffdab9; /* Peach */
+            --text-color: #5d4037; /* Coklat tua untuk teks */
+            --accent-color: #d4af37; /* Gold */
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --font-main: 'Poppins', sans-serif;
+            --font-handwriting: 'Dancing Script', cursive;
+        }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Efek Bokeh di Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 20%),
+                radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 15%),
+                radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 25%);
+            z-index: 1;
+        }
+
+        #app-container {
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .scene {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.8s ease-in-out; /* Animasi masuk dipercepat */
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+
+        .scene.active {
+            display: flex;
+        }
+
+        .scene img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 3px solid var(--accent-color);
+        }
+
+        h1, h2 {
+            font-family: var(--font-handwriting);
+            color: var(--accent-color);
+            font-size: 2.8rem;
+            margin: 10px 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+        h2 { font-size: 2.2rem; }
+        
+        p {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+
+        button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-family: var(--font-main);
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-shrink: 0; 
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes explodeOut {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+        
+        .exploding {
+            animation: explodeOut 0.5s forwards !important;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: fixed; /* Ubah ke fixed agar tetap di viewport */
+            font-size: 1.5rem;
+            color: #ff8fab; /* Pink Hati */
+            top: -5vh;
+            animation: fall 10s linear infinite;
+            z-index: 999; /* Pastikan di atas segalanya */
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        #love-letter, #hanan-surprise {
+            display: none;
+            flex-direction: column; 
+            background: #fffaf0; 
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px 15px 20px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease-in-out; 
+            transform-origin: top center;
+            max-height: 85vh; 
+        }
+        
+        #love-letter-content, #hanan-surprise-content {
+            overflow-y: auto; 
+            padding-right: 15px;
+        }
+
+        #love-letter h2, #hanan-surprise h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        #love-letter p, #hanan-surprise p {
+            font-family: var(--font-handwriting);
+            font-size: 1.6rem;
+            line-height: 1.8;
+            text-align: center;
+        }
+        
+        p.signature {
+             text-align: right !important;
+             font-size: 1.4rem;
+        }
+
+        .scene::-webkit-scrollbar,
+        #love-letter-content::-webkit-scrollbar,
+        #hanan-surprise-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scene::-webkit-scrollbar-track,
+        #love-letter-content::-webkit-scrollbar-track,
+        #hanan-surprise-content::-webkit-scrollbar-track {
+            background: rgba(255, 218, 185, 0.2); 
+            border-radius: 10px;
+        }
+
+        .scene::-webkit-scrollbar-thumb,
+        #love-letter-content::-webkit-scrollbar-thumb,
+        #hanan-surprise-content::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color); 
+            border-radius: 10px;
+            border: 2px solid #fffaf0;
+        }
+
+        /* === PERUBAHAN BARU: HUJAN KENANGAN === */
+        #final-shower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: none;
+            z-index: 100;
+        }
+        .falling-photo {
+            position: absolute;
+            top: -200px; /* Mulai dari atas layar */
+            border: 5px solid white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 150px;
+            height: auto;
+            animation: fall-and-sway 10s linear forwards;
+        }
+        @keyframes fall-and-sway {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(120vh) rotate(var(--rotation));
+            }
+        }
+        #final-shower-button {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 101;
+        }
+    </style>
+</head>
+<body>
+    <div id="hearts-container"></div>
+    <div id="app-container">
+
+        <!-- Semua Adegan Kenangan -->
+        <div id="story-scenes">
+            <div class="scene active" id="scene-0">
+                <h1>Untuk Elisa, Cintaku</h1>
+                <p>Di dalam kotak ini, ada sesuatu yang lebih manis dari donat. Klik untuk memulai perjalanan kita...</p>
+                <button onclick="nextScene()">Mulai Petualangan</button>
+            </div>
+            <div class="scene" id="scene-1"><img src="/img/ken1.jpg" alt="Kenangan Sekolah"><h2>Awal Mula di Sekolah</h2><p>Saat aku si kakak kelas, pertama kali melihatmu. Siapa sangka adik kelas ini yang akan menjadi partner seumur hidup?</p><button onclick="nextScene()">Lanjut ke Babak Baru</button></div>
+            <div class="scene" id="scene-2"><img src="/img/ken2.jpg" alt="Awal Pacaran"><h2>15 Oktober 2015</h2><p>Di tanggal ini, cerita kita resmi dimulai. Sebuah langkah awal dari perjalanan yang luar biasa.</p><button onclick="nextScene()">Lihat Janji Kita</button></div>
+            <div class="scene" id="scene-3"><img src="/img/ken3.jpg" alt="Tunangan"><h2>15 Juli 2021</h2><p>Sebuah janji serius, satu langkah lebih dekat untuk menghabiskan sisa hidupku bersamamu.</p><button onclick="nextScene()">Menuju Hari Bahagia</button></div>
+            <div class="scene" id="scene-4"><img src="/img/ken4.jpg" alt="Pernikahan"><h2>22 Juli 2022: SAH!</h2><p>Hari kemenangan! Saat aku bisa dengan bangga memanggilmu "Istriku". Babak baru kita dimulai.</p><button onclick="nextScene()">Lihat Keajaiban Kita</button></div>
+            <div class="scene" id="scene-5"><img src="/img/hanan.jpg" alt="Hanan Lahir"><h2>4 Mei 2023: Hadiah Terindah</h2><p>Keajaiban kecil kita, Hanan, datang melengkapi keluarga kita. Terima kasih telah menjadi Ummi yang hebat untuknya.</p><button onclick="nextScene()">Satu Petualangan Lagi</button></div>
+            <div class="scene" id="scene-6"><img src="/img/elisa.jpg" alt="Foto Elisa"><h2>Petualangan Rasa</h2><p>Berkat kamu, aku jadi tahu dunia perseblakan, perglotakan, dan perayaman. Cinta kita tak instan seperti tahu bulat, kan?</p><button onclick="nextScene()">Satu Kejutan Terakhir...</button></div>
+            <div class="scene" id="scene-7"><img src="/img/ken6.jpg" alt="Selamat Anniversary"><h2>Happy 3rd Anniversary!</h2><p>Tiga tahun menikah, dan setiap hari bersamamu masih terasa seperti petualangan baru. Aku punya sesuatu untukmu...</p><button onclick="showLetter()">Buka Surat Untukmu</button></div>
+        </div>
+
+        <!-- Surat Cinta Tersembunyi -->
+        <div id="love-letter">
+            <div id="love-letter-content">
+                <h2>Untuk Istriku, Elisa...</h2>
+                <p>Sayangku,<br><br>
+                Tiga tahun sudah kita berlayar bersama dalam bahtera pernikahan, dan petualangan ini jauh lebih indah dari yang pernah kubayangkan. Terima kasih sudah menjadi nahkoda keduaku, menemaniku melewati ombak dan lautan tenang.<br><br>
+                Kamu adalah paket lengkap: istri yang luar biasa, Ummi yang hebat untuk Hanan, dan partner kuliner terbaik yang mengenalkanku pada keajaiban seblak & glotak. Cintaku padamu itu nyata, lebih nyata dari tagihan bulanan kita.<br><br>
+                Aku mencintaimu lebih dari kamu mencintai ayam, lebih dalam dari kuah seblak, dan lebih manis dari martabak coklat kacang. Terima kasih untuk segalanya. Mari kita lanjutkan petualangan ini sampai kita tua dan ompong bersama.
+                </p>
+                <p class="signature">Dengan segenap cinta,<br>Suamimu yang paling beruntung,<br>Ardi</p>
+            </div>
+            <button onclick="showHanan()" style="margin: 15px auto 0;">Ada Pesan Lagi...</button>
+        </div>
+
+        <!-- Kejutan dari Hanan -->
+        <div id="hanan-surprise">
+            <div id="hanan-surprise-content">
+                <img src="/img/hanan.jpg" alt="Foto Hanan" style="max-width: 50%; margin: 0 auto 15px;">
+                <h2>Pesan dari Hanan</h2>
+                <p>"Mmii, Abbii, Aku sayang kalian berdua, Nanti kita beli es krim sama minum cucu ya? ya? ya?"</p>
+            </div>
+            <!-- PERUBAHAN TOMBOL -->
+            <button onclick="showFinalShower()" style="margin: 15px auto 0;">Satu Kejutan Terakhir...</button>
+        </div>
+    </div>
+    
+    <!-- PERUBAHAN BARU: Kontainer untuk hujan foto -->
+    <div id="final-shower">
+        <button id="final-shower-button" onclick="restart()">Ulangi Kenangan</button>
+    </div>
+
+    <audio id="bg-music" src="/perfect.mp3" loop></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentScene = 0;
+            const scenes = document.querySelectorAll('#story-scenes .scene');
+            const storyContainer = document.getElementById('story-scenes');
+            const letterContainer = document.getElementById('love-letter');
+            const hananContainer = document.getElementById('hanan-surprise');
+            const finalShowerContainer = document.getElementById('final-shower');
+            const bgMusic = document.getElementById('bg-music');
+            let musicPlayed = false;
+            let clickSound = null; 
+            let photoInterval = null; // PERUBAHAN: Untuk mengontrol interval foto
+
+            const photoSources = [
+                '/img/ken1.jpg', '/img/ken2.jpg', '/img/ken3.jpg', '/img/ken4.jpg', 
+                '/img/ken5.jpg', '/img/ken6.jpg', '/img/elisa.jpg', '/img/hanan.jpg'
+            ];
+
+            function initializeSound() {
+                if (window.Tone && !clickSound) {
+                     clickSound = new Tone.Synth({
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
+                    }).toDestination();
+                }
+            }
+            
+            const heartsContainer = document.getElementById('hearts-container');
+            for (let i = 0; i < 30; i++) { // Jumlah hati ditambah
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerHTML = '♥';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 5 + 7 + 's';
+                heart.style.animationDelay = Math.random() * 7 + 's';
+                heart.style.fontSize = Math.random() * 1 + 1 + 'rem';
+                heartsContainer.appendChild(heart);
+            }
+
+            function playMusic() {
+                if (!musicPlayed) {
+                    if(window.Tone) {
+                        Tone.start(); 
+                        initializeSound(); 
+                    }
+                    bgMusic.play().catch(e => console.log("Autoplay musik dicegah oleh browser."));
+                    musicPlayed = true;
+                }
+            }
+
+            function playClickSound() {
+                if (clickSound) {
+                    clickSound.triggerAttackRelease('C5', '8n');
+                }
+            }
+
+            function showScene(index) {
+                scenes.forEach((scene, i) => {
+                    scene.classList.toggle('active', i === index);
+                });
+            }
+            
+            function transitionOut(element, callback) {
+                element.classList.add('exploding');
+                setTimeout(() => {
+                    if (element) {
+                       element.style.display = 'none';
+                       element.classList.remove('exploding');
+                    }
+                    callback();
+                }, 500);
+            }
+            
+            // PERUBAHAN BARU: Fungsi untuk memulai hujan foto
+            function startPhotoShower() {
+                if (photoInterval) clearInterval(photoInterval); // Hentikan interval lama jika ada
+
+                photoInterval = setInterval(() => {
+                    const photo = document.createElement('img');
+                    photo.src = photoSources[Math.floor(Math.random() * photoSources.length)];
+                    photo.className = 'falling-photo';
+                    photo.style.left = Math.random() * 90 + 'vw'; // Agar tidak terlalu ke tepi
+                    photo.style.setProperty('--rotation', `${Math.random() * 60 - 30}deg`);
+                    photo.style.animationDuration = `${Math.random() * 5 + 8}s`;
+
+                    finalShowerContainer.appendChild(photo);
+
+                    setTimeout(() => {
+                        photo.remove();
+                    }, 13000); // Hapus foto setelah 13 detik
+                }, 800); // Buat foto baru setiap 800ms
+            }
+
+            window.nextScene = function() {
+                playMusic();
+                playClickSound();
+                if (currentScene < scenes.length - 1) {
+                    transitionOut(scenes[currentScene], () => {
+                        currentScene++;
+                        showScene(currentScene);
+                    });
+                }
+            };
+
+            window.showLetter = function() {
+                playMusic();
+                playClickSound();
+                transitionOut(scenes[currentScene], () => {
+                    storyContainer.style.display = 'none';
+                    letterContainer.style.display = 'flex';
+                });
+            };
+
+            window.showHanan = function() {
+                playClickSound();
+                transitionOut(letterContainer, () => {
+                    hananContainer.style.display = 'flex';
+                });
+            };
+
+            // PERUBAHAN BARU: Menampilkan adegan terakhir
+            window.showFinalShower = function() {
+                playClickSound();
+                transitionOut(hananContainer, () => {
+                    document.getElementById('app-container').style.display = 'none'; // Sembunyikan kontainer utama
+                    finalShowerContainer.style.display = 'block';
+                    startPhotoShower();
+                });
+            };
+
+            window.restart = function() {
+                playClickSound();
+                // Hentikan hujan foto
+                if (photoInterval) clearInterval(photoInterval);
+                finalShowerContainer.innerHTML = '<button id="final-shower-button" onclick="restart()">Ulangi Kenangan</button>'; // Bersihkan foto tapi sisakan tombol
+                finalShowerContainer.style.display = 'none';
+
+                // Tampilkan kembali kontainer utama
+                document.getElementById('app-container').style.display = 'block';
+
+                letterContainer.style.display = 'none';
+                hananContainer.style.display = 'none';
+                storyContainer.style.display = 'block';
+
+                currentScene = 0;
+                scenes.forEach(scene => scene.style.display = '');
+                showScene(currentScene);
+            };
+            
+            showScene(0);
+        });
+    </script>
+</body>
+</html>
