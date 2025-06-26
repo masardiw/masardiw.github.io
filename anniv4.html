@@ -158,6 +158,9 @@
         }
 
         /* Header Section */
+        .header {
+            position: relative; /* Diperlukan untuk efek hujan */
+        }
         .header img {
             width: 150px;
             height: 150px;
@@ -171,6 +174,40 @@
             font-size: 1.05rem;
             font-style: italic;
         }
+        .header-content {
+            position: relative;
+            z-index: 2; /* Memastikan konten di atas hujan */
+        }
+        
+        /* Love Rain Effect */
+        #love-rain-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            top: -50px;
+            font-size: 1.5rem;
+            color: var(--red-velvet);
+            animation-name: loveFall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            user-select: none;
+        }
+
+        @keyframes loveFall {
+            to {
+                transform: translateY(calc(100% + 100px)); /* Jatuh melewati bagian bawah header */
+            }
+        }
+
 
         /* Counter Section */
         .counter-section h2 {
@@ -456,13 +493,16 @@
         
         <!-- Header Section -->
         <header class="content-section header" id="header">
-            <img src="https://masardiw.github.io/img/elisa.jpg" alt="Foto Elisa" loading="lazy" decoding="async">
-            <h2>Untuk Istriku Tercinta, Elisa</h2>
-            <p>
-                <b><strong>Happy 3rd Anniverary!</strong></b><br><br>
-                Sayang, tiga tahun yang penuh warna telah kita lewati. Kamu hebat banget bisa bertahan sama aku dan sekarang ditambah sama 'bos kecil' kita, Hanan. Setiap detik bersamamu adalah pelajaran tentang cinta dan kesabaran... terutama kesabaran. Terima kasih telah menjadi partner 'jajan seblak' terbaik dan Ummi paling super. Aku tidak bisa membayangkan hidupku tanpamu. Mari kita terus membangun 'kerajaan' kecil kita ini sampai Jannah-Nya.
-                <br><br><strong>22 Juli 2022 - Selamanya.</strong>
-            </p>
+            <div id="love-rain-container"></div>
+            <div class="header-content">
+                <img src="https://masardiw.github.io/img/elisa.jpg" alt="Foto Elisa" loading="lazy" decoding="async">
+                <h2>Untuk Istriku Tercinta, Elisa</h2>
+                <p>
+                    <b><strong>Happy 3rd Anniverary!</strong></b><br><br>
+                    Sayang, tiga tahun yang penuh warna telah kita lewati. Kamu hebat banget bisa bertahan sama aku dan sekarang ditambah sama 'bos kecil' kita, Hanan. Setiap detik bersamamu adalah pelajaran tentang cinta dan kesabaran... terutama kesabaran. Terima kasih telah menjadi partner 'jajan seblak' terbaik dan Ummi paling super. Aku tidak bisa membayangkan hidupku tanpamu. Mari kita terus membangun 'kerajaan' kecil kita ini sampai Jannah-Nya.
+                    <br><br><strong>22 Juli 2022 - Selamanya.</strong>
+                </p>
+            </div>
         </header>
 
         <!-- Counter Section -->
@@ -603,12 +643,36 @@
                 document.getElementById('hours').innerText = hours;
             }
 
+            // --- FUNGSI EFEK HUJAN HATI ---
+            function createLoveRain() {
+                const container = document.getElementById('love-rain-container');
+                if (!container) return;
+                const heartCount = 20;
+
+                for (let i = 0; i < heartCount; i++) {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerText = '❤️';
+                    
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                    heart.style.animationDelay = Math.random() * 5 + 's';
+                    heart.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+                    heart.style.opacity = Math.random() * 0.5 + 0.2;
+
+                    container.appendChild(heart);
+                }
+            }
+            // --- AKHIR FUNGSI EFEK HUJAN HATI ---
+
+
             openButton.addEventListener('click', () => {
                 curtain.classList.add('hidden');
                 mainContent.style.display = 'flex';
                 backgroundMusic.play().catch(error => console.log("Autoplay dicegah."));
                 setInterval(updateTimer, 1000 * 3600);
                 updateTimer(); 
+                createLoveRain(); // Panggil efek hujan saat kejutan dibuka
             });
 
             // Logika untuk Modal Kejutan Akhir
