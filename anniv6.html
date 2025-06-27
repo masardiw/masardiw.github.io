@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kejutan Manis untuk Istriku</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tambahkan library jsQR untuk scanning -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    
+    <style>
+        /* CSS Reset and Basic Setup */
+        :root {
+            --peach: #FFDAB9;
+            --pink: #FFC0CB;
+            --red-velvet: #9B2335;
+            --gold: #FFD700;
+            --dark-text: #5d2b33;
+            --light-bg: #fff0f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--light-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--peach), var(--pink));
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--pink), var(--red-velvet));
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            overflow: hidden; /* Mencegah scroll saat di layar awal */
+        }
+        
+        body.unlocked {
+            overflow: auto;
+            overflow-x: hidden;
+        }
+
+        /* --- STYLING BARU UNTUK QR SCANNER --- */
+        #qr-scanner-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #1a0f12; /* Warna dasar red velvet sangat gelap */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            flex-direction: column;
+            transition: opacity 0.5s ease-out;
+        }
+        #qr-scanner-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #qr-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            opacity: 0.4; /* Membuat video sedikit temaram */
+        }
+        .scanner-overlay {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+        .scanner-overlay h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+        }
+         .scanner-overlay p {
+            font-size: 1rem;
+            margin-top: 25px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+        }
+        .scan-box {
+            width: 250px;
+            height: 250px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Sudut Dekoratif */
+        .scan-box .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-style: solid;
+            border-color: var(--gold);
+        }
+        .scan-box .corner-tl { top: -2px; left: -2px; border-width: 5px 0 0 5px; border-top-left-radius: 20px; }
+        .scan-box .corner-tr { top: -2px; right: -2px; border-width: 5px 5px 0 0; border-top-right-radius: 20px; }
+        .scan-box .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 5px 5px; border-bottom-left-radius: 20px; }
+        .scan-box .corner-br { bottom: -2px; right: -2px; border-width: 0 5px 5px 0; border-bottom-right-radius: 20px; }
+
+        /* Garis Pemindai */
+        .scan-box::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            box-shadow: 0 0 15px var(--gold);
+            animation: scan 3s infinite ease-in-out;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: calc(100% - 5px); }
+            100% { top: 0; }
+        }
+        
+        /* --- KADO HATI SCREEN --- */
+        .curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            clip-path: url(#heart-clip);
+            -webkit-clip-path: url(#heart-clip);
+            transition: visibility 0s 1.5s;
+            visibility: hidden; /* Sembunyi secara default */
+        }
+        .curtain.visible {
+            visibility: visible;
+        }
+        .curtain.opening {
+            visibility: hidden;
+        }
+        .curtain-panel {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--peach), var(--pink));
+            transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        .curtain.opening .curtain-left { transform: translateX(-100%); }
+        .curtain.opening .curtain-right { transform: translateX(100%); }
+
+        .curtain-content {
+            position: absolute;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            color: var(--red-velvet);
+            transition: opacity 0.5s ease;
+        }
+        .curtain.opening .curtain-content { opacity: 0; }
+        .curtain h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 5px rgba(255,255,255,0.5);
+        }
+        .curtain p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            max-width: 300px;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.5);
+        }
+        .curtain-button {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 2px solid var(--gold);
+            background-color: var(--red-velvet);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .curtain-button svg { width: 24px; height: 24px; fill: currentColor; }
+        .curtain-button:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); }
+
+        /* --- KONTEN UTAMA --- */
+        .main-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 1.5s 1s ease-in-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .content-section {
+            width: 100%; max-width: 600px; background-color: white; padding: 30px 20px;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(155, 35, 53, 0.1); margin-bottom: 30px;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            position: relative; overflow: hidden;
+        }
+        .content-section.visible { opacity: 1; transform: translateY(0); }
+
+        h2 { font-family: 'Great Vibes', cursive; font-size: 3rem; color: var(--red-velvet); margin-bottom: 20px; }
+        p { font-size: 1rem; line-height: 1.7; margin-bottom: 15px; }
+
+        /* Header Section */
+        .header { position: relative; }
+        .header img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); margin-bottom: 20px; }
+        .header p { font-size: 1.05rem; font-style: italic; }
+        .header-content { position: relative; z-index: 2; }
+        
+        /* Love Rain Effect */
+        #love-rain-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1; }
+        .heart { position: absolute; top: -50px; font-size: 1.5rem; color: var(--red-velvet); animation: loveFall linear infinite; user-select: none; }
+        @keyframes loveFall { to { transform: translateY(calc(100% + 100px)); } }
+
+        /* Styles lainnya tetap sama */
+        .counter-section h2 { font-size: 2.5rem; }
+        #countdown-timer { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .timer-box { background: var(--light-bg); padding: 10px 15px; border-radius: 15px; border: 2px solid var(--peach); min-width: 75px; font-size: 0.9rem; }
+        .timer-box span { font-size: 2rem; font-weight: 700; color: var(--red-velvet); display: block; }
+        .timeline { list-style: none; position: relative; padding: 20px 0; }
+        .timeline:before { content: ''; position: absolute; top: 0; left: 20px; height: 100%; width: 4px; background: linear-gradient(var(--peach), var(--pink)); border-radius: 2px; }
+        .timeline-item { margin-bottom: 20px; padding-left: 50px; position: relative; text-align: left; }
+        .timeline-item:before { content: ''; position: absolute; left: 12px; top: 5px; width: 20px; height: 20px; border-radius: 50%; background-color: var(--red-velvet); border: 3px solid var(--gold); }
+        .timeline-item h3 { font-weight: 600; color: var(--red-velvet); }
+        .timeline-item span { font-size: 0.9rem; color: #888; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        .gallery-grid img { width: 100%; height: 180px; object-fit: cover; border-radius: 15px; border: 3px solid var(--peach); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
+        .gallery-grid img:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .letter { text-align: left; background: linear-gradient(to bottom, #fff, #fff9f9); padding: 30px; border-left: 5px solid var(--gold); }
+        .letter p { font-size: 1.05rem; }
+        .letter::after { content: ''; position: absolute; bottom: -25px; right: -20px; width: 150px; height: 150px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFC0CB'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-size: contain; opacity: 0.15; transform: rotate(-15deg); }
+        #hanan img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--pink); margin-bottom: 15px; }
+        #hanan h3 { margin-top: 15px; }
+        footer { padding-top: 20px; text-align: center; }
+        .final-surprise-btn { font-family: 'Great Vibes', cursive; font-size: 1.8rem; padding: 15px 30px; border-radius: 50px; border: 2px solid var(--gold); background: var(--red-velvet); color: white; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .final-surprise-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        #back-to-top-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: var(--red-velvet); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; display: none; opacity: 0.7; z-index: 99; transition: opacity 0.3s, transform 0.3s; }
+        #back-to-top-btn:hover { opacity: 1; transform: scale(1.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 101; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 90%; width: 380px; position: relative; transform: scale(0.7); transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        .modal-content .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; color: #aaa; cursor: pointer; line-height: 1; }
+        .modal-content .close-btn:hover { color: #333; }
+        .modal-content h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .photo-modal-content img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
+        .photo-modal-content p { font-style: italic; }
+        .final-modal-content .hearts { font-size: 2rem; color: var(--red-velvet); margin: 10px 0 5px 0; }
+        .final-modal-content .final-love { font-size: 1.5rem; font-family: 'Great Vibes', cursive; color: var(--red-velvet); animation: pulse 2s infinite ease-in-out; display: block; transform: translateZ(0); -webkit-font-smoothing: antialiased; }
+        @keyframes pulse { 0% { transform: scale(1) translateZ(0); } 50% { transform: scale(1.1) translateZ(0); } 100% { transform: scale(1) translateZ(0); } }
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: var(--pink); opacity: 0.7; animation: fall 5s linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh); opacity: 0; } }
+    </style>
+</head>
+<body id="top">
+    
+    <!-- SVG Clip-path Definition for Heart Shape -->
+    <svg width="0" height="0">
+        <defs>
+            <clipPath id="heart-clip" clipPathUnits="objectBoundingBox">
+                <path d="M0.5,1 C0.5,1,0,0.7,0,0.3 A0.25,0.25,0,0,1,0.5,0.3 A0.25,0.25,0,0,1,1,0.3 C1,0.7,0.5,1,0.5,1 Z" />
+            </clipPath>
+        </defs>
+    </svg>
+
+    <!-- LAYAR QR SCANNER -->
+    <div id="qr-scanner-screen">
+        <video id="qr-video" playsinline></video>
+        <div class="scanner-overlay">
+            <div class="scan-box">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+            </div>
+            <h1>Scan Kode Cinta</h1>
+            <p>Arahkan kamera ke QR code di dalam brownis</p>
+        </div>
+        <canvas id="qr-canvas" style="display: none;"></canvas>
+    </div>
+
+    <!-- LAYAR KADO HATI (AWALNYA TERSEMBUNYI) -->
+    <div class="curtain" id="curtain">
+        <div class="curtain-panel curtain-left"></div>
+        <div class="curtain-panel curtain-right"></div>
+        <div class="curtain-content">
+            <h1>Kejutan Berhasil!</h1>
+            <p>Sekarang, buka kadonya untuk melihat isinya...</p>
+            <button class="curtain-button" id="open-surprise">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 7.55V19c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V7.55c0-.8.48-1.52 1.21-1.83L12 3.4l6.79 2.32c.73.31 1.21 1.03 1.21 1.83zM12 5.14L6 7.23v11.77h12V7.23L12 5.14zM11 9h2v10h-2zM3 5h18v2H3z"/></svg>
+                Buka Kado
+            </button>
+        </div>
+    </div>
+
+    <!-- KONTEN UTAMA -->
+    <div class="main-content" id="main-content">
+        <!-- Semua section konten ada di sini, tidak ada perubahan -->
+        <header class="content-section header" id="header">
+            <div id="love-rain-container"></div>
+            <div class="header-content">
+                <img src="https://masardiw.github.io/img/elisa.jpg" alt="Foto Elisa" loading="lazy" decoding="async">
+                <h2>Untuk Istriku Tercinta, Elisa</h2>
+                <p>
+                    <b><strong>Happy 3rd Anniverary!</strong></b><br><br>
+                    Sayang, tiga tahun yang penuh warna telah kita lewati. Kamu hebat banget bisa bertahan sama aku dan sekarang ditambah sama 'bos kecil' kita, Hanan. Setiap detik bersamamu adalah pelajaran tentang cinta dan kesabaran... terutama kesabaran. Terima kasih telah menjadi partner 'jajan seblak' terbaik dan Ummi paling super. Aku tidak bisa membayangkan hidupku tanpamu. Mari kita terus membangun 'kerajaan' kecil kita ini sampai Jannah-Nya.
+                    <br><br><strong>22 Juli 2022 - Selamanya.</strong>
+                </p>
+            </div>
+        </header>
+
+        <section class="content-section counter-section visible" id="counter">
+            <h2>Takan Lekang Oleh Waktu.</h2>
+            <p>Sudah selama ini kita mengarungi bahtera rumah tangga:</p>
+            <div id="countdown-timer">
+                <div class="timer-box"><span id="years">0</span>Tahun</div>
+                <div class="timer-box"><span id="months">0</span>Bulan</div>
+                <div class="timer-box"><span id="days">0</span>Hari</div>
+                <div class="timer-box"><span id="hours">0</span>Jam</div>
+            </div>
+        </section>
+
+        <section class="content-section" id="timeline-section">
+            <h2>Kisah Kita</h2>
+            <ul class="timeline">
+                <li class="timeline-item"><h3>Pertama Bertemu</h3><span>Di Sekolah</span><p>Saat kamu masih jadi adik kelas yang lucu, dan aku kakak kelas yang (sok) keren.</p></li>
+                <li class="timeline-item"><h3>Awal Perjalanan Cinta</h3><span>15 Oktober 2015</span><p>Tanggal di mana kita resmi memulai cerita, yang ternyata akan sepanjang dan seindah ini.</p></li>
+                <li class="timeline-item"><h3>Satu Langkah Lebih Serius</h3><span>15 Juli 2021</span><p>Momen di mana aku mengikatmu dengan janji, disaksikan keluarga kita.</p></li>
+                <li class="timeline-item"><h3>Sah!</h3><span>22 Juli 2022</span><p>Hari paling bahagia, di mana aku bisa resmi memanggilmu istri dan teman hidupku selamanya.</p></li>
+                <li class="timeline-item"><h3>Hadiah Terindah Hadir</h3><span>4 Mei 2023</span><p>Kebahagiaan kita menjadi lengkap dengan lahirnya jagoan kecil kita, Hanan.</p></li>
+                <li class="timeline-item"><h3>Hari Ini, Anniversary ke-3</h3><span>22 Juli 2025</span><p>Dan kita di sini, merayakan tiga tahun pernikahan yang luar biasa. Semoga akan ada banyak tahun-tahun indah berikutnya.</p></li>
+            </ul>
+        </section>
+        
+        <section class="content-section" id="hanan">
+            <h2>Hadiah Terindah Kita</h2>
+            <img src="https://masardiw.github.io/img/hanan.jpg" alt="Foto Hanan" loading="lazy" decoding="async">
+            <h3>Hanan Adhya Wijaya</h3>
+            <p>Kehadiran Hanan Adhya Wijaya (Lahir 4 Mei 2023) menjadikan keluarga kecil kita semakin ramai dan 'teratur' (sesuai aturan dia, tentunya). Tawa dan tangisnya adalah soundtrack resmi rumah kita. Di usianya yang ke-2 tahun, dia adalah bos kecil, sumber kebahagiaan, sekaligus alarm alami kita yang tak ternilai.</p>
+        </section>
+
+        <section class="content-section letter" id="letter-section">
+            <h2>Surat Cinta Untukmu</h2>
+            <p><strong>Hai Elisa sayang,</strong></p>
+            <p>Lucu ya kalau diingat-ingat lagi. Dari cuma kenal sebagai adik kelas, sampai sekarang jadi ibu dari anakku. Perjalanan kita ini bukti nyata kalau cinta itu nggak instan, nggak kayak tahu bulat yang digoreng dadakan lima ratusan... enaak!</p>
+            <p>Terima kasih ya sudah jadi partner terbaik dalam segala hal. Kamu yang ngenalin aku sama dunia perjajanan yang luar biasa, seperti seblak dan glotak. Mungkin bagi orang lain itu biasa, tapi buatku, itu adalah petualangan rasa baru bersamamu.</p>
+            <p>Sama seperti ayam kesukaanmu, cintaku padamu juga bisa diolah jadi apa aja. Bisa jadi cinta yang digoreng garing penuh tawa, bisa jadi cinta yang direbus lembut penuh pengertian, atau cinta yang dibumbuin pedas penuh gairah. Hehe.</p>
+            <p>Terima kasih sudah menjadi istri dan ibu yang hebat. Aku sangat bersyukur memilikimu. Mari kita lanjutkan petualangan ini, menciptakan lebih banyak lagi kenangan manis (dan mungkin mencoba jajanan aneh lainnya).</p>
+            <p>Love you always ❤️,<br><strong>Suamimu, Ardi.</strong></p>
+        </section>
+        
+        <section class="content-section" id="gallery-section">
+            <h2>Album Kenangan Kita</h2>
+            <p>Beberapa dari ribuan momen indah yang kita lewati bersama. Klik fotonya untuk kejutan!</p>
+            <div class="gallery-grid">
+                <img src="https://masardiw.github.io/img/ken1.jpg" alt="Kenangan 1" loading="lazy" decoding="async" data-message="Di balik senyum ini, ada cerita tentang kita yang lebih manis dari martabak coklat kacang favoritmu.">
+                <img src="https://masardiw.github.io/img/ken2.jpg" alt="Kenangan 2" loading="lazy" decoding="async" data-message="Setiap momen bersamamu, bahkan yang sederhana seperti ini, adalah episode terbaik dalam hidupku.">
+                <img src="https://masardiw.github.io/img/ken3.jpg" alt="Kenangan 3" loading="lazy" decoding="async" data-message="Ini bukti kalau aku selalu bahagia di dekatmu. Efek sampingnya: jadi pengen jajan seblak terus. 😂">
+                <img src="https://masardiw.github.io/img/ken4.jpg" alt="Kenangan 4" loading="lazy" decoding="async" data-message="Lihat kan? Kamu selalu berhasil membuatku tersenyum. Terima kasih sudah menjadi sumber kebahagiaanku.">
+                <img src="https://masardiw.github.io/img/ken5.jpg" alt="Kenangan 5" loading="lazy" decoding="async" data-message="Satu foto, ribuan kenangan. Dan di setiap kenangan itu, selalu ada kamu, partner terbaikku dalam segala hal.">
+                <img src="https://masardiw.github.io/img/ken6.jpg" alt="Kenangan 6" loading="lazy" decoding="async" data-message="Mungkin ini cuma foto biasa, tapi momennya luar biasa karena aku melewatinya bersamamu. Love you!">
+            </div>
+        </section>
+
+        <footer>
+            <button class="final-surprise-btn" id="final-surprise-btn">I Love You, Now and Forever...</button>
+        </footer>
+    </div>
+    
+    <!-- MODAL -->
+    <div class="modal-overlay" id="final-surprise-modal">
+        <div class="modal-content final-modal-content">
+            <span class="close-btn" id="close-final-modal-btn">&times;</span>
+            <h2>Kejutan Lagi!</h2>
+            <p>Karena cintaku padamu itu tak terbatas, sama seperti kejutan yang tak akan pernah habis. Terima kasih untuk segalanya, sayang.</p>
+            <p class="hearts">❤️❤️❤️</p>
+            <p class="final-love"><strong>Ardi Love Elisa</strong></p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="photo-message-modal">
+        <div class="modal-content photo-modal-content">
+            <span class="close-btn" id="close-photo-modal-btn">&times;</span>
+            <img id="modal-photo-img" src="" alt="Kenangan" loading="lazy" decoding="async">
+            <p id="modal-photo-message"></p>
+        </div>
+    </div>
+
+    <!-- Tombol Kembali ke Atas -->
+    <button id="back-to-top-btn" title="Kembali ke atas">&uarr;</button>
+
+    <!-- Background Music -->
+    <audio id="bg-music" loop>
+        <source src="https://masardiw.github.io/lesung.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+            const qrScannerScreen = document.getElementById('qr-scanner-screen');
+            const video = document.getElementById('qr-video');
+            const canvasElement = document.getElementById('qr-canvas');
+            const canvas = canvasElement.getContext('2d');
+            
+            const curtain = document.getElementById('curtain');
+            const openButton = document.getElementById('open-surprise');
+            const mainContent = document.getElementById('main-content');
+            const backgroundMusic = document.getElementById('bg-music');
+            
+            const finalSurpriseBtn = document.getElementById('final-surprise-btn');
+            const finalSurpriseModal = document.getElementById('final-surprise-modal');
+            const closeFinalModalBtn = document.getElementById('close-final-modal-btn');
+            
+            const galleryImages = document.querySelectorAll('.gallery-grid img');
+            const photoMessageModal = document.getElementById('photo-message-modal');
+            const closePhotoModalBtn = document.getElementById('close-photo-modal-btn');
+            const modalPhotoImage = document.getElementById('modal-photo-img');
+            const modalPhotoMessage = document.getElementById('modal-photo-message');
+
+            const backToTopBtn = document.getElementById('back-to-top-btn');
+
+            let stream;
+            
+            // --- LOGIKA UTAMA ---
+            
+            // 1. Mulai Scanner
+            async function startScanner() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true); // Required to work on iOS
+                    video.play();
+                    requestAnimationFrame(tick);
+                } catch(err) {
+                    console.error("Camera access error:", err);
+                    qrScannerScreen.innerHTML = `<div class="scanner-overlay"><h1>Akses Kamera Ditolak</h1><p>Kejutan ini memerlukan izin kamera. Mohon segarkan halaman dan izinkan akses kamera ya, sayang.</p></div>`;
+                }
+            }
+
+            // 2. Proses setiap frame video untuk mencari QR Code
+            function tick() {
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                    canvasElement.height = video.videoHeight;
+                    canvasElement.width = video.videoWidth;
+                    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                    const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+
+                    if (code && code.data === "22072022") {
+                        // Kode Benar! Lanjutkan ke tahap berikutnya
+                        stream.getTracks().forEach(track => track.stop()); // Matikan kamera
+                        qrScannerScreen.classList.add('hidden');
+                        
+                        setTimeout(() => {
+                           curtain.classList.add('visible'); // Tampilkan kado hati
+                        }, 300);
+
+                        return; // Hentikan loop scanning
+                    }
+                }
+                requestAnimationFrame(tick);
+            }
+            
+            startScanner(); // Mulai semuanya!
+
+            // 3. Buka Kado Hati
+            openButton.addEventListener('click', () => {
+                curtain.classList.add('opening');
+                body.classList.add('unlocked');
+                
+                setTimeout(() => {
+                    mainContent.style.display = 'flex';
+                    backgroundMusic.play().catch(error => console.log("Autoplay dicegah."));
+                    createLoveRain(); 
+                }, 500); 
+                
+                setInterval(updateTimer, 1000 * 3600);
+                updateTimer(); 
+            });
+
+            // --- Fungsi-fungsi lainnya ---
+            function updateTimer() {
+                const weddingDate = new Date('2022-07-22T14:00:00+07:00');
+                const now = new Date();
+                let years = now.getFullYear() - weddingDate.getFullYear();
+                let months = now.getMonth() - weddingDate.getMonth();
+                let days = now.getDate() - weddingDate.getDate();
+                let hours = now.getHours() - weddingDate.getHours();
+                
+                if (hours < 0) { days--; hours += 24; }
+                if (days < 0) { 
+                    months--;
+                    const lastDayOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                    days += lastDayOfPrevMonth;
+                }
+                if (months < 0) { years--; months += 12; }
+
+                document.getElementById('years').innerText = years;
+                document.getElementById('months').innerText = months;
+                document.getElementById('days').innerText = days;
+                document.getElementById('hours').innerText = hours;
+            }
+
+            function createLoveRain() {
+                const container = document.getElementById('love-rain-container');
+                if (!container) return;
+                const heartCount = 20;
+
+                for (let i = 0; i < heartCount; i++) {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerText = '❤️';
+                    
+                    heart.style.left = Math.random() * 100 + '%';
+                    heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                    heart.style.animationDelay = Math.random() * 5 + 's';
+                    heart.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+                    heart.style.opacity = Math.random() * 0.5 + 0.2;
+
+                    container.appendChild(heart);
+                }
+            }
+            
+            function createConfetti() {
+                const confettiContainer = finalSurpriseModal.querySelector('.modal-content');
+                for (let i = 0; i < 50; i++) {
+                    const c = document.createElement('div');
+                    c.classList.add('confetti');
+                    c.style.left = Math.random() * 100 + '%';
+                    c.style.animationDelay = Math.random() * 5 + 's';
+                    const colors = ['var(--pink)', 'var(--gold)', 'var(--peach)', '#fff'];
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    if(Math.random() > 0.5) {
+                        c.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+                    }
+                    confettiContainer.appendChild(c);
+                    c.addEventListener('animationend', () => c.remove());
+                }
+            }
+            
+            finalSurpriseBtn.addEventListener('click', () => {
+                finalSurpriseModal.style.display = 'flex';
+                setTimeout(() => finalSurpriseModal.classList.add('show'), 10);
+                createConfetti();
+            });
+            
+            function closeModal(modal) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 400);
+            }
+
+            closeFinalModalBtn.addEventListener('click', () => closeModal(finalSurpriseModal));
+            finalSurpriseModal.addEventListener('click', (e) => {
+                if (e.target === finalSurpriseModal) closeModal(finalSurpriseModal);
+            });
+
+            galleryImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    modalPhotoImage.src = img.src;
+                    modalPhotoMessage.textContent = img.dataset.message;
+                    photoMessageModal.style.display = 'flex';
+                    setTimeout(() => photoMessageModal.classList.add('show'), 10);
+                });
+            });
+
+            closePhotoModalBtn.addEventListener('click', () => closeModal(photoMessageModal));
+            photoMessageModal.addEventListener('click', (e) => {
+                if (e.target === photoMessageModal) closeModal(photoMessageModal);
+            });
+
+            window.addEventListener('scroll', () => {
+                backToTopBtn.style.display = (window.scrollY > 300) ? 'block' : 'none';
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            const sections = document.querySelectorAll('.content-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+
+</body>
+</html>
