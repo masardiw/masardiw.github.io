@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kejutan Manis untuk Elisa</title>
+    <title>Kejutan Manis untuk Istriku</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -358,7 +358,7 @@
 
     <!-- LAYAR PERTANYAAN CINTA -->
     <div id="love-question-screen" class="fullscreen-container hidden">
-        <h1>Do You Love Me?</h1>
+        <h1><center>Do You Love Me?</center></h1>
         <div class="button-container">
             <button id="yes-btn" class="love-btn">Yes</button>
             <button id="no-btn" class="love-btn">No</button>
@@ -556,9 +556,8 @@
                     setTimeout(() => errorMessage.innerText = "", 2000);
                 }
             });
-
-            // Logika Tombol "No" yang bergerak
-            noBtn.addEventListener('mouseover', () => {
+            
+            function moveNoButton() {
                 if (noBtn.style.position !== 'absolute') {
                     noBtn.style.position = 'absolute';
                 }
@@ -570,7 +569,6 @@
                     newX = Math.random() * (window.innerWidth - noBtn.offsetWidth);
                     newY = Math.random() * (window.innerHeight - noBtn.offsetHeight);
                     
-                    // Cek tabrakan
                     isColliding = (
                         newX < yesRect.right &&
                         newX + noBtn.offsetWidth > yesRect.left &&
@@ -582,6 +580,13 @@
 
                 noBtn.style.left = `${newX}px`;
                 noBtn.style.top = `${newY}px`;
+            }
+
+            // Logika Tombol "No" yang bergerak
+            noBtn.addEventListener('mouseover', moveNoButton);
+            noBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                moveNoButton();
             });
 
             // Logika Tombol "Yes"
