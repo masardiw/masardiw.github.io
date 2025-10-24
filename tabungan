@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <!-- Optimasi untuk perangkat mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Tabungan Jamiyah</title>
+    
+    <!-- Meta PWA -->
+    <meta name="theme-color" content="#3B82F6"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Tabungan">
+
+    <!-- Link PWA (Manifest & Ikon) -->
+    <link rel="manifest" id="manifestLink">
+    
+    <!-- Ikon SVG Inline sebagai Data URI (Mandiri) -->
+    <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233B82F6'%3E%3Cpath d='M11.8 1C6.38 1 2 3.01 2 5.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 1 11.8 1zm0 8C6.38 9 2 11.01 2 13.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 9 11.8 9zm0 8C6.38 17 2 19.01 2 21.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 17 11.8 17z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" id="appleIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233B82F6'%3E%3Cpath d='M11.8 1C6.38 1 2 3.01 2 5.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 1 11.8 1zm0 8C6.38 9 2 11.01 2 13.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 9 11.8 9zm0 8C6.38 17 2 19.01 2 21.5s4.38 4.5 9.8 4.5 9.8-2.01 9.8-4.5S17.22 17 11.8 17z'/%3E%3C/svg%3E">
+
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat jsPDF dan html2canvas untuk ekspor PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* Menggunakan font Inter yang bersih */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Menyembunyikan scrollbar untuk tampilan seperti aplikasi */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 
+      Kontainer utama aplikasi 
+      Dibuat agar terlihat seperti aplikasi di ponsel dengan max-w-md
+    -->
+    <div class="max-w-md mx-auto min-h-screen bg-white shadow-2xl flex flex-col">
+
+        <!-- Header Aplikasi -->
+        <header class="bg-blue-600 text-white p-5 shadow-md">
+            <h1 class="text-2xl font-bold text-center">Tabungan Jamiyah</h1>
+        </header>
+
+        <!-- Navigasi Tab di Atas (Dipindahkan) -->
+        <nav class="bg-white shadow-md border-b border-gray-200 grid grid-cols-3 gap-1">
+            <button data-tab="tab-setoran" class="tab-btn p-4 text-center text-sm font-medium border-b-4 border-blue-600 text-blue-600">
+                Setoran
+            </button>
+            <button data-tab="tab-anggota" class="tab-btn p-4 text-center text-sm font-medium border-b-4 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Anggota
+            </button>
+            <button data-tab="tab-laporan" class="tab-btn p-4 text-center text-sm font-medium border-b-4 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                Laporan
+            </button>
+        </nav>
+
+        <!-- Konten Utama -->
+        <main class="flex-grow p-4 md:p-6 overflow-y-auto">
+            
+            <!-- Konten Tab akan ditampilkan di sini -->
+            
+            <!-- Tab 1: Form Setoran -->
+            <div id="tab-setoran" class="tab-content space-y-6">
+                <h2 class="text-xl font-semibold text-gray-800">Tambah Setoran Baru</h2>
+                <form id="formSetoran" class="space-y-4">
+                    <div>
+                        <label for="selectAnggotaSetoran" class="block text-sm font-medium text-gray-700 mb-1">Nama Anggota</label>
+                        <select id="selectAnggotaSetoran" name="anggotaId" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">-- Pilih Anggota --</option>
+                            <!-- Opsi anggota akan dimuat oleh JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tanggalSetoran" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Setoran</label>
+                        <input type="date" id="tanggalSetoran" name="tanggal" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="nominalSetoran" class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
+                        <input type="text" id="nominalSetoran" name="nominal" required placeholder="Contoh: 50.000" inputmode="numeric" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-md">
+                        Tambah Setoran
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tab 2: Form Tambah Anggota & Daftar Anggota -->
+            <div id="tab-anggota" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-semibold text-gray-800">Manajemen Anggota</h2>
+                
+                <!-- Form Tambah Anggota -->
+                <form id="formAnggota" class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                    <h3 class="text-lg font-medium text-gray-900">Tambah Anggota Baru</h3>
+                    <div>
+                        <label for="namaAnggota" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="namaAnggota" name="nama" required placeholder="Nama lengkap anggota" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="tanggalMulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai Menabung</label>
+                        <input type="date" id="tanggalMulai" name="tanggal" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md">
+                        Tambah Anggota
+                    </button>
+                </form>
+                
+                <!-- Daftar Anggota -->
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-3">Daftar Anggota Saat Ini</h3>
+                    <div id="listAnggota" class="space-y-3">
+                        <!-- Daftar anggota akan dimuat oleh JS -->
+                        <p class="text-gray-500 text-center">Belum ada anggota.</p>
+                    </div>
+                </div>
+
+                <!-- (BLOK BARU) Backup & Restore -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                    <h3 class="text-lg font-medium text-gray-900">Backup & Restore Data</h3>
+                    <p class="text-sm text-gray-600">Simpan data Anda ke file, atau pulihkan data dari file backup.</p>
+                    
+                    <!-- Tombol Backup -->
+                    <button id="btnBackupData" class="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md">
+                        Backup Data Sekarang (.json)
+                    </button>
+                    
+                    <!-- Input Restore -->
+                    <div>
+                        <label for="fileRestoreData" class="w-full text-center block bg-yellow-500 text-white p-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-200 shadow-md cursor-pointer">
+                            Restore Data dari File...
+                        </label>
+                        <input type="file" id="fileRestoreData" class="hidden" accept=".json">
+                        <p id="restoreFileName" class="text-sm text-gray-500 mt-2 text-center">Belum ada file dipilih.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab 3: Laporan -->
+            <div id="tab-laporan" class="tab-content hidden space-y-6">
+                <h2 class="text-xl font-semibold text-gray-800">Laporan Tabungan</h2>
+                
+                <!-- Filter Laporan -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="selectAnggotaLaporan" class="block text-sm font-medium text-gray-700 mb-1">Tampilkan Laporan</label>
+                        <select id="selectAnggotaLaporan" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="semua">Semua Anggota</option>
+                            <!-- Opsi anggota akan dimuat oleh JS -->
+                        </select>
+                    </div>
+                     <button id="btnEksporPDF" class="w-full bg-red-600 text-white p-3 rounded-lg font-semibold hover:bg-red-700 transition duration-200 shadow-md">
+                        Ekspor ke PDF
+                    </button>
+                </div>
+                
+                <!-- Area Laporan -->
+                <div id="areaLaporanWrapper">
+                    <!-- ID 'areaLaporan' penting untuk ekspor PDF -->
+                    <div id="areaLaporan" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <!-- Konten laporan akan dimuat oleh JS -->
+                        <p class="text-gray-500 text-center">Pilih filter untuk melihat laporan.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Navigasi Tab di Bawah (Telah dipindahkan ke atas) -->
+    </div>
+
+    <!-- 
+      Modal (Pop-up)
+      Digunakan untuk Konfirmasi, Edit Setoran, dan Edit Anggota
+    -->
+    
+    <!-- Modal Konfirmasi Universal -->
+    <div id="modalKonfirmasi" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4" id="konfirmasiJudul">Konfirmasi Tindakan</h3>
+            <p class="text-gray-700 mb-6" id="konfirmasiPesan">Apakah Anda yakin?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="konfirmasiBatal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</Gbutton>
+                <button id="konfirmasiSetuju" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Edit Anggota -->
+    <div id="modalEditAnggota" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4">Edit Anggota</h3>
+            <form id="formEditAnggota" class="space-y-4">
+                <input type="hidden" id="editAnggotaId">
+                <div>
+                    <label for="editNamaAnggota" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="editNamaAnggota" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="editTanggalMulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai Menabung</label>
+                    <input type="date" id="editTanggalMulai" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="batalEditAnggota" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Edit Setoran -->
+    <div id="modalEditSetoran" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 class="text-lg font-semibold mb-4">Edit Setoran</h3>
+            <form id="formEditSetoran" class="space-y-4">
+                <input type="hidden" id="editSetoranId">
+                <div>
+                    <label for="editSelectAnggotaSetoran" class="block text-sm font-medium text-gray-700 mb-1">Nama Anggota</label>
+                    <!-- Dropdown ini harus diisi ulang saat modal dibuka -->
+                    <select id="editSelectAnggotaSetoran" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <!-- Opsi dimuat JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="editTanggalSetoran" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Setoran</label>
+                    <input type="date" id="editTanggalSetoran" required class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label for="editNominalSetoran" class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
+                    <input type="text" id="editNominalSetoran" required inputmode="numeric" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" id="batalEditSetoran" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Notifikasi/Alert Kustom -->
+    <div id="alertBox" class="fixed top-5 right-5 p-4 rounded-lg shadow-md text-white z-50 transition-transform translate-x-full duration-300">
+        <span id="alertMessage"></span>
+    </div>
+
+    <!-- 
+      (BLOK BARU) Template Inline untuk PWA 
+      Ini adalah "file" virtual yang akan kita daftarkan menggunakan JavaScript.
+    -->
+
+    <!-- Template Service Worker -->
+    <script id="serviceWorkerScript" type="text/sw-script">
+        // Nama cache unik
+        const CACHE_NAME = 'tabungan-jamiyah-cache-v1';
+        
+        // Daftar aset penting yang harus di-cache saat instalasi
+        // './' merujuk ke file HTML utama (aplikasi)
+        const URLS_TO_CACHE = [
+            './',
+            'https://cdn.tailwindcss.com',
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+        ];
+
+        // Event 'install': Dipanggil saat Service Worker pertama kali diinstal
+        self.addEventListener('install', event => {
+            console.log('Service Worker: Menginstal...');
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        console.log('Service Worker: Membuka cache dan menambahkan aset inti');
+                        return cache.addAll(URLS_TO_CACHE);
+                    })
+                    .then(() => self.skipWaiting()) // Aktifkan SW baru segera
+            );
+        });
+
+        // Event 'activate': Dipanggil saat Service Worker diaktifkan
+        // Berguna untuk membersihkan cache lama
+        self.addEventListener('activate', event => {
+            console.log('Service Worker: Mengaktifkan...');
+            event.waitUntil(
+                caches.keys().then(cacheNames => {
+                    return Promise.all(
+                        cacheNames
+                            .filter(cacheName => cacheName !== CACHE_NAME)
+                            .map(cacheName => caches.delete(cacheName))
+                    );
+                }).then(() => self.clients.claim()) // Ambil alih kontrol halaman
+            );
+        });
+
+        // Event 'fetch': Dipanggil setiap kali aplikasi meminta sumber daya (aset)
+        // Strategi: Cache-First (Cari di cache dulu, jika tidak ada, baru ambil dari jaringan)
+        self.addEventListener('fetch', event => {
+            event.respondWith(
+                caches.match(event.request)
+                    .then(response => {
+                        // Jika ada di cache, kembalikan dari cache
+                        if (response) {
+                            return response;
+                        }
+                        // Jika tidak ada, ambil dari jaringan
+                        return fetch(event.request);
+                    })
+            );
+        });
+    </script>
+
+    <!-- Template Manifest JSON -->
+    <script id="appManifest" type="text/manifest-json">
+    {
+        "name": "Tabungan Jamiyah",
+        "short_name": "Tabungan",
+        "description": "Aplikasi Manajemen Tabungan Jamiyah",
+        "start_url": ".",
+        "display": "standalone",
+        "background_color": "#FFFFFF",
+        "theme_color": "#3B82F6",
+        "icons": [
+            {
+                "src": "ICON_DATA_URI_HERE",
+                "sizes": "192x192 512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }
+        ]
+    }
+    </script>
+
+
+    <!-- JavaScript Aplikasi -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Variabel Global & Kunci LocalStorage ---
+            const LS_ANGGOTA = 'tabungan_jamiyah_anggota';
+            const LS_SETORAN = 'tabungan_jamiyah_setoran';
+
+            // --- Selektor DOM ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Form Setoran
+            const formSetoran = document.getElementById('formSetoran');
+            const selectAnggotaSetoran = document.getElementById('selectAnggotaSetoran');
+            const tanggalSetoran = document.getElementById('tanggalSetoran');
+            const nominalSetoran = document.getElementById('nominalSetoran');
+
+            // Form Anggota
+            const formAnggota = document.getElementById('formAnggota');
+            const namaAnggota = document.getElementById('namaAnggota');
+            const tanggalMulai = document.getElementById('tanggalMulai');
+            const listAnggota = document.getElementById('listAnggota');
+            
+            // Laporan
+            const selectAnggotaLaporan = document.getElementById('selectAnggotaLaporan');
+            const areaLaporan = document.getElementById('areaLaporan');
+            const btnEksporPDF = document.getElementById('btnEksporPDF');
+
+            // (BARU) Backup/Restore
+            const btnBackupData = document.getElementById('btnBackupData');
+            const fileRestoreData = document.getElementById('fileRestoreData');
+            const restoreFileName = document.getElementById('restoreFileName');
+
+            // Modal Konfirmasi
+            const modalKonfirmasi = document.getElementById('modalKonfirmasi');
+            const konfirmasiJudul = document.getElementById('konfirmasiJudul');
+            const konfirmasiPesan = document.getElementById('konfirmasiPesan');
+            const konfirmasiBatal = document.getElementById('konfirmasiBatal');
+            const konfirmasiSetuju = document.getElementById('konfirmasiSetuju');
+            let konfirmasiCallback = null;
+
+            // Modal Edit Anggota
+            const modalEditAnggota = document.getElementById('modalEditAnggota');
+            const formEditAnggota = document.getElementById('formEditAnggota');
+            const editAnggotaId = document.getElementById('editAnggotaId');
+            const editNamaAnggota = document.getElementById('editNamaAnggota');
+            const editTanggalMulai = document.getElementById('editTanggalMulai');
+            const batalEditAnggota = document.getElementById('batalEditAnggota');
+            
+            // Modal Edit Setoran
+            const modalEditSetoran = document.getElementById('modalEditSetoran');
+            const formEditSetoran = document.getElementById('formEditSetoran');
+            const editSetoranId = document.getElementById('editSetoranId');
+            const editSelectAnggotaSetoran = document.getElementById('editSelectAnggotaSetoran');
+            const editTanggalSetoran = document.getElementById('editTanggalSetoran');
+            const editNominalSetoran = document.getElementById('editNominalSetoran');
+            const batalEditSetoran = document.getElementById('batalEditSetoran');
+
+            // Alert Box
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+
+            // --- (BLOK BARU) Pendaftaran PWA (Manifest & Service Worker) ---
+            const registerPWA = () => {
+                const iconDataUri = document.getElementById('favicon').href;
+
+                // 1. Daftarkan Manifest
+                try {
+                    const manifestScript = document.getElementById('appManifest');
+                    let manifestJson = manifestScript.innerHTML;
+                    
+                    // Ganti placeholder ikon dengan Data URI ikon SVG kita
+                    manifestJson = manifestJson.replace('ICON_DATA_URI_HERE', iconDataUri);
+                    
+                    const manifestBlob = new Blob([manifestJson], { type: 'application/json' });
+                    const manifestUrl = URL.createObjectURL(manifestBlob);
+                    
+                    document.getElementById('manifestLink').href = manifestUrl;
+                } catch (e) {
+                    console.error('Gagal membuat manifest inline:', e);
+                }
+
+                // 2. Daftarkan Service Worker
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const swScript = document.getElementById('serviceWorkerScript').innerHTML;
+                        const swBlob = new Blob([swScript], { type: 'application/javascript' });
+                        const swUrl = URL.createObjectURL(swBlob);
+
+                        navigator.serviceWorker.register(swUrl)
+                            .then(registration => {
+                                console.log('Service Worker berhasil didaftarkan. Scope:', registration.scope);
+                            })
+                            .catch(error => {
+                                console.error('Pendaftaran Service Worker gagal:', error);
+                            });
+                    } catch (e) {
+                        console.error('Gagal membuat service worker inline:', e);
+                    }
+                } else {
+                    console.warn('Service Worker tidak didukung di browser ini.');
+                }
+            };
+            // --- Akhir Blok PWA ---
+
+
+            // --- Helper Functions (Fungsi Bantuan) ---
+
+            // Mendapatkan data dari LocalStorage
+            const getData = (key) => {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            };
+
+            // Menyimpan data ke LocalStorage
+            const saveData = (key, data) => {
+                localStorage.setItem(key, JSON.stringify(data));
+            };
+
+            // Membuat ID unik sederhana
+            const generateUUID = () => {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            };
+            
+            // Mendapatkan tanggal hari ini (YYYY-MM-DD)
+            const getTodayDate = () => {
+                return new Date().toISOString().split('T')[0];
+            };
+            
+            // Format angka ke Rupiah
+            const formatRupiah = (angka) => {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(angka);
+            };
+
+            // (FUNGSI BARU) Format angka dengan titik ribuan
+            const formatDisplayAngka = (angka) => {
+                if (angka === '' || angka === null || isNaN(Number(angka))) return '';
+                // Hapus non-digit dulu untuk memastikan
+                const stringAngka = String(angka).replace(/[^0-9]/g, '');
+                if (stringAngka === '') return '';
+                return new Intl.NumberFormat('id-ID').format(stringAngka);
+            };
+
+            // (FUNGSI BARU) Hapus format angka (titik) untuk penyimpanan
+            const deformatAngka = (value) => {
+                if (!value) return 0;
+                return parseInt(value.toString().replace(/[^0-9]/g, ''), 10) || 0;
+            };
+
+            // Format tanggal (DD MMMM YYYY)
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            };
+            
+            // Menampilkan notifikasi/alert
+            const showAlert = (message, isError = false) => {
+                alertMessage.textContent = message;
+                alertBox.classList.remove(isError ? 'bg-green-500' : 'bg-red-600', 'translate-x-full');
+                alertBox.classList.add(isError ? 'bg-red-600' : 'bg-green-500', 'translate-x-0');
+                
+                setTimeout(() => {
+                    alertBox.classList.remove('translate-x-0');
+                    alertBox.classList.add('translate-x-full');
+                }, 3000);
+            };
+
+            // Menampilkan modal konfirmasi
+            const showKonfirmasi = (judul, pesan, callback, bahaya = true) => {
+                konfirmasiJudul.textContent = judul;
+                konfirmasiPesan.textContent = pesan;
+                konfirmasiCallback = callback;
+                
+                konfirmasiSetuju.classList.toggle('bg-red-600', bahaya);
+                konfirmasiSetuju.classList.toggle('hover:bg-red-700', bahaya);
+                konfirmasiSetuju.classList.toggle('bg-blue-600', !bahaya);
+                konfirmasiSetuju.classList.toggle('hover:bg-blue-700', !bahaya);
+
+                modalKonfirmasi.classList.remove('hidden');
+            };
+            
+            // Menyembunyikan modal konfirmasi
+            const hideKonfirmasi = () => {
+                modalKonfirmasi.classList.add('hidden');
+                konfirmasiCallback = null;
+            };
+
+            // Menampilkan modal
+            const showModal = (modalElement) => {
+                modalElement.classList.remove('hidden');
+            };
+
+            // Menyembunyikan modal
+            const hideModal = (modalElement) => {
+                modalElement.classList.add('hidden');
+            };
+
+            // --- (FUNGSI BARU) Handler Backup Data ---
+            const handleBackup = () => {
+                try {
+                    const anggota = getData(LS_ANGGOTA);
+                    const setoran = getData(LS_SETORAN);
+                    
+                    const backupData = {
+                        anggota: anggota,
+                        setoran: setoran,
+                        backupDate: new Date().toISOString()
+                    };
+                    
+                    const jsonString = JSON.stringify(backupData, null, 2); // null, 2 agar rapi
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    const tanggal = new Date().toISOString().split('T')[0].replace(/-/g, '');
+                    a.download = `backup_tabungan_jamiyah_${tanggal}.json`;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showAlert('Data berhasil di-backup.');
+                } catch (error) {
+                    console.error('Gagal melakukan backup:', error);
+                    showAlert('Gagal melakukan backup data.', true);
+                }
+            };
+
+            // --- (FUNGSI BARU) Handler Restore Data ---
+            const handleRestore = (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+                
+                // Validasi tipe file
+                if (file.type !== 'application/json') {
+                    showAlert('File harus berekstensi .json', true);
+                    fileRestoreData.value = ''; // Reset input
+                    restoreFileName.textContent = 'Belum ada file dipilih.';
+                    return;
+                }
+                
+                restoreFileName.textContent = file.name;
+                
+                // Konfirmasi, karena ini tindakan berbahaya (menimpa data)
+                showKonfirmasi('Konfirmasi Restore', `YAKIN ingin me-restore data dari file "${file.name}"? Ini akan MENGHAPUS SEMUA data saat ini.`, () => {
+                    const reader = new FileReader();
+                    
+                    reader.onload = (event) => {
+                        try {
+                            const jsonString = event.target.result;
+                            const restoredData = JSON.parse(jsonString);
+                            
+                            // Validasi struktur file
+                            if (restoredData && typeof restoredData.anggota !== 'undefined' && typeof restoredData.setoran !== 'undefined') {
+                                // Simpan data baru
+                                saveData(LS_ANGGOTA, restoredData.anggota);
+                                saveData(LS_SETORAN, restoredData.setoran);
+                                
+                                showAlert('Data berhasil di-restore.');
+                                updateUI(); // Wajib untuk refresh seluruh UI
+                                gantiTab('tab-anggota'); // Pindah ke tab anggota
+                            } else {
+                                showAlert('Format file backup tidak valid.', true);
+                            }
+                        } catch (error) {
+                            console.error('Error parsing file restore:', error);
+                            showAlert('Gagal membaca file. File mungkin rusak.', true);
+                        } finally {
+                            // Reset input setelah selesai (baik sukses atau gagal)
+                            hideKonfirmasi(); // Tutup dialog konfirmasi
+                            fileRestoreData.value = '';
+                            restoreFileName.textContent = 'Belum ada file dipilih.';
+                        }
+                    };
+                    
+                    reader.onerror = () => {
+                        showAlert('Gagal membaca file.', true);
+                        hideKonfirmasi();
+                        fileRestoreData.value = '';
+                        restoreFileName.textContent = 'Belum ada file dipilih.';
+                    };
+                    
+                    reader.readAsText(file);
+                });
+                
+                // Catatan: Jika user membatalkan konfirmasi, input file sengaja tidak di-reset.
+                // Input akan di-reset HANYA setelah proses restore (reader) selesai.
+            };
+
+            // --- Fungsi Inti Aplikasi ---
+
+            // 1. Navigasi Tab
+            const gantiTab = (tabId) => {
+                // Sembunyikan semua konten
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Ubah style tombol
+                tabButtons.forEach(button => {
+                    if (button.dataset.tab === tabId) {
+                        button.classList.add('border-blue-600', 'text-blue-600', 'border-b-4');
+                        button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-t-4');
+                    } else {
+                        button.classList.remove('border-blue-600', 'text-blue-600', 'border-t-4', 'border-b-4'); // Pastikan border-b-4 dihapus
+                        button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-b-4');
+                    }
+                });
+                
+                // Tampilkan konten tab yang aktif
+                document.getElementById(tabId).classList.remove('hidden');
+            };
+
+            // 2. Muat Dropdown Anggota
+            const muatDropdownAnggota = () => {
+                const anggota = getData(LS_ANGGOTA);
+                // Urutkan berdasarkan nama
+                anggota.sort((a, b) => a.nama.localeCompare(b.nama));
+                
+                // Kosongkan semua dropdown
+                selectAnggotaSetoran.innerHTML = '<option value="">-- Pilih Anggota --</option>';
+                selectAnggotaLaporan.innerHTML = '<option value="semua">Semua Anggota</option>';
+                editSelectAnggotaSetoran.innerHTML = '<option value="">-- Pilih Anggota --</option>';
+
+                anggota.forEach(a => {
+                    const option = `<option value="${a.id}">${a.nama}</option>`;
+                    selectAnggotaSetoran.innerHTML += option;
+                    selectAnggotaLaporan.innerHTML += option;
+                    editSelectAnggotaSetoran.innerHTML += option;
+                });
+            };
+
+            // 3. Muat Daftar Anggota (di Tab 2)
+            const muatDaftarAnggota = () => {
+                const anggota = getData(LS_ANGGOTA);
+                // Urutkan berdasarkan nama
+                anggota.sort((a, b) => a.nama.localeCompare(b.nama));
+                
+                listAnggota.innerHTML = ''; // Kosongkan daftar
+
+                if (anggota.length === 0) {
+                    listAnggota.innerHTML = '<p class="text-gray-500 text-center">Belum ada anggota.</p>';
+                    return;
+                }
+
+                anggota.forEach(a => {
+                    const item = `
+                        <div class="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                            <div>
+                                <p class="font-medium text-gray-900">${a.nama}</p>
+                                <p class="text-sm text-gray-500">Bergabung: ${formatDate(a.tanggalMulai)}</p>
+                            </div>
+                            <div class="space-x-2">
+                                <button data-id="${a.id}" class="btn-edit-anggota text-yellow-500 hover:text-yellow-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                </button>
+                                <button data-id="${a.id}" data-nama="${a.nama}" class="btn-hapus-anggota text-red-500 hover:text-red-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    listAnggota.innerHTML += item;
+                });
+            };
+
+            // 4. Muat Laporan (di Tab 3)
+            const muatLaporan = () => {
+                const anggotaIdFilter = selectAnggotaLaporan.value;
+                const semuaAnggota = getData(LS_ANGGOTA);
+                const semuaSetoran = getData(LS_SETORAN);
+                
+                let anggotaTampil = [];
+                let judulLaporan = "";
+
+                if (anggotaIdFilter === 'semua') {
+                    anggotaTampil = semuaAnggota;
+                    judulLaporan = "Laporan Total Semua Anggota";
+                } else {
+                    const anggota = semuaAnggota.find(a => a.id === anggotaIdFilter);
+                    if (anggota) {
+                        anggotaTampil = [anggota];
+                        judulLaporan = `Laporan Detail: ${anggota.nama}`;
+                    }
+                }
+                
+                // Urutkan anggota berdasarkan nama
+                anggotaTampil.sort((a, b) => a.nama.localeCompare(b.nama));
+                
+                let html = `<h3 class="text-lg font-semibold mb-4 text-gray-900">${judulLaporan}</h3>`;
+                let grandTotal = 0;
+                
+                if (anggotaTampil.length === 0) {
+                    areaLaporan.innerHTML = '<p class="text-gray-500 text-center">Data tidak ditemukan.</p>';
+                    return;
+                }
+
+                // Jika filter per anggota, tampilkan detail setoran
+                if (anggotaIdFilter !== 'semua' && anggotaTampil.length > 0) {
+                    const setoranAnggota = semuaSetoran
+                        .filter(s => s.anggotaId === anggotaIdFilter)
+                        // Urutkan dari terbaru
+                        .sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+                    
+                    let totalAnggota = 0;
+                    
+                    if (setoranAnggota.length > 0) {
+                        html += `
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nominal</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                        `;
+                        
+                        setoranAnggota.forEach(s => {
+                            html += `
+                                <tr>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${formatDate(s.tanggal)}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${formatRupiah(s.nominal)}</td>
+                                    <td class="px-4 py-2 whitespace-nowrap text-sm space-x-2">
+                                        <button data-id="${s.id}" class="btn-edit-setoran text-yellow-500 hover:text-yellow-700 p-1">
+                                            Edit
+                                        </button>
+                                        <button data-id="${s.id}" class="btn-hapus-setoran text-red-500 hover:text-red-700 p-1">
+                                            Hapus
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                            totalAnggota += s.nominal;
+                        });
+                        
+                        html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        grandTotal = totalAnggota;
+
+                    } else {
+                        html += '<p class="text-gray-500 text-center my-4">Belum ada setoran untuk anggota ini.</p>';
+                    }
+                    
+                // Jika filter semua anggota, tampilkan ringkasan
+                } else {
+                    html += `
+                        <ul class="space-y-3">
+                    `;
+                    anggotaTampil.forEach(anggota => {
+                        const setoranAnggota = semuaSetoran.filter(s => s.anggotaId === anggota.id);
+                        const totalAnggota = setoranAnggota.reduce((acc, s) => acc + s.nominal, 0);
+                        grandTotal += totalAnggota;
+                        
+                        html += `
+                            <li class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <span class="font-medium text-gray-800">${anggota.nama}</span>
+                                <span class="font-semibold text-gray-900">${formatRupiah(totalAnggota)}</span>
+                            </li>
+                        `;
+                    });
+                    html += `</ul>`;
+                }
+                
+                // Tampilkan Grand Total
+                html += `
+                    <div class="mt-6 pt-4 border-t border-gray-300 flex justify-between items-center">
+                        <span class="text-lg font-bold text-gray-900">TOTAL TABUNGAN</span>
+                        <span class="text-xl font-bold text-blue-600">${formatRupiah(grandTotal)}</span>
+                    </div>
+                `;
+
+                areaLaporan.innerHTML = html;
+            };
+
+            // 5. Update UI (Fungsi untuk me-refresh semua data)
+            const updateUI = () => {
+                muatDropdownAnggota();
+                muatDaftarAnggota();
+                muatLaporan();
+            };
+
+            // --- Event Handlers ---
+
+            // Handler Navigasi Tab
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    gantiTab(button.dataset.tab);
+                });
+            });
+
+            // (BARU) Handler Backup/Restore
+            btnBackupData.addEventListener('click', handleBackup);
+            fileRestoreData.addEventListener('change', handleRestore);
+
+            // Handler Submit Form Anggota
+            formAnggota.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nama = namaAnggota.value.trim();
+                const tglMulai = tanggalMulai.value;
+
+                // Validasi
+                if (!nama || !tglMulai) {
+                    showAlert('Nama dan Tanggal Mulai wajib diisi.', true);
+                    return;
+                }
+                
+                const anggota = getData(LS_ANGGOTA);
+                if (anggota.some(a => a.nama.toLowerCase() === nama.toLowerCase())) {
+                    showAlert('Nama anggota sudah ada.', true);
+                    return;
+                }
+
+                // Konfirmasi
+                showKonfirmasi('Tambah Anggota', `Yakin ingin menambah "${nama}" sebagai anggota baru?`, () => {
+                    const anggotaBaru = {
+                        id: generateUUID(),
+                        nama: nama,
+                        tanggalMulai: tglMulai
+                    };
+                    
+                    anggota.push(anggotaBaru);
+                    saveData(LS_ANGGOTA, anggota);
+                    
+                    showAlert('Anggota baru berhasil ditambahkan.');
+                    formAnggota.reset();
+                    tanggalMulai.value = getTodayDate(); // Set default lagi
+                    updateUI();
+                    hideKonfirmasi();
+                }, false); // false = bukan aksi bahaya (merah)
+            });
+            
+            // Handler Submit Form Setoran
+            formSetoran.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const anggotaId = selectAnggotaSetoran.value;
+                const tanggal = tanggalSetoran.value;
+                const nominal = deformatAngka(nominalSetoran.value); // DIUBAH
+                
+                // Validasi
+                if (!anggotaId || !tanggal || !nominal) { // Validasi !nominal (jika 0) masih berfungsi
+                    showAlert('Semua field wajib diisi.', true);
+                    return;
+                }
+                
+                // Konfirmasi
+                const nama = selectAnggotaSetoran.options[selectAnggotaSetoran.selectedIndex].text;
+                showKonfirmasi('Tambah Setoran', `Yakin ingin menambah setoran ${formatRupiah(nominal)} untuk ${nama}?`, () => {
+                    const setoran = getData(LS_SETORAN);
+                    const setoranBaru = {
+                        id: generateUUID(),
+                        anggotaId: anggotaId,
+                        tanggal: tanggal,
+                        nominal: nominal
+                    };
+                    
+                    setoran.push(setoranBaru);
+                    saveData(LS_SETORAN, setoran);
+                    
+                    showAlert('Setoran berhasil ditambahkan.');
+                    formSetoran.reset();
+                    tanggalSetoran.value = getTodayDate(); // Set default lagi
+                    updateUI();
+                    hideKonfirmasi();
+                    
+                    // Otomatis pindah ke tab laporan & filter anggota tsb (Dihapus)
+                    // gantiTab('tab-laporan');
+                    // selectAnggotaLaporan.value = anggotaId;
+                    // muatLaporan();
+
+                }, false); // false = bukan aksi bahaya
+            });
+            
+            // Handler Filter Laporan
+            selectAnggotaLaporan.addEventListener('change', muatLaporan);
+            
+            // Handler Tombol Ekspor PDF
+            btnEksporPDF.addEventListener('click', () => {
+                // Gunakan html2canvas untuk "screenshot" area laporan
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const area = document.getElementById('areaLaporan');
+                
+                // Judul Laporan dari Filter
+                const judul = selectAnggotaLaporan.options[selectAnggotaLaporan.selectedIndex].text;
+                const tanggalCetak = formatDate(getTodayDate());
+                
+                html2canvas(area, { scale: 2 }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    
+                    let y = 15; // Posisi Y awal
+                    
+                    // Header PDF
+                    pdf.setFontSize(18);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text("Laporan Tabungan Jamiyah", pdfWidth / 2, y, { align: 'center' });
+                    y += 8;
+                    
+                    pdf.setFontSize(12);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.text(`Filter: ${judul}`, pdfWidth / 2, y, { align: 'center' });
+                    y += 5;
+                    pdf.text(`Tanggal Cetak: ${tanggalCetak}`, pdfWidth / 2, y, { align: 'center' });
+                    y += 10;
+                    
+                    // Garis pemisah
+                    pdf.setLineWidth(0.5);
+                    pdf.line(10, y, pdfWidth - 10, y);
+                    y += 10;
+
+                    // Tambahkan gambar (hasil canvas)
+                    // (kurangi margin kiri/kanan 10mm)
+                    pdf.addImage(imgData, 'PNG', 10, y, pdfWidth - 20, pdfHeight - 20);
+                    
+                    pdf.save(`laporan_tabungan_${judul.replace(/ /g, '_')}.pdf`);
+                });
+            });
+
+            // --- Event Delegation untuk tombol Edit/Hapus ---
+            
+            // Listener untuk tombol di #listAnggota (Tab 2)
+            listAnggota.addEventListener('click', (e) => {
+                const btnHapus = e.target.closest('.btn-hapus-anggota');
+                const btnEdit = e.target.closest('.btn-edit-anggota');
+
+                if (btnHapus) {
+                    const id = btnHapus.dataset.id;
+                    const nama = btnHapus.dataset.nama;
+                    showKonfirmasi('Hapus Anggota', `YAKIN ingin menghapus ${nama}? SEMUA data setoran milik ${nama} juga akan TERHAPUS PERMANEN!`, () => {
+                        let anggota = getData(LS_ANGGOTA);
+                        let setoran = getData(LS_SETORAN);
+                        
+                        // Filter data
+                        const anggotaBaru = anggota.filter(a => a.id !== id);
+                        const setoranBaru = setoran.filter(s => s.anggotaId !== id);
+                        
+                        // Simpan data
+                        saveData(LS_ANGGOTA, anggotaBaru);
+                        saveData(LS_SETORAN, setoranBaru);
+                        
+                        showAlert('Anggota dan semua setorannya berhasil dihapus.');
+                        updateUI();
+                        hideKonfirmasi();
+                    });
+                }
+                
+                if (btnEdit) {
+                    const id = btnEdit.dataset.id;
+                    const anggota = getData(LS_ANGGOTA).find(a => a.id === id);
+                    if (anggota) {
+                        editAnggotaId.value = anggota.id;
+                        editNamaAnggota.value = anggota.nama;
+                        editTanggalMulai.value = anggota.tanggalMulai;
+                        showModal(modalEditAnggota);
+                    }
+                }
+            });
+            
+            // Listener untuk tombol di #areaLaporan (Tab 3)
+            areaLaporan.addEventListener('click', (e) => {
+                const btnHapus = e.target.closest('.btn-hapus-setoran');
+                const btnEdit = e.target.closest('.btn-edit-setoran');
+                
+                if (btnHapus) {
+                    const id = btnHapus.dataset.id;
+                    showKonfirmasi('Hapus Setoran', 'Yakin ingin menghapus data setoran ini?', () => {
+                        let setoran = getData(LS_SETORAN);
+                        const setoranBaru = setoran.filter(s => s.id !== id);
+                        saveData(LS_SETORAN, setoranBaru);
+                        
+                        showAlert('Setoran berhasil dihapus.');
+                        muatLaporan(); // Hanya muat ulang laporan
+                        hideKonfirmasi();
+                    });
+                }
+                
+                if (btnEdit) {
+                    const id = btnEdit.dataset.id;
+                    const setoran = getData(LS_SETORAN).find(s => s.id === id);
+                    if (setoran) {
+                        editSetoranId.value = setoran.id;
+                        editSelectAnggotaSetoran.value = setoran.anggotaId;
+                        editTanggalSetoran.value = setoran.tanggal;
+                        editNominalSetoran.value = formatDisplayAngka(setoran.nominal); // DIUBAH
+                        showModal(modalEditSetoran);
+                    }
+                }
+            });
+            
+            // --- Handler Tombol Modal ---
+            
+            // Modal Konfirmasi
+            konfirmasiBatal.addEventListener('click', hideKonfirmasi);
+            konfirmasiSetuju.addEventListener('click', () => {
+                if (konfirmasiCallback) {
+                    konfirmasiCallback();
+                }
+            });
+            
+            // Modal Edit Anggota
+            batalEditAnggota.addEventListener('click', () => hideModal(modalEditAnggota));
+            formEditAnggota.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = editAnggotaId.value;
+                const nama = editNamaAnggota.value.trim();
+                const tglMulai = editTanggalMulai.value;
+                
+                if (!nama || !tglMulai) {
+                    showAlert('Nama dan Tanggal tidak boleh kosong.', true);
+                    return;
+                }
+                
+                let anggota = getData(LS_ANGGOTA);
+                // Cek duplikat nama (kecuali dirinya sendiri)
+                if (anggota.some(a => a.nama.toLowerCase() === nama.toLowerCase() && a.id !== id)) {
+                    showAlert('Nama anggota tersebut sudah ada.', true);
+                    return;
+                }
+                
+                const index = anggota.findIndex(a => a.id === id);
+                if (index !== -1) {
+                    anggota[index].nama = nama;
+                    anggota[index].tanggalMulai = tglMulai;
+                    saveData(LS_ANGGOTA, anggota);
+                    
+                    showAlert('Data anggota berhasil diperbarui.');
+                    hideModal(modalEditAnggota);
+                    updateUI();
+                }
+            });
+            
+            // Modal Edit Setoran
+            batalEditSetoran.addEventListener('click', () => hideModal(modalEditSetoran));
+            formEditSetoran.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = editSetoranId.value;
+                // --- PERBAIKAN ERROR ---
+                // Variabel 'anggotaId' sudah dideklarasikan di scope 'formSetoran.addEventListener'.
+                // Kita ganti nama variabel di scope ini untuk menghindari konflik.
+                const selectedAnggotaId = editSelectAnggotaSetoran.value;
+                const tanggal = editTanggalSetoran.value;
+                const nominal = deformatAngka(editNominalSetoran.value); // DIUBAH
+                
+                if (!selectedAnggotaId || !tanggal || !nominal) { // DIUBAH: Menggunakan nama variabel baru
+                    showAlert('Semua data valid wajib diisi.', true); // DIUBAH
+                    return;
+                }
+                
+                let setoran = getData(LS_SETORAN);
+                const index = setoran.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    setoran[index].anggotaId = selectedAnggotaId; // DIUBAH: Menggunakan nama variabel baru
+                    setoran[index].tanggal = tanggal;
+                    setoran[index].nominal = nominal;
+                    saveData(LS_SETORAN, setoran);
+                    
+                    showAlert('Data setoran berhasil diperbarui.');
+                    hideModal(modalEditSetoran);
+                    muatLaporan(); // Cukup update laporan
+                }
+            });
+
+            // --- (BLOK BARU) Event Listener untuk format input ---
+            const handleInputAngka = (e) => {
+                let value = e.target.value;
+                let formattedValue = formatDisplayAngka(value);
+                e.target.value = formattedValue;
+            };
+
+            nominalSetoran.addEventListener('input', handleInputAngka);
+            editNominalSetoran.addEventListener('input', handleInputAngka);
+
+
+            // --- Inisialisasi Aplikasi ---
+            const init = () => {
+                // (BARU) Panggil pendaftaran PWA
+                registerPWA();
+
+                // Set default tanggal di form
+                tanggalSetoran.value = getTodayDate();
+                tanggalMulai.value = getTodayDate();
+                
+                // Muat semua data dan tampilkan tab pertama
+                updateUI();
+                gantiTab('tab-setoran');
+            };
+
+            init();
+        });
+    </script>
+</body>
+</html>
+
+
+
