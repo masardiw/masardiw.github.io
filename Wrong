@@ -1,0 +1,56 @@
+
+        <!-- Footer for Backup/Restore -->
+        <footer class="mt-8 pt-6 border-t border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Utilitas Data</h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="backup-btn" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                    Backup Data (JSON)
+                </button>
+                <div class="w-full sm:w-auto">
+                    <label for="restore-file-input" class="w-full sm:w-auto cursor-pointer bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors block text-center">
+                        Restore dari JSON
+                    </label>
+                    <input type="file" id="restore-file-input" class="hidden" accept=".json">
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Penting: Selalu backup data Anda secara berkala. Data hanya tersimpan di perangkat ini.</p>
+        </footer>
+    </div>
+
+    <!-- Modal: Tambah/Edit Anggota -->
+    <div id="modal-anggota" class="modal">
+        <div class="modal-content w-full max-w-lg p-6 bg-white rounded-lg shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-anggota-title" class="text-xl font-semibold">Tambah Anggota Baru</h3>
+                <button id="modal-anggota-close" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="form-anggota" class="space-y-4">
+                <input type="hidden" id="anggota-id" name="id">
+                <div>
+                    <label for="anggota-nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Anggota</label>
+                    <input type="text" id="anggota-nama" name="nama" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label for="anggota-tanggal-mulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                    <input type="date" id="anggota-tanggal-mulai" name="tanggalMulai" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                    Simpan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Alert (Info/Error) -->
+    <div id="modal-alert" class="modal">
+        <div class="modal-content w-full max-w-sm p-6 bg-white rounded-lg shadow-xl">
+            <h4 id="modal-alert-title" class="text-lg font-semibold mb-4 text-gray-800">Informasi</h4>
+            <p id="modal-alert-message" class="text-gray-600 mb-6">Pesan alert.</p>
+            <button id="modal-alert-close" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Konfirmasi -->
+    <div id="mod
