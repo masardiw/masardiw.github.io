@@ -62,7 +62,7 @@
         }
         .modal-content {
             position: relative;
-            margin: auto; /* Dihapus margin 15% auto */
+            margin: auto; 
             animation: slideIn 0.3s ease-out;
         }
         
@@ -189,7 +189,6 @@
                             </tr>
                         </thead>
                         <tbody id="tabel-anggota-body">
-                            <!-- Data anggota akan dimuat di sini -->
                             <tr>
                                 <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
                                     Belum ada data anggota.
@@ -223,6 +222,7 @@
                         <label for="laporan-periode-tipe" class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
                         <select id="laporan-periode-tipe" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                             <option value="semua">Semua Waktu</option>
+                            <option value="tanggal">Per Tanggal</option>
                             <option value="mingguan">Per Minggu</option>
                             <option value="bulanan">Per Bulan</option>
                         </select>
@@ -231,6 +231,11 @@
                         <label for="laporan-periode-nilai" class="block text-sm font-medium text-gray-700 mb-1">Pilih Periode</label>
                         <input type="week" id="laporan-periode-minggu" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 hidden">
                         <input type="month" id="laporan-periode-bulan" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 hidden">
+                        <!-- Kontainer Per Tanggal -->
+                        <div id="laporan-periode-tanggal-container" class="hidden space-y-2">
+                             <input type="date" id="laporan-tanggal-mulai" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                             <input type="date" id="laporan-tanggal-akhir" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        </div>
                     </div>
                 </div>
 
@@ -266,6 +271,15 @@
             <!-- Tab 5: Catatan Mutasi -->
             <div id="tab-mutasi" class="tab-content bg-white p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-semibold mb-4">Catatan Mutasi (Semua Transaksi)</h2>
+                
+                <!-- Filter Mutasi -->
+                <div class="mb-4">
+                     <label for="mutasi-filter-anggota" class="block text-sm font-medium text-gray-700 mb-1">Filter Anggota</label>
+                     <select id="mutasi-filter-anggota" class="w-full md:w-1/3 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="semua">-- Semua Anggota --</option>
+                     </select>
+                </div>
+                
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-max border-collapse">
                         <thead class="bg-gray-50">
@@ -274,12 +288,13 @@
                                 <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Anggota</th>
                                 <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Jenis</th>
                                 <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Nominal</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-mutasi-body">
                             <!-- Data mutasi akan dimuat di sini -->
                             <tr>
-                                <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                                <td colspan="5" class="p-4 text-center text-gray-500 border border-gray-200">
                                     Belum ada transaksi.
                                 </td>
                             </tr>
@@ -330,6 +345,44 @@
             </form>
         </div>
     </div>
+    
+    <!-- Modal: Koreksi Mutasi -->
+    <div id="modal-mutasi" class="modal">
+        <div class="modal-content w-full max-w-lg p-6 bg-white rounded-lg shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-mutasi-title" class="text-xl font-semibold">Koreksi Transaksi</h3>
+                <button id="modal-mutasi-close" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="form-mutasi" class="space-y-4">
+                <input type="hidden" id="mutasi-id" name="id">
+                <input type="hidden" id="mutasi-tipe" name="tipe"> <!-- 'setoran' or 'penarikan' -->
+                
+                <div class="p-3 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800 text-sm">
+                    <strong>Perhatian:</strong> Mengubah data transaksi dapat mempengaruhi total saldo. Pastikan data sudah benar.
+                </div>
+                
+                <div>
+                    <label for="mutasi-anggota" class="block text-sm font-medium text-gray-700 mb-1">Anggota</param>
+                    <select id="mutasi-anggota" name="anggotaId" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <!-- Opsi akan diisi oleh JS, tapi kita perlu satu -->
+                         <option value="">-- Pilih Anggota --</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mutasi-tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Transaksi</label>
+                    <input type="date" id="mutasi-tanggal" name="tanggal" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                 <div>
+                    <label for="mutasi-nominal" class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
+                    <input type="number" id="mutasi-nominal" name="nominal" min="0" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-orange-700 transition-colors">
+                    Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
 
     <!-- Modal: Alert (Info/Error) -->
     <div id="modal-alert" class="modal">
@@ -434,6 +487,20 @@
          */
         function saveDB() {
             localStorage.setItem(DB_KEY, JSON.stringify(db));
+            // Setelah menyimpan, refresh tab yang mungkin terpengaruh
+            refreshActiveTabs();
+        }
+        
+        /**
+         * Refresh data di tab yang sedang aktif (Laporan & Mutasi)
+         */
+        function refreshActiveTabs() {
+            if (document.getElementById('tab-laporan').classList.contains('active')) {
+                renderLaporanTab();
+            }
+            if (document.getElementById('tab-mutasi').classList.contains('active')) {
+                renderMutasiTab();
+            }
         }
 
         /**
@@ -441,19 +508,22 @@
          */
         function getAnggotaName(anggotaId) {
             const anggota = db.anggota.find(a => a.id === anggotaId);
-            return anggota ? anggota.nama : 'Anggota Tidak Dikenal';
+            return anggota ? anggota.nama : 'Anggota Dihapus';
         }
 
         /**
          * Menghitung saldo anggota
+         * @param {string} anggotaId - ID anggota
+         * @param {string} [excludeTxId] - (Opsional) ID transaksi yang diabaikan
+         * @param {string} [excludeTxType] - (Opsional) Tipe transaksi yang diabaikan ('setoran'/'penarikan')
          */
-        function getSaldoAnggota(anggotaId) {
+        function getSaldoAnggota(anggotaId, excludeTxId = null, excludeTxType = null) {
             const totalSetoran = db.setoran
-                .filter(s => s.anggotaId === anggotaId)
+                .filter(s => s.anggotaId === anggotaId && !(s.id === excludeTxId && excludeTxType === 'setoran'))
                 .reduce((total, s) => total + s.nominal, 0);
 
             const totalPenarikan = db.penarikan
-                .filter(p => p.anggotaId === anggotaId)
+                .filter(p => p.anggotaId === anggotaId && !(p.id === excludeTxId && excludeTxType === 'penarikan'))
                 .reduce((total, p) => total + p.nominal, 0);
 
             return totalSetoran - totalPenarikan;
@@ -463,6 +533,7 @@
 
         const modalAlert = document.getElementById('modal-alert');
         const modalConfirm = document.getElementById('modal-confirm');
+        const modalMutasi = document.getElementById('modal-mutasi');
 
         /**
          * Menampilkan modal Alert (Info/Error)
@@ -540,16 +611,17 @@
             switch (tabId) {
                 case 'tab-setor':
                 case 'tab-ambil':
-                    populateAnggotaSelects();
+                    populateAnggotaSelects(['setor-anggota', 'ambil-anggota']);
                     break;
                 case 'tab-anggota':
                     renderAnggotaTab();
                     break;
                 case 'tab-laporan':
-                    populateLaporanFilter();
+                    populateAnggotaSelects(['laporan-anggota']);
                     renderLaporanTab();
                     break;
                 case 'tab-mutasi':
+                    populateAnggotaSelects(['mutasi-filter-anggota']);
                     renderMutasiTab();
                     break;
             }
@@ -558,27 +630,41 @@
         // --- Render Fungsi per Tab ---
 
         /**
-         * Memuat daftar anggota ke semua <select>
+         * Memuat daftar anggota ke <select> yang spesifik
+         * @param {string[]} selectIds - Array dari ID elemen <select>
          */
-        function populateAnggotaSelects() {
-            const selects = [
-                document.getElementById('setor-anggota'),
-                document.getElementById('ambil-anggota'),
-                document.getElementById('laporan-anggota')
-            ];
-            
+        function populateAnggotaSelects(selectIds = []) {
             // Urutkan anggota berdasarkan nama
             const sortedAnggota = [...db.anggota].sort((a, b) => a.nama.localeCompare(b.nama));
+            
+            const allSelects = [
+                'setor-anggota', 'ambil-anggota', 'laporan-anggota', 
+                'mutasi-filter-anggota', 'mutasi-anggota'
+            ];
+            
+            // Jika tidak ada ID spesifik, populate semua
+            const idsToPopulate = selectIds.length > 0 ? selectIds : allSelects;
 
-            selects.forEach(select => {
+            idsToPopulate.forEach(id => {
+                const select = document.getElementById(id);
                 if (!select) return;
                 
                 // Simpan value yang dipilih (jika ada)
                 const selectedValue = select.value;
                 
-                // Hapus opsi lama, kecuali yang pertama
-                while (select.options.length > 1) {
-                    select.remove(1);
+                // Hapus opsi lama, kecuali yang pertama (placeholder)
+                const firstOption = select.options[0];
+                select.innerHTML = '';
+                if(firstOption) {
+                     select.appendChild(firstOption.cloneNode(true));
+                     if(firstOption.value !== "") {
+                        // Jika placeholder tidak punya value, buat yang baru
+                         const placeholder = document.createElement('option');
+                         placeholder.value = (id === 'laporan-anggota' || id === 'mutasi-filter-anggota') ? 'semua' : '';
+                         placeholder.textContent = (id === 'laporan-anggota' || id === 'mutasi-filter-anggota') ? '-- Semua Anggota --' : '-- Pilih Anggota --';
+                         select.innerHTML = ''; // Hapus semua
+                         select.appendChild(placeholder);
+                     }
                 }
                 
                 sortedAnggota.forEach(anggota => {
@@ -588,17 +674,16 @@
                     select.appendChild(option);
                 });
                 
-                // Kembalikan value yang dipilih
-                select.value = selectedValue;
+                // Kembalikan value yang dipilih jika masih valid
+                if (Array.from(select.options).some(opt => opt.value === selectedValue)) {
+                    select.value = selectedValue;
+                } else if (!selectedValue && (id === 'laporan-anggota' || id === 'mutasi-filter-anggota')) {
+                    select.value = 'semua';
+                } else {
+                    select.value = (id === 'laporan-anggota' || id === 'mutasi-filter-anggota') ? 'semua' : '';
+                }
             });
         }
-        
-        /**
-         * Memuat filter laporan
-         */
-         function populateLaporanFilter() {
-            populateAnggotaSelects(); // Ini akan mengisi <select> laporan-anggota
-         }
 
         /**
          * Render Tab Daftar Anggota
@@ -647,6 +732,8 @@
             const filterPeriodeTipe = document.getElementById('laporan-periode-tipe').value;
             const filterPeriodeMinggu = document.getElementById('laporan-periode-minggu').value;
             const filterPeriodeBulan = document.getElementById('laporan-periode-bulan').value;
+            const filterTanggalMulai = document.getElementById('laporan-tanggal-mulai').value;
+            const filterTanggalAkhir = document.getElementById('laporan-tanggal-akhir').value;
 
             let anggotaList = [];
             let filteredSetoran = [...db.setoran];
@@ -656,7 +743,6 @@
             let startDate, endDate;
             if (filterPeriodeTipe === 'mingguan' && filterPeriodeMinggu) {
                 const [year, weekNum] = filterPeriodeMinggu.split('-W');
-                // Logika untuk mendapatkan Senin dari minggu
                 const d = new Date(year, 0, (weekNum - 1) * 7 + 1);
                 d.setDate(d.getDate() - (d.getDay() || 7) + 1); // Mundur ke Senin
                 startDate = d.toISOString().split('T')[0];
@@ -667,6 +753,9 @@
                 const [year, month] = filterPeriodeBulan.split('-');
                 const d = new Date(year, month, 0); // Hari terakhir bulan tersebut
                 endDate = d.toISOString().split('T')[0];
+            } else if (filterPeriodeTipe === 'tanggal' && filterTanggalMulai && filterTanggalAkhir) {
+                startDate = filterTanggalMulai;
+                endDate = filterTanggalAkhir;
             }
             
             if (startDate && endDate) {
@@ -714,18 +803,22 @@
                     .filter(p => p.anggotaId === anggota.id && (!startDate || (p.tanggal >= startDate && p.tanggal <= endDate)))
                     .reduce((total, p) => total + p.nominal, 0);
                 
-                // Jika filter 'semua anggota', kita hitung saldo akhir total, bukan saldo di periode itu saja
                 let saldoAkhir;
-                if(filterAnggotaId === 'semua' && filterPeriodeTipe === 'semua') {
-                    saldoAkhir = getSaldoAnggota(anggota.id);
-                } else if (filterAnggotaId !== 'semua') {
+                // Jika filter 'semua anggota' & 'semua waktu', atau filter 'satu anggota' (kapanpun periodenya), tampilkan saldo total.
+                if((filterAnggotaId === 'semua' && filterPeriodeTipe === 'semua') || (filterAnggotaId !== 'semua')) {
                     saldoAkhir = getSaldoAnggota(anggota.id);
                 } else {
+                    // Jika filter 'semua anggota' TAPI dengan periode, 'saldo akhir' adalah saldo PADA periode itu.
                     saldoAkhir = totalSetor - totalTarik;
                 }
                 
-                // Hanya tampilkan jika ada aktivitas atau filter 'semua'
-                if (totalSetor > 0 || totalTarik > 0 || (filterAnggotaId === 'semua' && saldoAkhir !== 0) || (filterAnggotaId !== 'semua')) {
+                // Tampilkan jika ada aktivitas di periode itu, ATAU
+                // jika filter 'semua'/'satu anggota' dan saldo akhirnya tidak nol
+                const shouldShow = (totalSetor > 0 || totalTarik > 0) || 
+                                   (filterPeriodeTipe === 'semua' && saldoAkhir !== 0) ||
+                                   (filterAnggotaId !== 'semua' && saldoAkhir !== 0);
+
+                if (shouldShow) {
                      const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50';
                     row.innerHTML = `
@@ -750,12 +843,19 @@
          */
         function renderMutasiTab() {
             const tableBody = document.getElementById('tabel-mutasi-body');
+            const filterAnggotaId = document.getElementById('mutasi-filter-anggota').value;
+            
             tableBody.innerHTML = ''; // Kosongkan tabel
 
             const mutasiSetoran = db.setoran.map(s => ({ ...s, jenis: 'Setoran' }));
             const mutasiPenarikan = db.penarikan.map(p => ({ ...p, jenis: 'Penarikan' }));
             
-            const allMutasi = [...mutasiSetoran, ...mutasiPenarikan];
+            let allMutasi = [...mutasiSetoran, ...mutasiPenarikan];
+            
+            // Filter berdasarkan anggota jika dipilih
+            if (filterAnggotaId !== 'semua') {
+                allMutasi = allMutasi.filter(tx => tx.anggotaId === filterAnggotaId);
+            }
             
             // Urutkan berdasarkan tanggal (terbaru dulu)
             allMutasi.sort((a, b) => b.tanggal.localeCompare(a.tanggal) || (b.jenis === 'Setoran' ? 1 : -1));
@@ -763,8 +863,8 @@
             if (allMutasi.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
-                            Belum ada transaksi.
+                        <td colspan="5" class="p-4 text-center text-gray-500 border border-gray-200">
+                            Belum ada transaksi${filterAnggotaId !== 'semua' ? ' untuk anggota ini' : ''}.
                         </td>
                     </tr>`;
                 return;
@@ -784,6 +884,10 @@
                     </td>
                     <td class="p-3 border border-gray-200 font-medium ${isSetoran ? 'text-green-600' : 'text-red-600'}">
                         ${isSetoran ? '+' : '-'}${formatCurrency(tx.nominal)}
+                    </td>
+                    <td class="p-3 border border-gray-200 space-x-2 text-sm">
+                        <button class="btn-edit-mutasi text-blue-600 hover:text-blue-800" data-id="${tx.id}" data-type="${isSetoran ? 'setoran' : 'penarikan'}">Edit</button>
+                        <button class="btn-hapus-mutasi text-red-600 hover:text-red-800" data-id="${tx.id}" data-type="${isSetoran ? 'setoran' : 'penarikan'}">Hapus</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -815,12 +919,16 @@
             const filterPeriodeText = filterPeriodeEl.options[filterPeriodeEl.selectedIndex].text;
             const filterMinggu = document.getElementById('laporan-periode-minggu').value;
             const filterBulan = document.getElementById('laporan-periode-bulan').value;
+            const filterTglMulai = document.getElementById('laporan-tanggal-mulai').value;
+            const filterTglAkhir = document.getElementById('laporan-tanggal-akhir').value;
 
             let filterInfo = `Anggota: ${filterAnggotaText}\nPeriode: ${filterPeriodeText}`;
             if (filterPeriodeEl.value === 'mingguan' && filterMinggu) {
                 filterInfo += ` (${filterMinggu})`;
             } else if (filterPeriodeEl.value === 'bulanan' && filterBulan) {
                 filterInfo += ` (${filterBulan})`;
+            } else if (filterPeriodeEl.value === 'tanggal' && filterTglMulai && filterTglAkhir) {
+                 filterInfo += ` (${formatDate(filterTglMulai)} - ${formatDate(filterTglAkhir)})`;
             }
 
             // 3. Buat PDF
@@ -889,10 +997,14 @@
             document.getElementById('modal-alert-close').addEventListener('click', () => {
                 modalAlert.style.display = 'none';
             });
+            document.getElementById('modal-mutasi-close').addEventListener('click', () => {
+                modalMutasi.style.display = 'none';
+            });
             // Tutup modal jika klik di luar area konten
             window.addEventListener('click', (e) => {
                 if (e.target == modalAlert) modalAlert.style.display = 'none';
                 if (e.target == modalConfirm) modalConfirm.style.display = 'none';
+                if (e.target == modalMutasi) modalMutasi.style.display = 'none';
                 if (e.target == document.getElementById('modal-anggota')) {
                     document.getElementById('modal-anggota').style.display = 'none';
                 }
@@ -925,9 +1037,6 @@
                     formSetor.reset();
                     document.getElementById('setor-tanggal').value = today; // Reset tanggal ke hari ini
                     document.getElementById('setor-anggota').value = ''; // Reset pilihan anggota
-                    // Refresh tab terkait
-                    if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
-                    if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
                 });
             });
 
@@ -981,9 +1090,6 @@
                     document.getElementById('ambil-tanggal').value = today; // Reset tanggal
                     document.getElementById('ambil-anggota').value = ''; // Reset pilihan anggota
                     saldoTersediaEl.textContent = formatCurrency(0); // Reset saldo
-                    // Refresh tab terkait
-                    if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
-                    if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
                 });
             });
 
@@ -1075,15 +1181,12 @@
                     // Cek apakah anggota punya transaksi
                     const hasTransaksi = db.setoran.some(s => s.anggotaId === id) || db.penarikan.some(p => p.anggotaId === id);
                     
-                    showConfirm(`Yakin ingin menghapus ${anggotaNama}? ${hasTransaksi ? 'PERINGATAN: Anggota ini memiliki riwayat transaksi. Menghapus anggota TIDAK akan menghapus transaksinya.' : ''}`, () => {
+                    showConfirm(`Yakin ingin menghapus ${anggotaNama}? ${hasTransaksi ? 'PERINGATAN: Anggota ini memiliki riwayat transaksi. Menghapus anggota TIDAK akan menghapus transaksinya, transaksi tsb akan ditampilkan sebagai "Anggota Dihapus".' : ''}`, () => {
                         db.anggota = db.anggota.filter(a => a.id !== id);
                         saveDB();
                         showAlert(`Anggota ${anggotaNama} berhasil dihapus.`);
                         renderAnggotaTab();
                         populateAnggotaSelects();
-                        // Refresh tab laporan dan mutasi jika sedang aktif
-                        if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
-                        if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
                     });
                 }
             });
@@ -1092,20 +1195,30 @@
             const periodeTipeSelect = document.getElementById('laporan-periode-tipe');
             const periodeMingguInput = document.getElementById('laporan-periode-minggu');
             const periodeBulanInput = document.getElementById('laporan-periode-bulan');
+            const periodeTanggalContainer = document.getElementById('laporan-periode-tanggal-container');
             
             periodeTipeSelect.addEventListener('change', () => {
                 const tipe = periodeTipeSelect.value;
                 periodeMingguInput.classList.toggle('hidden', tipe !== 'mingguan');
                 periodeBulanInput.classList.toggle('hidden', tipe !== 'bulanan');
+                periodeTanggalContainer.classList.toggle('hidden', tipe !== 'tanggal');
+                
                 // Reset nilai input periode jika disembunyikan
                 if (tipe !== 'mingguan') periodeMingguInput.value = '';
                 if (tipe !== 'bulanan') periodeBulanInput.value = '';
+                if (tipe !== 'tanggal') {
+                    document.getElementById('laporan-tanggal-mulai').value = '';
+                    document.getElementById('laporan-tanggal-akhir').value = '';
+                }
+                
                 renderLaporanTab();
             });
             
             document.getElementById('laporan-anggota').addEventListener('change', renderLaporanTab);
             periodeMingguInput.addEventListener('change', renderLaporanTab);
             periodeBulanInput.addEventListener('change', renderLaporanTab);
+            document.getElementById('laporan-tanggal-mulai').addEventListener('change', renderLaporanTab);
+            document.getElementById('laporan-tanggal-akhir').addEventListener('change', renderLaporanTab);
 
             // --- Listener Export PDF (Tab 4) ---
             document.getElementById('btn-export-pdf').addEventListener('click', () => {
@@ -1116,7 +1229,111 @@
                     showAlert("Gagal membuat PDF. Pastikan koneksi internet stabil untuk memuat library.", true);
                 }
             });
+            
+            // --- Listener Tab Mutasi (Tab 5) ---
+            document.getElementById('mutasi-filter-anggota').addEventListener('change', renderMutasiTab);
 
+            // Listener untuk Edit/Hapus Mutasi
+            document.getElementById('tabel-mutasi-body').addEventListener('click', (e) => {
+                const target = e.target;
+                const id = target.getAttribute('data-id');
+                const type = target.getAttribute('data-type'); // 'setoran' or 'penarikan'
+                if (!id || !type) return;
+
+                const tx = (type === 'setoran' ? db.setoran : db.penarikan).find(t => t.id === id);
+                if (!tx) {
+                    showAlert('Transaksi tidak ditemukan.', true);
+                    return;
+                }
+
+                if (target.classList.contains('btn-edit-mutasi')) {
+                    // Buka Modal Edit Mutasi
+                    document.getElementById('modal-mutasi-title').textContent = `Koreksi ${type === 'setoran' ? 'Setoran' : 'Penarikan'}`;
+                    document.getElementById('mutasi-id').value = tx.id;
+                    document.getElementById('mutasi-tipe').value = type;
+                    document.getElementById('mutasi-tanggal').value = tx.tanggal;
+                    document.getElementById('mutasi-nominal').value = tx.nominal;
+                    
+                    // Populate select anggota dan pilih yang sesuai
+                    populateAnggotaSelects(['mutasi-anggota']);
+                    document.getElementById('mutasi-anggota').value = tx.anggotaId;
+                    
+                    modalMutasi.style.display = 'flex';
+                
+                } else if (target.classList.contains('btn-hapus-mutasi')) {
+                    // Hapus Mutasi
+                    const txName = `${type === 'setoran' ? 'Setoran' : 'Penarikan'} ${formatCurrency(tx.nominal)} atas nama ${getAnggotaName(tx.anggotaId)}`;
+                    
+                    showConfirm(`Yakin ingin menghapus transaksi ini?\n(${txName})`, () => {
+                        // Validasi saldo sebelum hapus
+                        if (type === 'setoran') {
+                            const saldoSetelahHapus = getSaldoAnggota(tx.anggotaId, tx.id, 'setoran');
+                            if (saldoSetelahHapus < 0) {
+                                showAlert('Gagal hapus setoran. Menghapus setoran ini akan membuat saldo anggota menjadi minus.', true);
+                                return;
+                            }
+                        }
+                        
+                        // Lakukan penghapusan
+                        if (type === 'setoran') {
+                            db.setoran = db.setoran.filter(s => s.id !== id);
+                        } else {
+                            db.penarikan = db.penarikan.filter(p => p.id !== id);
+                        }
+                        
+                        saveDB();
+                        showAlert('Transaksi berhasil dihapus.');
+                    });
+                }
+            });
+
+            // Listener Form Koreksi Mutasi
+            document.getElementById('form-mutasi').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('mutasi-id').value;
+                const type = document.getElementById('mutasi-tipe').value;
+                const anggotaId = document.getElementById('mutasi-anggota').value;
+                const tanggal = document.getElementById('mutasi-tanggal').value;
+                const nominal = parseInt(document.getElementById('mutasi-nominal').value, 10);
+                
+                if (!id || !type || !anggotaId || !tanggal || !nominal || nominal <= 0) {
+                    showAlert('Semua field wajib diisi dan nominal harus lebih dari 0.', true);
+                    return;
+                }
+                
+                // Cari transaksi asli
+                const txArr = type === 'setoran' ? db.setoran : db.penarikan;
+                const txIndex = txArr.findIndex(t => t.id === id);
+                if (txIndex === -1) {
+                    showAlert('Transaksi asli tidak ditemukan.', true);
+                    return;
+                }
+                
+                // Validasi Saldo
+                const saldoTanpaTxIni = getSaldoAnggota(anggotaId, id, type);
+                
+                if (type === 'penarikan') {
+                    if (nominal > saldoTanpaTxIni) {
+                        showAlert(`Gagal simpan. Saldo anggota (${getAnggotaName(anggotaId)}) tidak mencukupi untuk penarikan ${formatCurrency(nominal)}. Saldo tersedia (tanpa penarikan ini) adalah ${formatCurrency(saldoTanpaTxIni)}.`, true);
+                        return;
+                    }
+                } else { // type === 'setoran'
+                    const saldoBaru = saldoTanpaTxIni + nominal;
+                    // Cek apakah saldo baru (setelah edit setoran) masih cukup untuk total penarikan
+                    const totalPenarikan = getSaldoAnggota(anggotaId, null, null) - saldoTanpaTxIni; // Trik: Saldo - SaldoTanpaSetoran = TotalPenarikan
+                    
+                    if (saldoBaru < totalPenarikan) {
+                         showAlert(`Gagal simpan. Mengubah setoran ke ${formatCurrency(nominal)} akan membuat total saldo (${formatCurrency(saldoBaru)}) lebih kecil dari total penarikan yang sudah ada.`, true);
+                         return;
+                    }
+                }
+                
+                // Semua validasi lolos, simpan perubahan
+                txArr[txIndex] = { ...txArr[txIndex], anggotaId, tanggal, nominal };
+                saveDB();
+                modalMutasi.style.display = 'none';
+                showAlert('Transaksi berhasil diperbarui.');
+            });
 
             // --- Listener Backup & Restore ---
             document.getElementById('backup-btn').addEventListener('click', () => {
@@ -1174,6 +1391,11 @@
             // Set default tanggal ke hari ini
             document.getElementById('setor-tanggal').value = today;
             document.getElementById('ambil-tanggal').value = today;
+            document.getElementById('laporan-tanggal-mulai').value = today;
+            document.getElementById('laporan-tanggal-akhir').value = today;
+            
+            // Populate semua select saat load
+            populateAnggotaSelects(['setor-anggota', 'ambil-anggota', 'laporan-anggota', 'mutasi-filter-anggota', 'mutasi-anggota']);
             
             // Aktifkan tab pertama
             activateTab('tab-setor');
