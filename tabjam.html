@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Tabungan Jamiyah</title>
+    
+    <!-- Info PWA & Manifest -->
+    <meta name="theme-color" content="#3b82f6"> <!-- Warna tema biru -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Jamiyah">
+    
+    <!-- Icon Placeholder untuk PWA -->
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/3b82f6/ffffff?text=TJ">
+    <link rel="icon" type="image/png" href="https://placehold.co/192x192/3b82f6/ffffff?text=TJ">
+    
+    <!-- 
+      Manifest PWA sebagai Data URI (agar tetap 1 file)
+      Ini mendefinisikan nama, ikon, dan cara aplikasi dibuka.
+    -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Manajemen%20Tabungan%20Jamiyah%22%2C%22short_name%22%3A%22Jamiyah%22%2C%22description%22%3A%22Aplikasi%20untuk%20mengelola%20tabungan%20jamiyah.%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f3f4f6%22%2C%22theme_color%22%3A%22%233b82f6%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fplacehold.co%2F192x192%2F3b82f6%2Fffffff%3Ftext%3DTJ%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fplacehold.co%2F512x512%2F3b82f6%2Fffffff%3Ftext%3DTJ%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
+    <!-- Memuat Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Library untuk Ekspor PDF (jsPDF & jsPDF-AutoTable) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        /* Gaya untuk font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Menambahkan font Inter dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* Menyembunyikan tab content secara default */
+        .tab-content {
+            display: none;
+        }
+        /* Menampilkan tab content yang aktif */
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Gaya untuk modal */
+        .modal {
+            display: none; /* Sembunyi default */
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5); /* Overlay gelap */
+            animation: fadeIn 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            position: relative;
+            margin: auto; /* Dihapus margin 15% auto */
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Sembunyikan panah di input number */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- Kontainer Utama -->
+    <div class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Manajemen Tabungan Jamiyah</h1>
+            <p class="text-gray-600">Aplikasi untuk mengelola setoran, penarikan, dan laporan tabungan anggota.</p>
+        </header>
+
+        <!-- Navigasi Tab -->
+        <nav class="mb-6 bg-white rounded-lg shadow-md sticky top-0 z-40">
+            <div class="flex flex-wrap border-b border-gray-200" id="tabs-nav">
+                <button class="tab-link flex-1 py-3 px-4 font-medium text-center text-gray-600 hover:text-blue-600 focus:outline-none" data-tab="tab-setor">
+                    Input Tabungan
+                </button>
+                <button class="tab-link flex-1 py-3 px-4 font-medium text-center text-gray-600 hover:text-blue-600 focus:outline-none" data-tab="tab-ambil">
+                    Ambil Tabungan
+                </button>
+                <button class="tab-link flex-1 py-3 px-4 font-medium text-center text-gray-600 hover:text-blue-600 focus:outline-none" data-tab="tab-anggota">
+                    Daftar Anggota
+                </button>
+                <button class="tab-link flex-1 py-3 px-4 font-medium text-center text-gray-600 hover:text-blue-600 focus:outline-none" data-tab="tab-laporan">
+                    Laporan
+                </button>
+                <button class="tab-link flex-1 py-3 px-4 font-medium text-center text-gray-600 hover:text-blue-600 focus:outline-none" data-tab="tab-mutasi">
+                    Catatan Mutasi
+                </button>
+            </div>
+        </nav>
+
+        <!-- Konten Tab -->
+        <main id="tabs-content">
+            <!-- Tab 1: Input Tabungan -->
+            <div id="tab-setor" class="tab-content bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Input Tabungan (Setoran)</h2>
+                <form id="form-setor" class="space-y-4">
+                    <div>
+                        <label for="setor-anggota" class="block text-sm font-medium text-gray-700 mb-1">Pilih Anggota</label>
+                        <select id="setor-anggota" name="anggotaId" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Anggota --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="setor-tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Setor</label>
+                        <input type="date" id="setor-tanggal" name="tanggal" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="setor-nominal" class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
+                        <input type="number" id="setor-nominal" name="nominal" min="0" placeholder="Contoh: 50000" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                        Simpan Setoran
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tab 2: Ambil Tabungan -->
+            <div id="tab-ambil" class="tab-content bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Ambil Tabungan (Penarikan)</h2>
+                <form id="form-ambil" class="space-y-4">
+                    <div>
+                        <label for="ambil-anggota" class="block text-sm font-medium text-gray-700 mb-1">Pilih Anggota</label>
+                        <select id="ambil-anggota" name="anggotaId" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Anggota --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ambil-tanggal" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Ambil</label>
+                        <input type="date" id="ambil-tanggal" name="tanggal" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="ambil-nominal" class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
+                        <input type="number" id="ambil-nominal" name="nominal" min="0" placeholder="Contoh: 20000" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Saldo Tersedia: <span id="saldo-tersedia" class="font-bold">Rp 0</span>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-orange-700 transition-colors">
+                        Simpan Penarikan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tab 3: Daftar Anggota -->
+            <div id="tab-anggota" class="tab-content bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold">Daftar Anggota</h2>
+                    <button id="btn-tambah-anggota" class="bg-green-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">
+                        Tambah Anggota
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max border-collapse">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">No</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Nama Anggota</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Tanggal Mulai</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-anggota-body">
+                            <!-- Data anggota akan dimuat di sini -->
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                                    Belum ada data anggota.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 4: Laporan -->
+            <div id="tab-laporan" class="tab-content bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Laporan Tabungan</h2>
+                
+                <!-- Card Total Global -->
+                <div class="mb-6 bg-blue-600 text-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-lg font-medium">Total Saldo Global (Sesuai Filter)</h3>
+                    <p id="laporan-total-global" class="text-4xl font-bold">Rp 0</p>
+                    <p class="text-sm opacity-80">Total dari semua tabungan anggota berdasarkan filter di bawah.</p>
+                </div>
+
+                <!-- Filter Laporan -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg border">
+                    <div>
+                        <label for="laporan-anggota" class="block text-sm font-medium text-gray-700 mb-1">Anggota</label>
+                        <select id="laporan-anggota" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="semua">-- Semua Anggota --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="laporan-periode-tipe" class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
+                        <select id="laporan-periode-tipe" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="semua">Semua Waktu</option>
+                            <option value="mingguan">Per Minggu</option>
+                            <option value="bulanan">Per Bulan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="laporan-periode-nilai" class="block text-sm font-medium text-gray-700 mb-1">Pilih Periode</label>
+                        <input type="week" id="laporan-periode-minggu" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 hidden">
+                        <input type="month" id="laporan-periode-bulan" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 hidden">
+                    </div>
+                </div>
+
+                <!-- Tabel Laporan -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-3 gap-3">
+                    <h3 class="text-xl font-semibold">Rincian Saldo per Anggota</h3>
+                    <button id="btn-export-pdf" class="w-full sm:w-auto bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors text-sm">
+                        Export ke PDF
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max border-collapse">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Nama Anggota</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Total Setoran</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Total Penarikan</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Saldo Akhir</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-laporan-body">
+                           <!-- Data laporan akan dimuat di sini -->
+                           <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                                    Silakan pilih filter untuk melihat laporan.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 5: Catatan Mutasi -->
+            <div id="tab-mutasi" class="tab-content bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Catatan Mutasi (Semua Transaksi)</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max border-collapse">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Tanggal</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Anggota</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Jenis</th>
+                                <th class="p-3 text-left text-sm font-semibold text-gray-600 border border-gray-200">Nominal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-mutasi-body">
+                            <!-- Data mutasi akan dimuat di sini -->
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                                    Belum ada transaksi.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer for Backup/Restore -->
+        <footer class="mt-8 pt-6 border-t border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Utilitas Data</h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="backup-btn" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                    Backup Data (JSON)
+                </button>
+                <div class="w-full sm:w-auto">
+                    <label for="restore-file-input" class="w-full sm:w-auto cursor-pointer bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition-colors block text-center">
+                        Restore dari JSON
+                    </label>
+                    <input type="file" id="restore-file-input" class="hidden" accept=".json">
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Penting: Selalu backup data Anda secara berkala. Data hanya tersimpan di perangkat ini.</p>
+        </footer>
+    </div>
+
+    <!-- Modal: Tambah/Edit Anggota -->
+    <div id="modal-anggota" class="modal">
+        <div class="modal-content w-full max-w-lg p-6 bg-white rounded-lg shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-anggota-title" class="text-xl font-semibold">Tambah Anggota Baru</h3>
+                <button id="modal-anggota-close" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <form id="form-anggota" class="space-y-4">
+                <input type="hidden" id="anggota-id" name="id">
+                <div>
+                    <label for="anggota-nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Anggota</label>
+                    <input type="text" id="anggota-nama" name="nama" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div>
+                    <label for="anggota-tanggal-mulai" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                    <input type="date" id="anggota-tanggal-mulai" name="tanggalMulai" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                    Simpan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Alert (Info/Error) -->
+    <div id="modal-alert" class="modal">
+        <div class="modal-content w-full max-w-sm p-6 bg-white rounded-lg shadow-xl">
+            <h4 id="modal-alert-title" class="text-lg font-semibold mb-4 text-gray-800">Informasi</h4>
+            <p id="modal-alert-message" class="text-gray-600 mb-6">Pesan alert.</p>
+            <button id="modal-alert-close" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Konfirmasi -->
+    <div id="modal-confirm" class="modal">
+        <div class="modal-content w-full max-w-sm p-6 bg-white rounded-lg shadow-xl">
+            <h4 class="text-lg font-semibold mb-4 text-gray-800">Konfirmasi</h4>
+            <p id="modal-confirm-message" class="text-gray-600 mb-6">Apakah Anda yakin?</p>
+            <div class="flex justify-end gap-3">
+                <button id="modal-confirm-cancel" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                    Batal
+                </button>
+                <button id="modal-confirm-ok" class="bg-red-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors">
+                    Yakin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Aplikasi -->
+    <script type="module">
+        // Kunci untuk LocalStorage
+        const DB_KEY = 'jamiyahSavingsDB_v1';
+
+        // Variabel global untuk database
+        let db = {
+            anggota: [],
+            setoran: [],
+            penarikan: []
+        };
+
+        // Elemen DOM yang sering digunakan
+        const tabsNav = document.getElementById('tabs-nav');
+        const tabsContent = document.getElementById('tabs-content');
+        const today = new Date().toISOString().split('T')[0];
+
+        // --- Fungsi Utilitas ---
+
+        /**
+         * Menghasilkan ID unik (UUID v4)
+         */
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        /**
+         * Memformat angka menjadi mata uang Rupiah (IDR)
+         */
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(number);
+        }
+
+        /**
+         * Memformat string tanggal (YYYY-MM-DD) menjadi format lokal (DD/MM/YYYY)
+         */
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        /**
+         * Memuat database dari LocalStorage
+         */
+        function loadDB() {
+            const data = localStorage.getItem(DB_KEY);
+            if (data) {
+                db = JSON.parse(data);
+                // Pastikan semua array ada
+                if (!db.anggota) db.anggota = [];
+                if (!db.setoran) db.setoran = [];
+                if (!db.penarikan) db.penarikan = [];
+            } else {
+                // Inisialisasi db jika tidak ada di localStorage
+                db = {
+                    anggota: [],
+                    setoran: [],
+                    penarikan: []
+                };
+            }
+        }
+
+        /**
+         * Menyimpan database ke LocalStorage
+         */
+        function saveDB() {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        }
+
+        /**
+         * Mencari nama anggota berdasarkan ID
+         */
+        function getAnggotaName(anggotaId) {
+            const anggota = db.anggota.find(a => a.id === anggotaId);
+            return anggota ? anggota.nama : 'Anggota Tidak Dikenal';
+        }
+
+        /**
+         * Menghitung saldo anggota
+         */
+        function getSaldoAnggota(anggotaId) {
+            const totalSetoran = db.setoran
+                .filter(s => s.anggotaId === anggotaId)
+                .reduce((total, s) => total + s.nominal, 0);
+
+            const totalPenarikan = db.penarikan
+                .filter(p => p.anggotaId === anggotaId)
+                .reduce((total, p) => total + p.nominal, 0);
+
+            return totalSetoran - totalPenarikan;
+        }
+
+        // --- Fungsi Modal ---
+
+        const modalAlert = document.getElementById('modal-alert');
+        const modalConfirm = document.getElementById('modal-confirm');
+
+        /**
+         * Menampilkan modal Alert (Info/Error)
+         */
+        function showAlert(message, isError = false) {
+            const title = document.getElementById('modal-alert-title');
+            const msg = document.getElementById('modal-alert-message');
+            const btn = document.getElementById('modal-alert-close');
+            
+            title.textContent = isError ? 'Error' : 'Informasi';
+            msg.textContent = message;
+            btn.className = `w-full text-white py-2 px-4 rounded-lg shadow-md transition-colors ${isError ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`;
+            
+            modalAlert.style.display = 'flex';
+        }
+
+        /**
+         * Menampilkan modal Konfirmasi
+         * @param {string} message - Pesan konfirmasi
+         * @param {function} onConfirm - Callback jika user menekan 'Yakin'
+         */
+        function showConfirm(message, onConfirm) {
+            const msg = document.getElementById('modal-confirm-message');
+            const btnOk = document.getElementById('modal-confirm-ok');
+            const btnCancel = document.getElementById('modal-confirm-cancel');
+
+            msg.textContent = message;
+            modalConfirm.style.display = 'flex';
+
+            // Hapus listener lama sebelum menambah yang baru (penting!)
+            const newBtnOk = btnOk.cloneNode(true);
+            btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+            
+            newBtnOk.addEventListener('click', () => {
+                modalConfirm.style.display = 'none';
+                if (onConfirm) {
+                    onConfirm();
+                }
+            });
+
+            btnCancel.onclick = () => {
+                modalConfirm.style.display = 'none';
+            };
+        }
+
+        // --- Logika Tab ---
+
+        /**
+         * Mengaktifkan tab yang dipilih
+         */
+        function activateTab(tabId) {
+            // Nonaktifkan semua link tab
+            tabsNav.querySelectorAll('.tab-link').forEach(link => {
+                link.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                link.classList.add('text-gray-600');
+            });
+            // Nonaktifkan semua konten tab
+            tabsContent.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Aktifkan link dan konten tab yang dipilih
+            const activeLink = tabsNav.querySelector(`[data-tab="${tabId}"]`);
+            const activeContent = document.getElementById(tabId);
+
+            if (activeLink) {
+                activeLink.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                activeLink.classList.remove('text-gray-600');
+            }
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
+
+            // Refresh konten tab saat diaktifkan
+            switch (tabId) {
+                case 'tab-setor':
+                case 'tab-ambil':
+                    populateAnggotaSelects();
+                    break;
+                case 'tab-anggota':
+                    renderAnggotaTab();
+                    break;
+                case 'tab-laporan':
+                    populateLaporanFilter();
+                    renderLaporanTab();
+                    break;
+                case 'tab-mutasi':
+                    renderMutasiTab();
+                    break;
+            }
+        }
+        
+        // --- Render Fungsi per Tab ---
+
+        /**
+         * Memuat daftar anggota ke semua <select>
+         */
+        function populateAnggotaSelects() {
+            const selects = [
+                document.getElementById('setor-anggota'),
+                document.getElementById('ambil-anggota'),
+                document.getElementById('laporan-anggota')
+            ];
+            
+            // Urutkan anggota berdasarkan nama
+            const sortedAnggota = [...db.anggota].sort((a, b) => a.nama.localeCompare(b.nama));
+
+            selects.forEach(select => {
+                if (!select) return;
+                
+                // Simpan value yang dipilih (jika ada)
+                const selectedValue = select.value;
+                
+                // Hapus opsi lama, kecuali yang pertama
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                sortedAnggota.forEach(anggota => {
+                    const option = document.createElement('option');
+                    option.value = anggota.id;
+                    option.textContent = anggota.nama;
+                    select.appendChild(option);
+                });
+                
+                // Kembalikan value yang dipilih
+                select.value = selectedValue;
+            });
+        }
+        
+        /**
+         * Memuat filter laporan
+         */
+         function populateLaporanFilter() {
+            populateAnggotaSelects(); // Ini akan mengisi <select> laporan-anggota
+         }
+
+        /**
+         * Render Tab Daftar Anggota
+         */
+        function renderAnggotaTab() {
+            const tableBody = document.getElementById('tabel-anggota-body');
+            tableBody.innerHTML = ''; // Kosongkan tabel
+
+            if (db.anggota.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                            Belum ada data anggota. Silakan tambah anggota baru.
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            // Urutkan berdasarkan nama
+            const sortedAnggota = [...db.anggota].sort((a, b) => a.nama.localeCompare(b.nama));
+
+            sortedAnggota.forEach((anggota, index) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3 border border-gray-200">${index + 1}</td>
+                    <td class="p-3 border border-gray-200 font-medium">${anggota.nama}</td>
+                    <td class="p-3 border border-gray-200">${formatDate(anggota.tanggalMulai)}</td>
+                    <td class="p-3 border border-gray-200 space-x-2">
+                        <button class="btn-edit-anggota text-blue-600 hover:text-blue-800" data-id="${anggota.id}">Edit</button>
+                        <button class="btn-hapus-anggota text-red-600 hover:text-red-800" data-id="${anggota.id}">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        /**
+         * Render Tab Laporan
+         */
+        function renderLaporanTab() {
+            const tableBody = document.getElementById('tabel-laporan-body');
+            const totalGlobalEl = document.getElementById('laporan-total-global');
+            
+            const filterAnggotaId = document.getElementById('laporan-anggota').value;
+            const filterPeriodeTipe = document.getElementById('laporan-periode-tipe').value;
+            const filterPeriodeMinggu = document.getElementById('laporan-periode-minggu').value;
+            const filterPeriodeBulan = document.getElementById('laporan-periode-bulan').value;
+
+            let anggotaList = [];
+            let filteredSetoran = [...db.setoran];
+            let filteredPenarikan = [...db.penarikan];
+
+            // --- Filter Tanggal ---
+            let startDate, endDate;
+            if (filterPeriodeTipe === 'mingguan' && filterPeriodeMinggu) {
+                const [year, weekNum] = filterPeriodeMinggu.split('-W');
+                // Logika untuk mendapatkan Senin dari minggu
+                const d = new Date(year, 0, (weekNum - 1) * 7 + 1);
+                d.setDate(d.getDate() - (d.getDay() || 7) + 1); // Mundur ke Senin
+                startDate = d.toISOString().split('T')[0];
+                d.setDate(d.getDate() + 6); // Maju ke Minggu
+                endDate = d.toISOString().split('T')[0];
+            } else if (filterPeriodeTipe === 'bulanan' && filterPeriodeBulan) {
+                startDate = `${filterPeriodeBulan}-01`;
+                const [year, month] = filterPeriodeBulan.split('-');
+                const d = new Date(year, month, 0); // Hari terakhir bulan tersebut
+                endDate = d.toISOString().split('T')[0];
+            }
+            
+            if (startDate && endDate) {
+                filteredSetoran = filteredSetoran.filter(s => s.tanggal >= startDate && s.tanggal <= endDate);
+                filteredPenarikan = filteredPenarikan.filter(p => p.tanggal >= startDate && p.tanggal <= endDate);
+            }
+            
+            // --- Filter Anggota ---
+            if (filterAnggotaId === 'semua') {
+                anggotaList = [...db.anggota];
+            } else {
+                const anggota = db.anggota.find(a => a.id === filterAnggotaId);
+                if (anggota) {
+                    anggotaList = [anggota];
+                }
+                // Jika satu anggota, filter transaksi hanya untuk dia
+                filteredSetoran = filteredSetoran.filter(s => s.anggotaId === filterAnggotaId);
+                filteredPenarikan = filteredPenarikan.filter(p => p.anggotaId === filterAnggotaId);
+            }
+
+            // --- Hitung Total Global (dari data yang sudah difilter) ---
+            const totalSetoranGlobal = filteredSetoran.reduce((total, s) => total + s.nominal, 0);
+            const totalPenarikanGlobal = filteredPenarikan.reduce((total, p) => total + p.nominal, 0);
+            totalGlobalEl.textContent = formatCurrency(totalSetoranGlobal - totalPenarikanGlobal);
+
+            // --- Render Tabel Laporan ---
+            tableBody.innerHTML = '';
+            if (anggotaList.length === 0 && filterAnggotaId !== 'semua') {
+                 tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">Anggota tidak ditemukan.</td></tr>`;
+                 return;
+            }
+            
+            if (anggotaList.length === 0) {
+                 tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">Belum ada data anggota.</td></tr>`;
+                 return;
+            }
+            
+            let hasData = false;
+            anggotaList.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(anggota => {
+                const totalSetor = (filterAnggotaId === 'semua' ? filteredSetoran : db.setoran)
+                    .filter(s => s.anggotaId === anggota.id && (!startDate || (s.tanggal >= startDate && s.tanggal <= endDate)))
+                    .reduce((total, s) => total + s.nominal, 0);
+                
+                const totalTarik = (filterAnggotaId === 'semua' ? filteredPenarikan : db.penarikan)
+                    .filter(p => p.anggotaId === anggota.id && (!startDate || (p.tanggal >= startDate && p.tanggal <= endDate)))
+                    .reduce((total, p) => total + p.nominal, 0);
+                
+                // Jika filter 'semua anggota', kita hitung saldo akhir total, bukan saldo di periode itu saja
+                let saldoAkhir;
+                if(filterAnggotaId === 'semua' && filterPeriodeTipe === 'semua') {
+                    saldoAkhir = getSaldoAnggota(anggota.id);
+                } else if (filterAnggotaId !== 'semua') {
+                    saldoAkhir = getSaldoAnggota(anggota.id);
+                } else {
+                    saldoAkhir = totalSetor - totalTarik;
+                }
+                
+                // Hanya tampilkan jika ada aktivitas atau filter 'semua'
+                if (totalSetor > 0 || totalTarik > 0 || (filterAnggotaId === 'semua' && saldoAkhir !== 0) || (filterAnggotaId !== 'semua')) {
+                     const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="p-3 border border-gray-200 font-medium">${anggota.nama}</td>
+                        <td class="p-3 border border-gray-200 text-green-600">${formatCurrency(totalSetor)}</td>
+                        <td class="p-3 border border-gray-200 text-red-600">${formatCurrency(totalTarik)}</td>
+                        <td class="p-3 border border-gray-200 font-bold">${formatCurrency(saldoAkhir)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                    hasData = true;
+                }
+            });
+            
+            if (!hasData) {
+                 tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">Tidak ada data untuk filter yang dipilih.</td></tr>`;
+            }
+        }
+
+
+        /**
+         * Render Tab Mutasi
+         */
+        function renderMutasiTab() {
+            const tableBody = document.getElementById('tabel-mutasi-body');
+            tableBody.innerHTML = ''; // Kosongkan tabel
+
+            const mutasiSetoran = db.setoran.map(s => ({ ...s, jenis: 'Setoran' }));
+            const mutasiPenarikan = db.penarikan.map(p => ({ ...p, jenis: 'Penarikan' }));
+            
+            const allMutasi = [...mutasiSetoran, ...mutasiPenarikan];
+            
+            // Urutkan berdasarkan tanggal (terbaru dulu)
+            allMutasi.sort((a, b) => b.tanggal.localeCompare(a.tanggal) || (b.jenis === 'Setoran' ? 1 : -1));
+
+            if (allMutasi.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-500 border border-gray-200">
+                            Belum ada transaksi.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            allMutasi.forEach(tx => {
+                const isSetoran = tx.jenis === 'Setoran';
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3 border border-gray-200">${formatDate(tx.tanggal)}</td>
+                    <td class="p-3 border border-gray-200">${getAnggotaName(tx.anggotaId)}</td>
+                    <td class="p-3 border border-gray-200">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${isSetoran ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${tx.jenis}
+                        </span>
+                    </td>
+                    <td class="p-3 border border-gray-200 font-medium ${isSetoran ? 'text-green-600' : 'text-red-600'}">
+                        ${isSetoran ? '+' : '-'}${formatCurrency(tx.nominal)}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        /**
+         * Mengekspor data laporan ke PDF
+         */
+        function exportLaporanToPDF() {
+            // Ambil library dari window
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                showAlert('Library PDF belum ter-load. Coba lagi.', true);
+                return;
+            }
+            // Inisialisasi jsPDF
+            const doc = new jsPDF();
+
+            // 1. Dapatkan data
+            const tableBody = document.getElementById('tabel-laporan-body');
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+            const totalGlobal = document.getElementById('laporan-total-global').textContent;
+            
+            // 2. Dapatkan info filter
+            const filterAnggotaEl = document.getElementById('laporan-anggota');
+            const filterAnggotaText = filterAnggotaEl.options[filterAnggotaEl.selectedIndex].text;
+            const filterPeriodeEl = document.getElementById('laporan-periode-tipe');
+            const filterPeriodeText = filterPeriodeEl.options[filterPeriodeEl.selectedIndex].text;
+            const filterMinggu = document.getElementById('laporan-periode-minggu').value;
+            const filterBulan = document.getElementById('laporan-periode-bulan').value;
+
+            let filterInfo = `Anggota: ${filterAnggotaText}\nPeriode: ${filterPeriodeText}`;
+            if (filterPeriodeEl.value === 'mingguan' && filterMinggu) {
+                filterInfo += ` (${filterMinggu})`;
+            } else if (filterPeriodeEl.value === 'bulanan' && filterBulan) {
+                filterInfo += ` (${filterBulan})`;
+            }
+
+            // 3. Buat PDF
+            doc.setFontSize(18);
+            doc.text("Laporan Tabungan Jamiyah", 14, 22);
+            
+            doc.setFontSize(11);
+            doc.text(filterInfo, 14, 32);
+            
+            doc.setFontSize(12);
+            doc.text(`Total Saldo (Sesuai Filter): ${totalGlobal}`, 14, 50);
+
+            // 4. Buat Tabel
+            const tableData = rows.map(row => {
+                // Cek jika ini baris 'data tidak ditemukan'
+                if (row.cells.length < 4 || row.cells[0].getAttribute('colspan') === '4') {
+                    return [row.cells[0].textContent, '', '', ''];
+                }
+                return [
+                    row.cells[0].textContent, // Nama
+                    row.cells[1].textContent, // Setoran
+                    row.cells[2].textContent, // Penarikan
+                    row.cells[3].textContent  // Saldo
+                ];
+            }).filter(row => row[0].trim() !== ''); // Filter baris kosong jika ada
+
+            if (tableData.length > 0) {
+                // Cek apakah data pertama adalah "Tidak ada data..."
+                if(tableData.length === 1 && tableData[0][1] === '') {
+                     doc.text(tableData[0][0], 14, 70);
+                } else {
+                    doc.autoTable({
+                        head: [['Nama Anggota', 'Total Setoran', 'Total Penarikan', 'Saldo Akhir']],
+                        body: tableData,
+                        startY: 60,
+                        theme: 'striped',
+                        headStyles: { fillColor: [59, 130, 246] } // Warna biru (rgb)
+                    });
+                }
+            } else {
+                 doc.text("Tidak ada data untuk ditampilkan di tabel.", 14, 70);
+            }
+
+            // 5. Simpan file
+            doc.save(`laporan_tabungan_jamiyah_${today}.pdf`);
+        }
+        
+        // --- Event Listener ---
+
+        /**
+         * Inisialisasi Aplikasi
+         */
+        function initApp() {
+            // Muat DB
+            loadDB();
+
+            // --- Listener Navigasi Tab ---
+            tabsNav.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-link')) {
+                    const tabId = e.target.getAttribute('data-tab');
+                    activateTab(tabId);
+                }
+            });
+
+            // --- Listener Modal ---
+            document.getElementById('modal-alert-close').addEventListener('click', () => {
+                modalAlert.style.display = 'none';
+            });
+            // Tutup modal jika klik di luar area konten
+            window.addEventListener('click', (e) => {
+                if (e.target == modalAlert) modalAlert.style.display = 'none';
+                if (e.target == modalConfirm) modalConfirm.style.display = 'none';
+                if (e.target == document.getElementById('modal-anggota')) {
+                    document.getElementById('modal-anggota').style.display = 'none';
+                }
+            });
+
+            // --- Listener Form Setor (Tab 1) ---
+            const formSetor = document.getElementById('form-setor');
+            formSetor.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formSetor);
+                const anggotaId = formData.get('anggotaId');
+                const tanggal = formData.get('tanggal');
+                const nominal = parseInt(formData.get('nominal'), 10);
+
+                if (!anggotaId || !tanggal || !nominal || nominal <= 0) {
+                    showAlert('Semua field wajib diisi dan nominal harus lebih dari 0.', true);
+                    return;
+                }
+                
+                showConfirm(`Simpan setoran ${formatCurrency(nominal)} untuk ${getAnggotaName(anggotaId)}?`, () => {
+                    const newSetoran = {
+                        id: generateUUID(),
+                        anggotaId: anggotaId,
+                        tanggal: tanggal,
+                        nominal: nominal
+                    };
+                    db.setoran.push(newSetoran);
+                    saveDB();
+                    showAlert('Setoran berhasil disimpan.');
+                    formSetor.reset();
+                    document.getElementById('setor-tanggal').value = today; // Reset tanggal ke hari ini
+                    document.getElementById('setor-anggota').value = ''; // Reset pilihan anggota
+                    // Refresh tab terkait
+                    if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
+                    if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
+                });
+            });
+
+            // --- Listener Form Ambil (Tab 2) ---
+            const formAmbil = document.getElementById('form-ambil');
+            const ambilAnggotaSelect = document.getElementById('ambil-anggota');
+            const saldoTersediaEl = document.getElementById('saldo-tersedia');
+            
+            // Update saldo tersedia saat anggota dipilih
+            ambilAnggotaSelect.addEventListener('change', (e) => {
+                const anggotaId = e.target.value;
+                if (anggotaId) {
+                    const saldo = getSaldoAnggota(anggotaId);
+                    saldoTersediaEl.textContent = formatCurrency(saldo);
+                    saldoTersediaEl.className = saldo < 0 ? 'font-bold text-red-600' : 'font-bold text-green-600';
+                } else {
+                    saldoTersediaEl.textContent = formatCurrency(0);
+                    saldoTersediaEl.className = 'font-bold';
+                }
+            });
+            
+            formAmbil.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(formAmbil);
+                const anggotaId = formData.get('anggotaId');
+                const tanggal = formData.get('tanggal');
+                const nominal = parseInt(formData.get('nominal'), 10);
+
+                if (!anggotaId || !tanggal || !nominal || nominal <= 0) {
+                    showAlert('Semua field wajib diisi dan nominal harus lebih dari 0.', true);
+                    return;
+                }
+                
+                const saldo = getSaldoAnggota(anggotaId);
+                if (nominal > saldo) {
+                    showAlert(`Saldo tidak mencukupi. Saldo tersedia ${formatCurrency(saldo)}.`, true);
+                    return;
+                }
+                
+                showConfirm(`Simpan penarikan ${formatCurrency(nominal)} untuk ${getAnggotaName(anggotaId)}?`, () => {
+                    const newPenarikan = {
+                        id: generateUUID(),
+                        anggotaId: anggotaId,
+                        tanggal: tanggal,
+                        nominal: nominal
+                    };
+                    db.penarikan.push(newPenarikan);
+                    saveDB();
+                    showAlert('Penarikan berhasil disimpan.');
+                    formAmbil.reset();
+                    document.getElementById('ambil-tanggal').value = today; // Reset tanggal
+                    document.getElementById('ambil-anggota').value = ''; // Reset pilihan anggota
+                    saldoTersediaEl.textContent = formatCurrency(0); // Reset saldo
+                    // Refresh tab terkait
+                    if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
+                    if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
+                });
+            });
+
+            // --- Listener Tab Anggota (Tab 3) ---
+            const modalAnggota = document.getElementById('modal-anggota');
+            const modalAnggotaTitle = document.getElementById('modal-anggota-title');
+            const formAnggota = document.getElementById('form-anggota');
+            const anggotaIdInput = document.getElementById('anggota-id');
+            const anggotaNamaInput = document.getElementById('anggota-nama');
+            const anggotaTglMulaiInput = document.getElementById('anggota-tanggal-mulai');
+
+            // Buka modal untuk tambah
+            document.getElementById('btn-tambah-anggota').addEventListener('click', () => {
+                formAnggota.reset();
+                anggotaIdInput.value = ''; // Pastikan ID kosong
+                anggotaTglMulaiInput.value = today;
+                modalAnggotaTitle.textContent = 'Tambah Anggota Baru';
+                modalAnggota.style.display = 'flex';
+                anggotaNamaInput.focus();
+            });
+            
+            // Tutup modal
+            document.getElementById('modal-anggota-close').addEventListener('click', () => {
+                modalAnggota.style.display = 'none';
+            });
+
+            // Simpan Anggota (Add/Edit)
+            formAnggota.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = anggotaIdInput.value;
+                const nama = anggotaNamaInput.value.trim();
+                const tanggalMulai = anggotaTglMulaiInput.value;
+
+                if (!nama || !tanggalMulai) {
+                    showAlert('Nama dan Tanggal Mulai wajib diisi.', true);
+                    return;
+                }
+
+                if (id) {
+                    // Mode Edit
+                    const index = db.anggota.findIndex(a => a.id === id);
+                    if (index > -1) {
+                        db.anggota[index].nama = nama;
+                        db.anggota[index].tanggalMulai = tanggalMulai;
+                        showAlert('Data anggota berhasil diperbarui.');
+                    }
+                } else {
+                    // Mode Tambah
+                    // Cek duplikasi nama
+                    if (db.anggota.some(a => a.nama.toLowerCase() === nama.toLowerCase())) {
+                        showAlert('Nama anggota sudah ada. Harap gunakan nama lain.', true);
+                        return;
+                    }
+                    const newAnggota = {
+                        id: generateUUID(),
+                        nama: nama,
+                        tanggalMulai: tanggalMulai
+                    };
+                    db.anggota.push(newAnggota);
+                    showAlert('Anggota baru berhasil ditambahkan.');
+                }
+                
+                saveDB();
+                modalAnggota.style.display = 'none';
+                renderAnggotaTab(); // Refresh tabel anggota
+                populateAnggotaSelects(); // Refresh semua dropdown anggota
+            });
+            
+            // Listener untuk tombol Edit/Hapus di tabel anggota
+            document.getElementById('tabel-anggota-body').addEventListener('click', (e) => {
+                const target = e.target;
+                const id = target.getAttribute('data-id');
+                if (!id) return;
+
+                if (target.classList.contains('btn-edit-anggota')) {
+                    // Edit Anggota
+                    const anggota = db.anggota.find(a => a.id === id);
+                    if (anggota) {
+                        anggotaIdInput.value = anggota.id;
+                        anggotaNamaInput.value = anggota.nama;
+                        anggotaTglMulaiInput.value = anggota.tanggalMulai;
+                        modalAnggotaTitle.textContent = 'Edit Data Anggota';
+                        modalAnggota.style.display = 'flex';
+                        anggotaNamaInput.focus();
+                    }
+                } else if (target.classList.contains('btn-hapus-anggota')) {
+                    // Hapus Anggota
+                    const anggotaNama = getAnggotaName(id);
+                    // Cek apakah anggota punya transaksi
+                    const hasTransaksi = db.setoran.some(s => s.anggotaId === id) || db.penarikan.some(p => p.anggotaId === id);
+                    
+                    showConfirm(`Yakin ingin menghapus ${anggotaNama}? ${hasTransaksi ? 'PERINGATAN: Anggota ini memiliki riwayat transaksi. Menghapus anggota TIDAK akan menghapus transaksinya.' : ''}`, () => {
+                        db.anggota = db.anggota.filter(a => a.id !== id);
+                        saveDB();
+                        showAlert(`Anggota ${anggotaNama} berhasil dihapus.`);
+                        renderAnggotaTab();
+                        populateAnggotaSelects();
+                        // Refresh tab laporan dan mutasi jika sedang aktif
+                        if (document.getElementById('tab-laporan').classList.contains('active')) renderLaporanTab();
+                        if (document.getElementById('tab-mutasi').classList.contains('active')) renderMutasiTab();
+                    });
+                }
+            });
+
+            // --- Listener Filter Laporan (Tab 4) ---
+            const periodeTipeSelect = document.getElementById('laporan-periode-tipe');
+            const periodeMingguInput = document.getElementById('laporan-periode-minggu');
+            const periodeBulanInput = document.getElementById('laporan-periode-bulan');
+            
+            periodeTipeSelect.addEventListener('change', () => {
+                const tipe = periodeTipeSelect.value;
+                periodeMingguInput.classList.toggle('hidden', tipe !== 'mingguan');
+                periodeBulanInput.classList.toggle('hidden', tipe !== 'bulanan');
+                // Reset nilai input periode jika disembunyikan
+                if (tipe !== 'mingguan') periodeMingguInput.value = '';
+                if (tipe !== 'bulanan') periodeBulanInput.value = '';
+                renderLaporanTab();
+            });
+            
+            document.getElementById('laporan-anggota').addEventListener('change', renderLaporanTab);
+            periodeMingguInput.addEventListener('change', renderLaporanTab);
+            periodeBulanInput.addEventListener('change', renderLaporanTab);
+
+            // --- Listener Export PDF (Tab 4) ---
+            document.getElementById('btn-export-pdf').addEventListener('click', () => {
+                try {
+                    exportLaporanToPDF();
+                } catch (e) {
+                    console.error("Gagal export PDF:", e);
+                    showAlert("Gagal membuat PDF. Pastikan koneksi internet stabil untuk memuat library.", true);
+                }
+            });
+
+
+            // --- Listener Backup & Restore ---
+            document.getElementById('backup-btn').addEventListener('click', () => {
+                // Pastikan data terbaru dari db
+                const currentDB = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                const dataStr = JSON.stringify(currentDB, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `backup_tabungan_jamiyah_${today}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showAlert('Backup data berhasil dibuat.');
+            });
+
+            document.getElementById('restore-file-input').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const parsedData = JSON.parse(event.target.result);
+                        
+                        // Validasi sederhana (pastikan formatnya mirip)
+                        if (typeof parsedData.anggota === 'undefined' || typeof parsedData.setoran === 'undefined') {
+                            throw new Error('Format file tidak valid. File harus berisi "anggota" dan "setoran".');
+                        }
+
+                        showConfirm('Merestore data akan MENGGANTI semua data saat ini. Lanjutkan?', () => {
+                            // Simpan langsung ke localStorage, lalu muat ulang
+                            localStorage.setItem(DB_KEY, JSON.stringify(parsedData));
+                            
+                            showAlert('Data berhasil direstore! Aplikasi akan dimuat ulang.');
+                            
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+                        });
+
+                    } catch (err) {
+                        showAlert(`Gagal membaca file: ${err.message}`, true);
+                    } finally {
+                        // Reset input file agar bisa pilih file yang sama lagi
+                        e.target.value = null;
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // --- Inisialisasi Tampilan ---
+            // Set default tanggal ke hari ini
+            document.getElementById('setor-tanggal').value = today;
+            document.getElementById('ambil-tanggal').value = today;
+            
+            // Aktifkan tab pertama
+            activateTab('tab-setor');
+        }
+
+        // Jalankan aplikasi saat DOM siap
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
+
+
