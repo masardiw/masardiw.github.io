@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamus Bahasa Inggris Sehari-hari (1000+ Kata)</title>
+    <style>
+        /* Reset & Base Styles */
+        :root {
+            --dw-bg: #ffffff;
+            --dw-text: #000000;
+            --dw-link: #0000EE;
+            --dw-header-bg: #dc143c; /* DistroWatch Red accent vibe */
+            --dw-table-header: #eeeeee;
+            --dw-border: #cccccc;
+            --dw-accent: #ff9900;
+        }
+
+        body {
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: var(--dw-text);
+        }
+
+        a { text-decoration: none; color: var(--dw-link); }
+        a:hover { text-decoration: underline; }
+
+        /* Layout Structure */
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 10px auto;
+            background-color: #fff;
+            border: 1px solid #999;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        /* Header Area */
+        header {
+            background-color: #fff;
+            padding: 10px;
+            border-bottom: 2px solid var(--dw-header-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .logo span { color: var(--dw-header-bg); }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+        .navbar a { color: white; margin-right: 15px; }
+
+        /* Main Content Layout */
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-right: 1px solid var(--dw-border);
+            flex-shrink: 0;
+        }
+        
+        .sidebar-box {
+            border: 1px solid var(--dw-border);
+            background: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .sidebar-header {
+            background: var(--dw-header-bg);
+            color: white;
+            padding: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .sidebar-content {
+            padding: 10px;
+            font-size: 11px;
+        }
+
+        /* Main Area */
+        .main-area {
+            flex-grow: 1;
+            padding: 15px;
+        }
+
+        /* Search Box */
+        .search-container {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #999;
+            box-sizing: border-box;
+        }
+
+        /* Data Table (DistroWatch Style) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--dw-border);
+        }
+
+        th {
+            background-color: #dddddd;
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+        }
+
+        /* Zebra Striping */
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:nth-child(odd) { background-color: #ffffff; }
+        tr:hover { background-color: #ffffcc; cursor: default; }
+
+        /* Back to Top Button */
+        #myBtn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            z-index: 99;
+            font-size: 14px;
+            border: none;
+            outline: none;
+            background-color: var(--dw-header-bg);
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        #myBtn:hover {
+            background-color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--dw-border); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Back To Top -->
+    <button onclick="topFunction()" id="myBtn" title="Kembali ke atas">▲ Top</button>
+
+    <div class="container">
+        <header>
+            <div class="logo">Vocab<span>Watch</span></div>
+            <div style="font-size: 11px; text-align: right;">
+                Daily English Vocabulary<br>
+                Updated: Today
+            </div>
+        </header>
+
+        <nav class="navbar">
+            <a href="#">Beranda</a>
+        </nav>
+
+        <div class="content-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-box">
+                    <div class="sidebar-header">Statistik</div>
+                    <div class="sidebar-content">
+                        Total Kata: <b id="totalWords">0</b><br><br>
+                        Urutan: A-Z<br>
+                        Status: Lengkap<br>
+                    </div>
+                </div>
+
+                <div class="sidebar-box">
+                    <div class="sidebar-header">Kategori</div>
+                    <div class="sidebar-content">
+                        • Common Nouns<br>
+                        • Common Verbs<br>
+                        • Adjectives<br>
+                        • Adverbs<br>
+                        • Prepositions
+                    </div>
+                </div>
+                
+                <div class="sidebar-box">
+                    <div class="sidebar-header">Tentang</div>
+                    <div class="sidebar-content">
+                        Daftar ini berisi kata-kata frekuensi tinggi yang digunakan dalam percakapan sehari-hari.
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-area">
+                <h2 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; color: #cc0000;">Daftar Kosakata Lengkap (A-Z)</h2>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari kata inggris atau arti indonesia...">
+                </div>
+
+                <table id="vocabTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No</th>
+                            <th style="width: 40%;">English (Inggris)</th>
+                            <th>Indonesian (Indonesia)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be inserted here via JS -->
+                        <tr><td colspan="3" style="text-align:center;">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </main>
+        </div>
+        
+        <footer style="background: #333; color: white; padding: 10px; text-align: center; margin-top: 10px;">
+            &copy; 2024 VocabWatch - Simple Daily Vocabulary List
+        </footer>
+    </div>
+
+    <script>
+        // Data Kosakata (Compressed format to keep file manageable but satisfy the 1000+ requirement)
+        // Format: "english:indonesian"
+        const rawDataString = `
+a:sebuah/seekor|ability:kemampuan|able:mampu|about:tentang|above:di atas|accept:menerima|accident:kecelakaan|according:menurut|account:akun/rekening|across:di seberang|act:bertindak|action:tindakan|active:aktif|activity:kegiatan|actor:aktor|actress:aktris|actually:sebenarnya|add:menambahkan|address:alamat|administer:mengelola|admire:mengagumi|admit:mengakui|adult:dewasa|advance:kemajuan|advantage:keuntungan|adventure:petualangan|advice:nasihat|advise:menasihati|afford:mampu membeli|afraid:takut|after:setelah|afternoon:sore|again:lagi|against:melawan|age:usia|agency:agensi|agent:agen|ago:yang lalu|agree:setuju|agreement:persetujuan|ahead:di depan|air:udara|airport:bandara|alarm:alarm|alcohol:alkohol|alive:hidup|all:semua|allow:mengizinkan|almost:hampir|alone:sendirian|along:sepanjang|already:sudah|also:juga|alter:mengubah|although:meskipun|always:selalu|amazing:luar biasa|ambition:ambisi|amount:jumlah|analyse:menganalisis|ancient:kuno|and:dan|anger:kemarahan|angle:sudut|angry:marah|animal:hewan|anniversary:ulang tahun (perayaan)|announce:mengumumkan|annoy:mengganggu|annual:tahunan|another:yang lain|answer:jawaban|anxiety:kecemasan|anxious:cemas|any:apa saja|anybody:siapa saja|anymore:lagi|anyone:siapapun|anything:apapun|anyway:bagaimanapun|anywhere:dimanapun|apart:terpisah|apartment:apartemen|apologize:meminta maaf|appeal:daya tarik|appear:muncul|appearance:penampilan|apple:apel|application:aplikasi|apply:menerapkan|appoint:menunjuk|approach:pendekatan|approve:menyetujui|area:daerah|argue:berdebat|argument:argumen|arise:timbul|arm:lengan|army:tentara|around:sekitar|arrange:mengatur|arrest:menangkap|arrival:kedatangan|arrive:tiba|art:seni|article:artikel|artist:seniman|as:sebagai|ashamed:malu|aside:di samping|ask:bertanya|asleep:tertidur|aspect:aspek|assist:membantu|assistance:bantuan|assistant:asisten|associate:menghubungkan|assume:berasumsi|assumption:asumsi|atmosphere:suasana|attach:melampirkan|attack:serangan|attempt:percobaan|attend:menghadiri|attention:perhatian|attitude:sikap|attract:menarik|audience:penonton|aunt:bibi|author:penulis|authority:otoritas|automatic:otomatis|available:tersedia|average:rata-rata|avoid:menghindari|awake:bangun|award:penghargaan|aware:sadar|away:jauh|baby:bayi|back:kembali/punggung|background:latar belakang|bad:buruk|bag:tas|bake:memanggang|balance:keseimbangan|ball:bola|ban:melarang|band:band/kelompok|bank:bank|bar:batang/bar|barely:hampir tidak|barrier:penghalang|base:dasar|basic:dasar|basically:pada dasarnya|basis:dasar|basket:keranjang|bat:kelelawar/pemukul|bath:mandi|bathroom:kamar mandi|battle:pertempuran|beach:pantai|bean:kacang|bear:beruang/menanggung|beat:mengalahkan|beautiful:indah|beauty:kecantikan|because:karena|become:menjadi|bed:tempat tidur|bedroom:kamar tidur|beer:bir|before:sebelum|beg:memohon|begin:mulai|beginning:permulaan|behave:berperilaku|behavior:perilaku|behind:di belakang|belief:keyakinan|believe:percaya|bell:lonceng|belong:termasuk|below:di bawah|belt:sabuk|bench:bangku|bend:menekuk|benefit:manfaat|beside:di samping|best:terbaik|bet:bertaruh|better:lebih baik|between:antara|beyond:melebihi|bicycle:sepeda|big:besar|bike:sepeda|bill:tagihan|billion:milyar|bind:mengikat|bird:burung|birth:kelahiran|birthday:ulang tahun|bit:sedikit|bite:menggigit|bitter:pahit|black:hitam|blade:bilah pisau|blame:menyalahkan|blank:kosong|blind:buta|block:blok|blood:darah|blow:meniup|blue:biru|board:papan|boat:perahu|body:tubuh|boil:mendidih|bomb:bom|bond:ikatan|bone:tulang|book:buku|boom:ledakan|boot:sepatu bot|border:perbatasan|bore:membosankan|born:lahir|borrow:meminjam|boss:bos|both:keduanya|bother:mengganggu|bottle:botol|bottom:dasar|boundary:batas|bowl:mangkuk|box:kotak|boy:anak laki-laki|boyfriend:pacar laki-laki|brain:otak|branch:cabang|brand:merek|brave:berani|bread:roti|break:istirahat/memecahkan|breakfast:sarapan|breast:dada|breath:nafas|breathe:bernafas|brick:batu bata|bridge:jembatan|brief:singkat|bright:terang|bring:membawa|broad:luas|broadcast:siaran|broken:rusak|brother:saudara laki-laki|brown:coklat|brush:sikat|budget:anggaran|build:membangun|building:bangunan|bullet:peluru|burn:membakar|bury:mengubur|bus:bis|business:bisnis|busy:sibuk|but:tapi|butter:mentega|button:tombol|buy:membeli|buyer:pembeli|cabinet:lemari|cable:kabel|cake:kue|calculate:menghitung|call:memanggil|calm:tenang|camera:kamera|camp:berkemah|campaign:kampanye|can:bisa/kaleng|cancel:membatalkan|cancer:kanker|candidate:kandidat|candle:lilin|candy:permen|cap:topi|capable:mampu|capacity:kapasitas|capital:modal/ibukota|captain:kapten|capture:menangkap|car:mobil|card:kartu|care:peduli|career:karir|careful:hati-hati|carpet:karpet|carry:membawa|case:kasus|cash:tunai|cast:melemparkan|cat:kucing|catch:menangkap|category:kategori|cause:penyebab|celebrate:merayakan|celebration:perayaan|cell:sel|ceiling:langit-langit|central:pusat|center:tengah|century:abad|ceremony:upacara|certain:tertentu|certainly:pasti|chain:rantai|chair:kursi|chairman:ketua|challenge:tantangan|champion:juara|chance:kesempatan|change:mengubah|channel:saluran|chapter:bab|character:karakter|charge:biaya|charity:amal|chart:grafik|cheap:murah|cheat:curang|check:memeriksa|cheek:pipi|cheese:keju|chef:koki|chemical:bahan kimia|chest:dada|chicken:ayam|chief:kepala|child:anak|childhood:masa kecil|chip:keripik|chocolate:cokelat|choice:pilihan|choose:memilih|church:gereja|cigarette:rokok|cinema:bioskop|circle:lingkaran|circumstance:keadaan|citizen:warga negara|city:kota|civil:sipil|claim:klaim|class:kelas|classic:klasik|classroom:ruang kelas|clean:bersih|clear:jelas|clerk:pramuniaga|clever:pintar|client:klien|climb:memanjat|clock:jam|close:menutup/dekat|closed:tutup|closet:lemari|cloth:kain|clothes:pakaian|cloud:awan|club:klub|coach:pelatih|coal:batu bara|coast:pantai|coat:mantel|code:kode|coffee:kopi|coin:koin|cold:dingin|collapse:runtuh|colleague:rekan kerja|collect:mengumpulkan|collection:koleksi|college:perguruan tinggi|color:warna|column:kolom|combination:kombinasi|combine:menggabungkan|come:datang|comedy:komedi|comfort:kenyamanan|comfortable:nyaman|command:perintah|comment:komentar|commercial:komersial|commission:komisi|commit:melakukan|committee:panitia|common:umum|communicate:berkomunikasi|communication:komunikasi|community:masyarakat|company:perusahaan|compare:membandingkan|comparison:perbandingan|compete:bersaing|competition:kompetisi|complain:mengeluh|complaint:keluhan|complete:lengkap|completely:sepenuhnya|complex:kompleks|complicate:rumit|component:komponen|computer:komputer|concentrate:berkonsentrasi|concept:konsep|concern:kekhawatiran|concerned:khawatir|concert:konser|conclude:menyimpulkan|conclusion:kesimpulan|condition:kondisi|conduct:mengadakan|conference:konferensi|confidence:kepercayaan diri|confident:percaya diri|confirm:konfirmasi|conflict:konflik|confuse:bingung|confusion:kebingungan|connect:menghubungkan|connection:koneksi|consequence:konsekuensi|conservative:konservatif|consider:mempertimbangkan|consideration:pertimbangan|consist:terdiri|consistent:konsisten|constant:konstan|construct:membangun|construction:konstruksi|consume:mengkonsumsi|consumer:konsumen|contact:kontak|contain:berisi|container:wadah|contemporary:kontemporer|content:isi|contest:kontes|context:konteks|continue:melanjutkan|contract:kontrak|contrast:kontras|contribute:menyumbang|contribution:kontribusi|control:kontrol|convenient:nyaman|convention:konvensi|conversation:percakapan|convert:mengubah|convince:meyakinkan|cook:memasak|cookie:kue kering|cool:keren/sejuk|cooperation:kerjasama|copy:menyalin|core:inti|corn:jagung|corner:sudut|corporate:perusahaan|correct:benar|cost:biaya|cotton:katun|couch:sofa|cough:batuk|could:bisa|council:dewan|count:menghitung|counter:konter|country:negara|county:wilayah|couple:pasangan|courage:keberanian|course:kursus|court:pengadilan|cousin:sepupu|cover:menutupi|cow:sapi|crack:retak|craft:kerajinan|crash:tabrakan|crazy:gila|cream:krim|create:menciptakan|creation:penciptaan|creative:kreatif|creature:makhluk|credit:kredit|crew:kru|crime:kejahatan|criminal:penjahat|crisis:krisis|criteria:kriteria|critic:kritikus|critical:kritis|criticism:kritik|criticize:mengkritik|crop:tanaman|cross:menyeberang|crowd:kerumunan|crucial:penting|cry:menangis|cultural:budaya|culture:budaya|cup:cangkir|cupboard:lemari|cure:menyembuhkan|curious:penasaran|currency:mata uang|current:saat ini|currently:saat ini|curtain:gorden|custom:adat|customer:pelanggan|cut:memotong|cycle:siklus|dad:ayah|daily:harian|damage:kerusakan|dance:menari|danger:bahaya|dangerous:berbahaya|dare:berani|dark:gelap|data:data|date:tanggal/kencan|daughter:anak perempuan|day:hari|dead:mati|deal:kesepakatan|dealer:pedagang|dear:sayang|death:kematian|debate:debat|debt:hutang|decade:dekade|decide:memutuskan|decision:keputusan|deck:dek|declare:menyatakan|decline:menolak|decorate:menghias|decrease:mengurangi|deep:dalam|deeply:sangat|defeat:mengalahkan|defence:pertahanan|defend:membela|define:mendefinisikan|definite:pasti|definition:definisi|degree:derajat/gelar|delay:menunda|deliver:mengirim|delivery:pengiriman|demand:permintaan|democracy:demokrasi|democratic:demokratis|demonstrate:mendemonstrasikan|deny:menyangkal|department:departemen|depend:tergantung|dependent:bergantung|depend:tergantung|deposit:setoran|depression:depresi|depth:kedalaman|derive:berasal|describe:menggambarkan|description:deskripsi|desert:gurun|deserve:pantas|design:desain|designer:perancang|desire:keinginan|desk:meja tulis|desperate:putus asa|despite:meskipun|destroy:menghancurkan|destruction:kehancuran|detail:detail|detailed:terperinci|detect:mendeteksi|determine:menentukan|develop:mengembangkan|development:pengembangan|device:perangkat|devote:mencurahkan|diagram:diagram|dialogue:dialog|diamond:berlian|diary:buku harian|dictionary:kamus|die:mati|diet:diet|differ:berbeda|difference:perbedaan|different:beda|difficult:sulit|difficulty:kesulitan|dig:menggali|digital:digital|dinner:makan malam|direct:langsung|direction:arah|directly:secara langsung|director:direktur|dirt:kotoran|dirty:kotor|disability:cacat|disagree:tidak setuju|disappear:menghilang|disaster:bencana|discipline:disiplin|discover:menemukan|discovery:penemuan|discuss:membahas|discussion:diskusi|disease:penyakit|dish:hidangan|disk:disket|dismiss:memberhentikan|display:tampilan|distance:jarak|distant:jauh|distinct:berbeda|distinction:perbedaan|distinguish:membedakan|distribute:mendistribusikan|distribution:distribusi|district:daerah|divide:membagi|division:divisi|divorce:perceraian|do:melakukan|doctor:dokter|document:dokumen|dog:anjing|dollar:dolar|domestic:domestik|dominant:dominan|dominate:mendominasi|door:pintu|double:ganda|doubt:ragu|down:bawah|downtown:pusat kota|dozen:lusin|draft:draf|drag:menarik|drama:drama|dramatic:dramatis|draw:menggambar|drawer:laci|drawing:gambar|dream:mimpi|dress:gaun|drink:minum|drive:mengemudi|driver:pengemudi|drop:menjatuhkan|drug:obat|drum:drum|drunk:mabuk|dry:kering|duck:bebek|due:karena|dull:kusam|dump:membuang|during:selama|dust:debu|duty:tugas|each:setiap|ear:telinga|early:awal|earn:menghasilkan|earnings:pendapatan|earth:bumi|ease:kemudahan|easily:dengan mudah|east:timur|eastern:timur|easy:mudah|eat:makan|economic:ekonomi|economy:ekonomi|edge:tepi|edit:mengedit|edition:edisi|editor:editor|educate:mendidik|education:pendidikan|educational:pendidikan|effect:efek|effective:efektif|effectively:secara efektif|efficiency:efisiensi|efficient:efisien|effort:usaha|egg:telur|eight:delapan|either:salah satu|elderly:tua|elect:memilih|election:pemilihan|electric:listrik|electricity:listrik|electronic:elektronik|element:elemen|elevator:lift|eleven:sebelas|else:lain|elsewhere:di tempat lain|email:email|embarrassed:malu|emerge:muncul|emergency:darurat|emotion:emosi|emotional:emosional|emphasis:penekanan|emphasize:menekankan|empire:kekaisaran|employ:mempekerjakan|employee:karyawan|employer:majikan|employment:pekerjaan|empty:kosong|enable:memungkinkan|encounter:pertemuan|encourage:mendorong|end:akhir|enemy:musuh|energy:energi|engage:melibatkan|engine:mesin|engineer:insinyur|engineering:teknik|enhance:meningkatkan|enjoy:menikmati|enormous:sangat besar|enough:cukup|ensure:memastikan|enter:masuk|enterprise:perusahaan|entertainment:hiburan|enthusiasm:antusiasme|entire:seluruh|entirely:sepenuhnya|entrance:pintu masuk|entry:masuk|environment:lingkungan|environmental:lingkungan|episode:episode|equal:sama|equally:sama rata|equipment:peralatan|era:era|error:kesalahan|escape:melarikan diri|especially:terutama|essay:esai|essential:penting|establish:mendirikan|establishment:pendirian|estate:perkebunan|estimate:memperkirakan|ethnic:etnis|evaluate:mengevaluasi|evaluation:evaluasi|even:bahkan|evening:malam|event:acara|eventually:akhirnya|ever:pernah|every:setiap|everybody:setiap orang|everyone:semua orang|everything:segala sesuatu|everywhere:dimana saja|evidence:bukti|evil:jahat|exact:tepat|exactly:tepat|exam:ujian|examination:pemeriksaan|examine:memeriksa|example:contoh|excellent:luar biasa|except:kecuali|exception:pengecualian|exchange:pertukaran|cite:mengutip|exercise:latihan|exhibit:pameran|exhibition:pameran|exist:ada|existence:keberadaan|existing:yang ada|expand:memperluas|expansion:ekspansi|expect:mengharapkan|expectation:harapan|expense:biaya|expensive:mahal|experience:pengalaman|experiment:percobaan|expert:ahli|explain:menjelaskan|explanation:penjelasan|explode:meledak|explore:menjelajah|explosion:ledakan|export:ekspor|expose:memaparkan|express:mengekspresikan|expression:ekspresi|extend:memperpanjang|extension:perpanjangan|extensive:luas|extent:sejauh|external:eksternal|extra:tambahan|extraordinary:luar biasa|extreme:ekstrim|eye:mata|fabric:kain|face:wajah|facility:fasilitas|fact:fakta|factor:faktor|factory:pabrik|fail:gagal|failure:kegagalan|fair:adil|fairly:cukup|faith:iman|fall:jatuh|false:salah|familiar:akrab|family:keluarga|famous:terkenal|fan:penggemar/kipas|fancy:indah|far:jauh|farm:pertanian|farmer:petani|farming:pertanian|fashion:mode|fast:cepat|fat:gemuk|fate:nasib|father:ayah|fault:kesalahan|favor:mendukung|favorite:favorit|fear:takut|feature:fitur|federal:federal|fee:biaya|feed:memberi makan|feel:merasa|feeling:perasaan|fellow:rekan|female:perempuan|fence:pagar|festival:festival|few:beberapa|fiber:serat|fiction:fiksi|field:bidang|fight:berkelahi|fighter:petarung|fighting:perkelahian|figure:angka/sosok|file:berkas|fill:mengisi|film:film|final:akhir|finally:akhirnya|finance:keuangan|financial:keuangan|find:menemukan|finding:temuan|fine:baik/denda|finger:jari|finish:selesai|fire:api|firm:perusahaan|first:pertama|fish:ikan|fishing:memancing|fit:cocok|fitness:kebugaran|five:lima|fix:memperbaiki|flag:bendera|flame:nyala api|flat:datar|flavor:rasa|flee:melarikan diri|flesh:daging|flight:penerbangan|float:mengapung|floor:lantai|flow:mengalir|flower:bunga|fly:terbang|focus:fokus|fold:melipat|folk:rakyat|follow:mengikuti|following:berikut|food:makanan|foot:kaki|football:sepak bola|for:untuk|force:kekuatan|foreign:asing|forest:hutan|forever:selamanya|forget:lupa|forgive:memaafkan|form:membentuk|formal:resmi|formation:formasi|former:mantan|formula:rumus|forth:sebagainya|fortune:keberuntungan|forward:maju|found:ditemukan|foundation:yayasan|founder:pendiri|four:empat|frame:bingkai|framework:kerangka kerja|free:bebas|freedom:kebebasan|freeze:membeku|frequency:frekuensi|frequent:sering|frequently:sering|fresh:segar|friend:teman|friendly:ramah|friendship:persahabatan|frighten:menakuti|frog:katak|from:dari|front:depan|fruit:buah|fry:menggoreng|fuel:bahan bakar|full:penuh|fully:sepenuhnya|fun:menyenangkan|function:fungsi|fund:dana|fundamental:mendasar|funding:pendanaan|funeral:pemakaman|funny:lucu|furniture:mebel|further:lebih lanjut|future:masa depan|gain:mendapatkan|galaxy:galaksi|gallery:galeri|game:permainan|gang:geng|gap:kesenjangan|garage:garasi|garden:taman|garlic:bawang putih|gas:gas|gate:gerbang|gather:mengumpulkan|gay:gay|gaze:menatap|gear:gigi/perlengkapan|gender:jenis kelamin|gene:gen|general:umum|generally:umumnya|generate:menghasilkan|generation:generasi|generous:murah hati|gentle:lembut|gentleman:pria|gently:dengan lembut|genuine:asli|geography:geografi|get:mendapatkan|ghost:hantu|giant:raksasa|gift:hadiah|gifted:berbakat|girl:gadis|girlfriend:pacar perempuan|give:memberi|glad:senang|glance:sekilas|glass:kaca|global:global|glove:sarung tangan|go:pergi|goal:tujuan|god:tuhan|gold:emas|golden:keemasan|golf:golf|good:baik|government:pemerintah|governor:gubernur|grab:mengambil|grade:kelas|gradually:secara bertahap|graduate:lulusan|grain:biji-bijian|grand:agung|grandfather:kakek|grandmother:nenek|grant:memberikan|grass:rumput|grave:kuburan|gray:abu-abu|great:hebat|greatest:terbesar|green:hijau|grocery:toko kelontong|ground:tanah|group:kelompok|grow:tumbuh|growing:berkembang|growth:pertumbuhan|guarantee:jaminan|guard:penjaga|guess:tebak|guest:tamu|guide:panduan|guilty:bersalah|gun:senjata|guy:orang/pria|habit:kebiasaan|habitat:habitat|hair:rambut|half:setengah|hall:aula|hand:tangan|handful:segelintir|handle:menangani|hang:menggantung|happen:terjadi|happy:bahagia|harassment:pelecehan|hard:keras|hardly:hampir tidak|hardware:perangkat keras|harm:bahaya|hat:topi|hate:benci|have:memiliki|he:dia|head:kepala|headline:judul|headquarters:markas besar|health:kesehatan|healthy:sehat|hear:mendengar|hearing:pendengaran|heart:jantung|heat:panas|heaven:surga|heavy:berat|heel:tumit|height:tinggi|helicopter:helikopter|hell:neraka|hello:halo|help:membantu|helpful:bermanfaat|her:dia|here:di sini|hero:pahlawan|herself:dirinya sendiri|hide:menyembunyikan|high:tinggi|highlight:sorotan|highly:sangat|highway:jalan raya|hill:bukit|him:dia|himself:dirinya sendiri|hire:menyewa|his:miliknya|historian:sejarawan|historic:bersejarah|historical:historis|history:sejarah|hit:memukul|hobby:hobi|hold:memegang|hole:lubang|holiday:liburan|holy:suci|home:rumah|homeless:tunawisma|honest:jujur|honey:madu|honor:kehormatan|hope:harapan|horizon:cakrawala|horror:horor|horse:kuda|hospital:rumah sakit|host:tuan rumah|hot:panas|hotel:hotel|hour:jam|house:rumah|household:rumah tangga|housing:perumahan|how:bagaimana|however:namun|huge:besar sekali|human:manusia|humor:humor|hundred:seratus|hungry:lapar|hunt:berburu|hunter:pemburu|hurricane:badai|hurry:buru-buru|hurt:sakit|husband:suami|I:saya|ice:es|idea:ide|ideal:ideal|identification:identifikasi|identify:mengidentifikasi|identity:identitas|if:jika|ignore:mengabaikan|ill:sakit|illegal:ilegal|illness:penyakit|illustrate:mengilustrasikan|image:gambar|imagination:imajinasi|imagine:membayangkan|immediate:segera|immediately:segera|immigrant:imigran|immigration:imigrasi|impact:dampak|implement:menerapkan|implication:implikasi|imply:menyiratkan|import:impor|importance:pentingnya|important:penting|impose:memaksakan|impossible:mustahil|impress:mengesankan|impression:kesan|impressive:mengesankan|improve:memperbaiki|improvement:perbaikan|in:di dalam|incentive:insentif|incident:insiden|include:termasuk|including:termasuk|income:pendapatan|incorporate:menggabungkan|increase:meningkatkan|increased:meningkat|increasing:meningkat|increasingly:semakin|incredible:luar biasa|indeed:memang|independence:kemerdekaan|independent:mandiri|index:indeks|indicate:menunjukkan|indication:indikasi|individual:individu|industrial:industri|industry:industri|infant:bayi|infection:infeksi|inflation:inflasi|influence:pengaruh|inform:menginformasikan|information:informasi|ingredient:bahan|initial:awal|initially:pada awalnya|initiative:inisiatif|injury:cedera|inner:batin|innocent:tidak bersalah|inquiry:pertanyaan|inside:di dalam|insight:wawasan|insist:bersikeras|inspire:menginspirasi|install:memasang|instance:contoh|instant:instan|instead:malah|institution:lembaga|institutional:kelembagaan|instruction:instruksi|instructor:instruktur|instrument:instrumen|insurance:asuransi|intellectual:intelektual|intelligence:kecerdasan|intelligent:cerdas|intend:berniat|intense:intens|intensity:intensitas|intention:niat|interaction:interaksi|interest:minat|interested:tertarik|interesting:menarik|internal:internal|international:internasional|internet:internet|interpret:menafsirkan|interpretation:interpretasi|intervention:intervensi|interview:wawancara|into:ke dalam|introduce:memperkenalkan|introduction:pengantar|invasion:invasi|invest:berinvestasi|investigate:menyelidiki|investigation:penyelidikan|investigator:penyidik|investment:investasi|investor:investor|invite:mengundang|involve:melibatkan|involved:terlibat|involvement:keterlibatan|iron:besi|island:pulau|issue:masalah|it:itu|item:barang|its:miliknya|itself:itu sendiri|jacket:jaket|jail:penjara|jam:selai/macet|job:pekerjaan|join:bergabung|joint:bersama|joke:lelucon|journal:jurnal|journalist:wartawan|journey:perjalanan|joy:kegembiraan|judge:hakim|judgment:pertimbangan|juice:jus|jump:melompat|jungle:hutan rimba|junior:junior|jury:juri|just:hanya|justice:keadilan|justify:membenarkan|keep:menyimpan|key:kunci|kick:menendang|kid:anak|kill:membunuh|killer:pembunuh|killing:pembunuhan|kind:jenis|king:raja|kiss:mencium|kitchen:dapur|knee:lutut|knife:pisau|knock:mengetuk|know:tahu|knowledge:pengetahuan|lab:laboratorium|label:label|labor:buruh|laboratory:laboratorium|lack:kekurangan|lady:wanita|lake:danau|land:tanah|landscape:pemandangan|language:bahasa|lap:pangkuan|large:besar|largely:sebagian besar|last:terakhir|late:terlambat|later:kemudian|laugh:tertawa|launch:meluncurkan|law:hukum|lawn:halaman rumput|lawyer:pengacara|lay:meletakkan|layer:lapisan|lead:memimpin|leader:pemimpin|leadership:kepemimpinan|leading:terkemuka|leaf:daun|league:liga|lean:bersandar|learn:belajar|learning:pembelajaran|least:paling sedikit|leather:kulit|leave:meninggalkan|left:kiri|leg:kaki|legacy:warisan|legal:hukum|legend:legenda|legislation:undang-undang|legitimate:sah|lemon:lemon|length:panjang|less:kurang|lesson:pelajaran|let:membiarkan|letter:surat|level:tingkat|liberal:liberal|library:perpustakaan|license:lisensi|lie:berbohong|life:hidup|lifestyle:gaya hidup|lifetime:seumur hidup|lift:mengangkat|light:cahaya|like:suka|likely:kemungkinan|limit:batas|limitation:keterbatasan|limited:terbatas|line:garis|link:tautan|lip:bibir|liquid:cair|list:daftar|listen:mendengarkan|listener:pendengar|literally:secara harfiah|literary:sastra|literature:sastra|little:sedikit|live:hidup|living:hidup|load:beban|loan:pinjaman|local:lokal|locate:menemukan|location:lokasi|lock:mengunci|long:panjang|look:melihat|loose:longgar|lose:kalah|loss:kerugian|lost:hilang|lot:banyak|loud:keras|love:cinta|lovely:indah|lover:kekasih|low:rendah|lower:menurunkan|luck:keberuntungan|lucky:beruntung|lunch:makan siang|lung:paru-paru|machine:mesin|mad:gila/marah|magazine:majalah|mail:surat|main:utama|mainly:terutama|maintain:memelihara|maintenance:pemeliharaan|major:utama|majority:mayoritas|make:membuat|maker:pembuat|makeup:dandan|male:laki-laki|mall:mal|man:pria|manage:mengelola|management:pengelolaan|manager:manajer|manner:cara|manufacturer:produsen|manufacturing:manufaktur|many:banyak|map:peta|margin:batas|mark:tanda|market:pasar|marketing:pemasaran|marriage:pernikahan|married:menikah|marry:menikah|mask:topeng|mass:massa|massive:besar-besaran|master:tuan|match:pertandingan|material:bahan|math:matematika|matter:masalah|may:mungkin|maybe:mungkin|mayor:walikota|me:saya|meal:makanan|mean:berarti|meaning:arti|meanwhile:sementara itu|measure:mengukur|measurement:pengukuran|meat:daging|mechanism:mekanisme|media:media|medical:medis|medication:obat|medicine:obat|medium:sedang|meet:bertemu|meeting:pertemuan|member:anggota|membership:keanggotaan|memory:ingatan|mental:mental|mention:menyebutkan|menu:menu|mere:hanya|merely:hanya|mess:kekacauan|message:pesan|metal:logam|meter:meter|method:metode|middle:tengah|midnight:tengah malam|might:mungkin|military:militer|milk:susu|million:juta|mind:pikiran|mine:milikku|mineral:mineral|minimum:minimum|minister:menteri|minor:kecil|minority:minoritas|minute:menit|miracle:keajaiban|mirror:cermin|miss:rindu/melewatkan|missile:rudal|mission:misi|mistake:kesalahan|mix:mencampur|mixture:campuran|mode:mode|model:model|moderate:sedang|modern:modern|modest:sederhana|mom:ibu|moment:momen|money:uang|monitor:memantau|month:bulan|mood:suasana hati|moon:bulan|moral:moral|more:lebih|moreover:selain itu|morning:pagi|mortgage:hipotek|most:paling|mostly:sebagian besar|mother:ibu|motion:gerakan|motivation:motivasi|motor:motor|mount:mendaki|mountain:gunung|mouse:tikus|mouth:mulut|move:bergerak|movement:gerakan|movie:film|much:banyak|multiple:ganda|muscle:otot|museum:museum|music:musik|musical:musikal|musician:musisi|muslim:muslim|must:harus|mutual:saling|my:saya|myself:diri saya sendiri|mystery:misteri|myth:mitos|naked:telanjang|name:nama|narrative:narasi|narrow:sempit|nation:bangsa|national:nasional|native:asli|natural:alami|naturally:secara alami|nature:alam|near:dekat|nearby:dekat|nearly:hampir|necessarily:semestinya|necessary:perlu|neck:leher|need:membutuhkan|negative:negatif|negotiate:bernegosiasi|negotiation:negosiasi|neighbor:tetangga|neighborhood:lingkungan|neither:tidak keduanya|nerve:saraf|nervous:gugup|net:jaring|network:jaringan|never:tidak pernah|nevertheless:namun|new:baru|newly:baru saja|news:berita|newspaper:koran|next:berikutnya|nice:bagus|night:malam|nine:sembilan|no:tidak|nobody:tak seorangpun|nod:mengangguk|noise:kebisingan|nomination:nominasi|none:tidak ada|nonetheless:meskipun demikian|nor:maupun|normal:normal|normally:biasanya|north:utara|northern:utara|nose:hidung|not:tidak|note:catatan|nothing:tidak ada|notice:pemberitahuan|notion:gagasan|novel:novel|now:sekarang|nowhere:tidak kemana-mana|nuclear:nuklir|number:nomor|numerous:banyak|nurse:perawat|nut:kacang|object:obyek|objective:tujuan|obligation:kewajiban|observation:pengamatan|observe:mengamati|observer:pengamat|obtain:memperoleh|obvious:jelas|obviously:jelas|occasion:kesempatan|occasionally:kadang-kadang|occupation:pekerjaan|occupy:menempati|occur:terjadi|ocean:lautan|odd:ganjil/aneh|odds:peluang|of:dari|off:mati|offense:pelanggaran|offensive:menyinggung|offer:menawarkan|office:kantor|officer:petugas|official:resmi|often:sering|oh:oh|oil:minyak|ok:ok|okay:oke|old:tua|olympic:olimpiade|on:di atas|once:sekali|one:satu|ongoing:sedang berlangsung|onion:bawang|online:online|only:hanya|onto:ke atas|open:buka|opening:pembukaan|operate:beroperasi|operating:operasi|operation:operasi|operator:operator|opinion:pendapat|opponent:lawan|opportunity:kesempatan|oppose:menentang|opposite:berlawanan|opposition:oposisi|option:pilihan|or:atau|orange:jeruk|order:pesanan|ordinary:biasa|organic:organik|organization:organisasi|organize:mengatur|orientation:orientasi|origin:asal|original:asli|originally:awalnya|other:lainnya|others:orang lain|otherwise:jika tidak|ought:seharusnya|our:kami|ourselves:diri kita sendiri|out:keluar|outcome:hasil|outside:di luar|oven:oven|over:lebih|overall:keseluruhan|overcome:mengatasi|overlook:mengabaikan|owe:berhutang|own:sendiri|owner:pemilik|pace:kecepatan|pack:kemasan|package:paket|page:halaman|pain:sakit|painful:menyakitkan|paint:cat|painter:pelukis|painting:lukisan|pair:pasangan|pale:pucat|palm:telapak tangan|pan:wajan|panel:panel|pant:celana|paper:kertas|parent:orang tua|park:taman|parking:parkir|part:bagian|participant:peserta|participate:berpartisipasi|participation:partisipasi|particular:tertentu|particularly:terutama|partly:sebagian|partner:mitra|partnership:kemitraan|party:pesta/partai|pass:lulus|passage:bagian|passenger:penumpang|passion:gairah|past:masa lalu|patch:menambal|path:jalan|patient:pasien/sabar|pattern:pola|pause:jeda|pay:bayar|payment:pembayaran|peace:perdamaian|peak:puncak|peer:rekan|pen:pena|penalty:hukuman|people:orang-orang|pepper:lada|per:per|perceive:memahami|percentage:persentase|perception:persepsi|perfect:sempurna|perfectly:sempurna|perform:melakukan|performance:kinerja|perhaps:mungkin|period:periode|permanent:permanen|permission:izin|permit:mengizinkan|person:orang|personal:pribadi|personality:kepribadian|personally:secara pribadi|personnel:personil|perspective:perspektif|persuade:membujuk|pet:hewan peliharaan|phase:fase|phenomenon:fenomena|philosophy:filsafat|phone:telepon|photo:foto|photograph:foto|photographer:fotografer|phrase:frasa|physical:fisik|physically:secara fisik|physician:dokter|piano:piano|pick:memilih|picture:gambar|pie:pai|piece:potongan|pile:tumpukan|pilot:pilot|pine:pinus|pink:merah muda|pipe:pipa|pitch:lemparan|place:tempat|plan:rencana|plane:pesawat|planet:planet|planning:perencanaan|plant:tanaman|plastic:plastik|plate:piring|platform:peron|play:bermain|player:pemain|please:silahkan|pleasure:kesenangan|plenty:banyak|plot:alur|plus:tambah|pocket:saku|poem:puisi|poet:penyair|poetry:puisi|point:titik|pole:tiang|police:polisi|policy:kebijakan|political:politik|politically:secara politik|politician:politisi|politics:politik|poll:jajak pendapat|pollution:polusi|pool:kolam|poor:miskin|pop:pop|popular:populer|population:populasi|porch:beranda|port:pelabuhan|portion:bagian|portrait:potret|portray:menggambarkan|pose:menimbulkan|position:posisi|positive:positif|possess:memiliki|possibility:kemungkinan|possible:mungkin|possibly:mungkin|post:pos|pot:panci|potato:kentang|potential:potensi|potentially:berpotensi|pound:pound|pour:menuangkan|poverty:kemiskinan|powder:bubuk|power:kekuatan|powerful:kuat|practical:praktis|practice:praktek|pray:berdoa|prayer:doa|precisely:tepat|predict:memprediksi|prefer:lebih suka|preference:preferensi|pregnancy:kehamilan|pregnant:hamil|preparation:persiapan|prepare:mempersiapkan|prescription:resep|presence:kehadiran|present:hadir/hadiah|presentation:presentasi|preserve:melestarikan|president:presiden|presidential:presidensial|press:menekan|pressure:tekanan|pretend:berpura-pura|pretty:cantik|prevent:mencegah|previous:sebelumnya|previously:sebelumnya|price:harga|pride:kebanggaan|priest:imam|primarily:terutama|primary:utama|prime:utama|principal:kepala sekolah|principle:prinsip|print:mencetak|prior:sebelumnya|priority:prioritas|prison:penjara|prisoner:tahanan|privacy:privasi|private:pribadi|probably:mungkin|problem:masalah|procedure:prosedur|proceed:melanjutkan|process:proses|produce:menghasilkan|producer:produsen|product:produk|production:produksi|profession:profesi|professional:profesional|professor:profesor|profile:profil|profit:keuntungan|program:program|progress:kemajuan|project:proyek|prominent:menonjol|promise:janji|promote:mempromosikan|prompt:cepat|proof:bukti|proper:tepat|properly:dengan benar|property:properti|proportion:proporsi|proposal:usulan|propose:mengusulkan|prosecutor:jaksa|prospect:prospek|protect:melindungi|protection:perlindungan|protein:protein|protest:protes|proud:bangga|prove:membuktikan|provide:menyediakan|provider:penyedia|province:provinsi|provision:ketentuan|psychological:psikologis|psychologist:psikolog|psychology:psikologi|public:publik|publication:publikasi|publicly:secara umum|publish:menerbitkan|publisher:penerbit|pull:menarik|punishment:hukuman|purchase:pembelian|pure:murni|purpose:tujuan|pursue:mengejar|push:mendorong|put:menaruh|qualify:memenuhi syarat|quality:kualitas|quarter:seperempat|quarterback:quarterback|question:pertanyaan|quick:cepat|quickly:dengan cepat|quiet:diam|quietly:diam-diam|quit:berhenti|quite:cukup|quote:kutipan|race:balapan/ras|racial:rasial|radical:radikal|radio:radio|rail:rel|rain:hujan|raise:menaikkan|range:jangkauan|rank:pangkat|rapid:cepat|rapidly:dengan cepat|rare:langka|rarely:jarang|rate:menilai|rather:agak|rating:penilaian|ratio:rasio|raw:mentah|reach:mencapai|react:bereaksi|reaction:reaksi|read:membaca|reader:pembaca|reading:bacaan|ready:siap|real:nyata|reality:kenyataan|realize:menyadari|really:sungguh|reason:alasan|reasonable:masuk akal|recall:mengingat|receive:menerima|recent:baru-baru ini|recently:baru-baru ini|recipe:resep|recognition:pengakuan|recognize:mengenali|recommend:merekomendasikan|recommendation:rekomendasi|record:catatan|recording:rekaman|recover:pulih|recovery:pemulihan|recruit:merekrut|red:merah|reduce:mengurangi|reduction:pengurangan|refer:merujuk|reference:referensi|reflect:mencerminkan|reflection:refleksi|reform:reformasi|refugee:pengungsi|refuse:menolak|regard:menganggap|regarding:mengenai|regardless:bagaimanapun|regime:rezim|region:wilayah|regional:regional|register:daftar|regular:biasa|regularly:secara teratur|regulate:mengatur|regulation:peraturan|reinforce:memperkuat|reject:menolak|relate:berhubungan|relation:hubungan|relationship:hubungan|relative:relatif|relatively:relatif|relax:bersantai|release:melepaskan|relevant:relevan|relief:bantuan|religion:agama|religious:religius|rely:mengandalkan|remain:tetap|remaining:tersisa|remarkable:luar biasa|remember:ingat|remind:mengingatkan|remote:jauh|remove:menghapus|repeat:mengulangi|repeatedly:berulang kali|replace:mengganti|reply:membalas|report:laporan|reporter:reporter|represent:mewakili|representation:perwakilan|representative:wakil|republican:republik|reputation:reputasi|request:permintaan|require:memerlukan|requirement:persyaratan|research:penelitian|researcher:peneliti|resemble:menyerupai|reservation:reservasi|resident:penduduk|resist:menolak|resistance:perlawanan|resolution:resolusi|resolve:menyelesaikan|resort:or|resource:sumber daya|respect:menghormati|respond:menanggapi|respondent:responden|response:tanggapan|responsibility:tanggung jawab|responsible:bertanggung jawab|rest:istirahat|restaurant:restoran|restore:mengembalikan|restriction:pembatasan|result:hasil|retain:mempertahankan|retire:pensiun|retirement:pensiun|return:kembali|reveal:mengungkapkan|revenue:pendapatan|review:tinjauan|revolution:revolusi|rhythm:irama|rice:beras|rich:kaya|rid:membersihkan|ride:mengendarai|rifle:senapan|right:kanan/benar|ring:cincin|rise:naik|risk:risiko|river:sungai|road:jalan|rock:batu|role:peran|roll:menggulung|romantic:romantis|roof:atap|room:kamar|root:akar|rope:tali|rose:mawar|rough:kasar|roughly:kurang lebih|round:bulat|route:rute|routine:rutin|row:baris|royal:kerajaan|rub:menggosok|rubber:karet|ruin:kehancuran|rule:aturan|run:lari|runner:pelari|running:berjalan|rural:pedesaan|rush:terburu-buru|russian:rusia|sacred:suci|sad:sedih|safe:aman|safety:keselamatan|sake:demi|salad:salad|salary:gaji|sale:penjualan|sales:penjualan|salt:garam|same:sama|sample:contoh|sanction:sanksi|sand:pasir|satellite:satelit|satisfaction:kepuasan|satisfy:memuaskan|sauce:saus|save:menyimpan|saving:penghematan|say:mengatakan|scale:skala|scandal:skandal|scared:takut|scenario:skenario|scene:pemandangan|schedule:jadwal|scheme:skema|scholar:sarjana|scholarship:beasiswa|school:sekolah|science:ilmu|scientific:ilmiah|scientist:ilmuwan|scope:lingkup|score:skor|scream:berteriak|screen:layar|script:naskah|sea:laut|search:pencarian|season:musim|seat:kursi|second:kedua|secret:rahasia|secretary:sekretaris|section:bagian|sector:sektor|secure:aman|security:keamanan|see:melihat|seed:benih|seek:mencari|seem:tampak|segment:segmen|seize:merebut|select:memilih|selection:pilihan|self:diri|sell:menjual|senate:senat|senator:senator|send:mengirim|senior:senior|sense:rasa|sensitive:sensitif|sentence:kalimat|separate:terpisah|sequence:urutan|series:seri|serious:serius|seriously:serius|servant:hamba|serve:melayani|service:layanan|session:sesi|set:mengatur|setting:pengaturan|settle:menetap|settlement:penyelesaian|seven:tujuh|several:beberapa|severe:parah|sex:seks|sexual:seksual|shade:naungan|shadow:bayangan|shake:mengguncang|shall:akan|shape:bentuk|share:berbagi|sharp:tajam|she:dia|sheet:lembar|shelf:rak|shell:kerang|shelter:tempat berlindung|shift:bergeser|shine:bersinar|ship:kapal|shirt:kemeja|shit:sial|shock:terkejut|shoe:sepatu|shoot:menembak|shooting:penembakan|shop:toko|shopping:berbelanja|shore:pantai|short:pendek|shortage:kekurangan|shot:tembakan|should:harus|shoulder:bahu|shout:berteriak|show:menunjukkan|shower:mandi|shrug:mengangkat bahu|shut:menutup|sick:sakit|side:sisi|sigh:menghela nafas|sight:pemandangan|sign:tanda|signal:sinyal|significance:makna|significant:signifikan|significantly:secara signifikan|silence:keheningan|silent:diam|silver:perak|similar:serupa|similarity:kesamaan|simple:sederhana|simply:hanya|sin:dosa|since:sejak|sing:bernyanyi|singer:penyanyi|single:tunggal|sink:tenggelam|sister:saudara perempuan|sit:duduk|site:situs|situation:situasi|six:enam|size:ukuran|ski:ski|skill:keterampilan|skin:kulit|sky:langit|slave:budak|sleep:tidur|slice:iris|slide:meluncur|slight:sedikit|slightly:sedikit|slip:tergelincir|slow:lambat|slowly:perlahan|small:kecil|smart:pintar|smell:bau|smile:senyum|smoke:asap|smooth:halus|snap:memotret|snow:salju|so:jadi|soccer:sepak bola|social:sosial|society:masyarakat|soft:lembut|software:perangkat lunak|soil:tanah|solar:surya|soldier:tentara|solid:padat|solution:solusi|solve:memecahkan|some:beberapa|somebody:seseorang|somehow:entah bagaimana|someone:seseorang|something:sesuatu|sometimes:kadang-kadang|somewhat:agak|somewhere:di suatu tempat|son:anak laki-laki|song:lagu|soon:segera|sophisticated:canggih|sorry:maaf|sort:jenis|soul:jiwa|sound:suara|soup:sup|source:sumber|south:selatan|southern:selatan|space:ruang|speak:berbicara|speaker:pembicara|special:khusus|specialist:spesialis|species:spesies|specific:spesifik|specifically:secara khusus|speech:pidato|speed:kecepatan|spend:menghabiskan|spending:pengeluaran|spin:berputar|spirit:semangat|spiritual:spiritual|split:membagi|spokesman:juru bicara|sport:olahraga|spot:tempat|spread:menyebar|spring:musim semi|square:persegi|squeeze:memeras|stability:stabilitas|stable:stabil|staff:staf|stage:tahap|stair:tangga|stake:taruhan|stand:berdiri|standard:standar|standing:berdiri|star:bintang|stare:menatap|start:mulai|state:negara|statement:pernyataan|station:stasiun|statistics:statistik|status:status|stay:tinggal|steady:stabil|steal:mencuri|steel:baja|step:langkah|stick:tongkat|still:masih|stir:mengaduk|stock:saham|stomach:perut|stone:batu|stop:berhenti|storage:penyimpanan|store:toko|storm:badai|story:cerita|straight:lurus|strange:aneh|stranger:orang asing|strategic:strategis|strategy:strategi|stream:aliran|street:jalan|strength:kekuatan|strengthen:memperkuat|stress:stres|stretch:meregangkan|strike:mogok|string:tali|strip:jalur|stroke:stroke|strong:kuat|strongly:dengan kuat|structure:struktur|struggle:perjuangan|student:siswa|studio:studio|study:belajar|stuff:barang|stupid:bodoh|style:gaya|subject:subjek|submit:menyerahkan|subsequent:berikutnya|substance:zat|substantial:substansial|succeed:berhasil|success:sukses|successful:sukses|successfully:dengan sukses|such:seperti|sudden:tiba-tiba|suddenly:tiba-tiba|suffer:menderita|sufficient:cukup|sugar:gula|suggest:menyarankan|suggestion:saran|suicide:bunuh diri|suit:sesuai|summer:musim panas|summit:puncak|sun:matahari|super:super|supermarket:supermarket|suppose:seharusnya|supposed:seharusnya|supply:pasokan|support:dukungan|supporter:pendukung|sure:yakin|surely:pasti|surface:permukaan|surgery:operasi|surprise:kejutan|surprised:terkejut|surprising:mengejutkan|surprisingly:secara mengejutkan|surround:mengelilingi|survey:survei|survival:kelangsungan hidup|survive:bertahan hidup|survivor:yang selamat|suspect:tersangka|sustain:mempertahankan|swear:bersumpah|sweep:menyapu|sweet:manis|swim:berenang|swing:ayunan|switch:beralih|symbol:simbol|symptom:gejala|system:sistem|table:meja|tablespoon:sendok makan|tactic:taktik|tail:ekor|take:mengambil|tale:kisah|talent:bakat|talk:berbicara|tall:tinggi|tank:tangki|tap:ketuk|tape:pita|target:target|task:tugas|taste:rasa|tax:pajak|taxpayer:pembayar pajak|tea:teh|teach:mengajar|teacher:guru|teaching:pengajaran|team:tim|tear:air mata|technical:teknis|technique:teknik|technology:teknologi|teen:remaja|teenager:remaja|telephone:telepon|telescope:teleskop|television:televisi|tell:menceritakan|temperature:suhu|temporary:sementara|ten:sepuluh|tend:cenderung|tendency:kecenderungan|tennis:tenis|tension:ketegangan|tent:tenda|term:istilah|terms:istilah|terrible:mengerikan|territory:wilayah|terror:teror|terrorism:terorisme|terrorist:teroris|test:uji|testify:bersaksi|testimony:kesaksian|testing:pengujian|text:teks|than:daripada|thank:terima kasih|thanks:terima kasih|that:itu|the:itu|theater:teater|their:mereka|them:mereka|theme:tema|themselves:mereka sendiri|then:kemudian|theory:teori|therapy:terapi|there:di sana|therefore:karena itu|these:ini|they:mereka|thick:tebal|thin:tipis|thing:benda|think:berpikir|thinking:pemikiran|third:ketiga|thirty:tiga puluh|this:ini|those:itu|though:meskipun|thought:pikiran|thousand:ribu|threat:ancaman|threaten:mengancam|three:tiga|throat:tenggorokan|through:melalui|throughout:sepanjang|throw:melempar|thus:jadi|ticket:tiket|tie:dasi|tight:ketat|time:waktu|tiny:kecil|tip:ujung|tire:ban/lelah|tired:lelah|tissue:tisu|title:judul|to:ke|tobacco:tembakau|today:hari ini|toe:jari kaki|together:bersama|tomato:tomat|tomorrow:besok|tone:nada|tongue:lidah|tonight:malam ini|too:terlalu|tool:alat|tooth:gigi|top:atas|topic:topik|toss:melempar|total:total|totally:sama sekali|touch:sentuhan|tough:tangguh|tour:wisata|tourist:turis|tournament:turnamen|toward:menuju|towards:menuju|tower:menara|town:kota|toy:mainan|trace:jejak|track:melacak|trade:perdagangan|tradition:tradisi|traditional:tradisional|traffic:lalu lintas|tragedy:tragedi|trail:jejak|train:kereta|training:pelatihan|transfer:transfer|transform:mengubah|transformation:transformasi|transition:transisi|translate:menerjemahkan|transportation:transportasi|travel:perjalanan|treat:memperlakukan|treatment:pengobatan|treaty:perjanjian|tree:pohon|tremendous:dahsyat|trend:tren|trial:pengadilan|tribe:suku|trick:trik|trip:perjalanan|troop:pasukan|trouble:masalah|truck:truk|true:benar|truly:sungguh|trust:kepercayaan|truth:kebenaran|try:mencoba|tube:tabung|tunnel:terowongan|turn:belok|tv:tv|twelve:dua belas|twenty:dua puluh|twice:dua kali|twin:kembar|two:dua|type:jenis|typical:khas|typically:biasanya|ugly:jelek|ultimate:terakhir|ultimately:pada akhirnya|unable:tidak mampu|uncle:paman|under:di bawah|undergo:menjalani|understand:mengerti|understanding:pengertian|unfortunately:sayangnya|uniform:seragam|union:serikat|unique:unik|unit:unit|united:bersatu|universal:universal|universe:alam semesta|university:universitas|unknown:tidak diketahui|unless:kecuali|unlike:tidak seperti|unlikely:tidak mungkin|until:sampai|unusual:tidak biasa|up:atas|upon:atas|upper:atas|urban:perkotaan|urge:mendesak|us:kita|use:menggunakan|used:digunakan|useful:berguna|user:pengguna|usual:biasa|usually:biasanya|utility:kegunaan|vacation:liburan|valley:lembah|valuable:berharga|value:nilai|variable:variabel|variation:variasi|variety:ragam|various:berbagai|vary:bervariasi|vast:luas|vegetable:sayur|vehicle:kendaraan|venture:usaha|version:versi|versus:lawan|very:sangat|vessel:kapal|veteran:veteran|via:melalui|victim:korban|victory:kemenangan|video:video|view:pemandangan|viewer:penonton|village:desa|violate:melanggar|violation:pelanggar|violence:kekerasan|violent:keras|virtual:virtual|virtue:kebajikan|virus:virus|visible:terlihat|vision:visi|visit:mengunjungi|visitor:pengunjung|visual:visual|vital:penting|voice:suara|volume:volume|volunteer:sukarelawan|vote:suara|voter:pemilih|vs:vs|vulnerable:rentan|wage:upah|wait:tunggu|wake:bangun|walk:berjalan|wall:dinding|wander:mengembara|want:ingin|war:perang|warm:hangat|warn:memperingatkan|warning:peringatan|wash:mencuci|waste:limbah|watch:menonton|water:air|wave:gelombang|way:cara|we:kami|weak:lemah|wealth:kekayaan|wealthy:kaya|weapon:senjata|wear:memakai|weather:cuaca|wedding:pernikahan|week:minggu|weekend:akhir pekan|weekly:mingguan|weigh:menimbang|weight:berat|welcome:selamat datang|welfare:kesejahteraan|well:baik|west:barat|western:barat|wet:basah|what:apa|whatever:apapun|wheel:roda|when:kapan|whenever:kapanpun|where:dimana|whereas:sedangkan|whether:apakah|which:yang mana|while:sementara|whisper:berbisik|white:putih|who:siapa|whole:seluruh|whom:siapa|whose:siapa|why:mengapa|wide:lebar|widely:luas|widespread:meluas|wife:istri|wild:liar|will:akan|willing:bersedia|win:menang|wind:angin|window:jendela|wine:anggur|wing:sayap|winner:pemenang|winter:musim dingin|wipe:menghapus|wire:kawat|wisdom:kebijaksanaan|wise:bijaksana|wish:berharap|with:dengan|withdraw:menarik|within:di dalam|without:tanpa|witness:saksi|woman:wanita|wonder:heran|wonderful:indah|wood:kayu|wooden:kayu|word:kata|work:kerja|worker:pekerja|working:bekerja|works:karya|workshop:lokakarya|world:dunia|worried:khawatir|worry:khawatir|worth:bernilai|would:akan|wound:luka|wrap:membungkus|write:menulis|writer:penulis|writing:tulisan|wrong:salah|yard:halaman|yeah:ya|year:tahun|yell:berteriak|yellow:kuning|yes:ya|yesterday:kemarin|yet:belum|yield:menghasilkan|you:anda|young:muda|your:milikmu|yours:milikmu|yourself:dirimu sendiri|youth:masa muda|zone:zona`;
+
+        // Function to parse the raw string into an array of objects
+        function getVocabulary() {
+            // Split by pipe | then split by colon :
+            let items = rawDataString.split('|');
+            let vocabArray = [];
+            
+            items.forEach(item => {
+                let parts = item.split(':');
+                if(parts.length === 2) {
+                    vocabArray.push({
+                        en: parts[0].trim(),
+                        id: parts[1].trim()
+                    });
+                }
+            });
+            
+            // Sort Alphabetically
+            vocabArray.sort((a, b) => a.en.localeCompare(b.en));
+            return vocabArray;
+        }
+
+        // Global variable for data
+        const vocabList = getVocabulary();
+
+        // Initialize Table
+        function renderTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ""; // Clear existing
+
+            if(data.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='3' style='text-align:center;'>Tidak ada data ditemukan</td></tr>";
+                return;
+            }
+
+            // Chunk rendering for performance if list is huge (though 1000 is fine for modern browsers)
+            // Using document fragment for speed
+            const fragment = document.createDocumentFragment();
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                
+                const tdNo = document.createElement('td');
+                tdNo.textContent = index + 1;
+                
+                const tdEn = document.createElement('td');
+                tdEn.innerHTML = `<b>${item.en}</b>`; // Bold English
+                
+                const tdId = document.createElement('td');
+                tdId.textContent = item.id;
+
+                tr.appendChild(tdNo);
+                tr.appendChild(tdEn);
+                tr.appendChild(tdId);
+                fragment.appendChild(tr);
+            });
+
+            tableBody.appendChild(fragment);
+            
+            // Update Stats
+            document.getElementById('totalWords').innerText = data.length;
+        }
+
+        // Search/Filter Function
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            
+            const filteredData = vocabList.filter(item => {
+                return item.en.toLowerCase().includes(filter) || item.id.toLowerCase().includes(filter);
+            });
+
+            renderTable(filteredData);
+        }
+
+        // Scroll to Top Button Logic
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            const mybutton = document.getElementById("myBtn");
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+        // Initial Render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable(vocabList);
+        });
+
+    </script>
+</body>
+</html>
