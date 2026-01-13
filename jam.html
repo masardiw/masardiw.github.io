@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jam Bicara Nokia Jadul</title>
+    <style>
+        /* Import Font Pixel Retro */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+        :root {
+            --nokia-screen-bg: #c6dbaa; /* Hijau klasik Nokia */
+            --nokia-text: #2b2b2b;
+            --body-color: #3d4e5d; /* Biru gelap body Nokia 3310 */
+            --button-color: #ececec;
+            --button-text: #3d4e5d;
+            --screen-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Mencegah teks diblok */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            font-family: 'VT323', monospace;
+        }
+
+        /* Container HP */
+        .phone-case {
+            width: 300px;
+            height: 580px;
+            background-color: var(--body-color);
+            border-radius: 40px 40px 50px 50px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 
+                -10px 10px 20px rgba(0,0,0,0.3),
+                inset 5px 5px 10px rgba(255,255,255,0.2),
+                inset -5px -5px 10px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        /* Speaker Atas */
+        .earpiece {
+            width: 60px;
+            height: 8px;
+            background-color: #222;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Layar */
+        .screen-container {
+            width: 100%;
+            background-color: #555;
+            padding: 10px;
+            border-radius: 15px 15px 25px 25px;
+            margin-bottom: 30px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .screen {
+            background-color: var(--nokia-screen-bg);
+            width: 100%;
+            height: 180px;
+            border-radius: 5px;
+            box-shadow: var(--screen-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            color: var(--nokia-text);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline effect untuk layar jadul */
+        .screen::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            z-index: 3;
+        }
+
+        .main-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            z-index: 3;
+        }
+
+        .time-large {
+            font-size: 4.5rem;
+            line-height: 1;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .date-small {
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .screen-footer {
+            display: flex;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 3;
+        }
+
+        /* Navigasi / Tombol */
+        .nav-area {
+            width: 100%;
+            height: 60px;
+            background-color: #e0e0e0;
+            border-radius: 30px 30px 10px 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* Tombol Utama (Navi Key) */
+        .navi-key {
+            width: 80px;
+            height: 45px;
+            background: linear-gradient(to bottom, #fff, #ccc);
+            border: 2px solid #999;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--button-text);
+            box-shadow: 0 4px 0 #888;
+            transition: all 0.1s;
+        }
+
+        .navi-key:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #888;
+        }
+
+        /* Keypad Angka */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .key {
+            background: var(--button-color);
+            height: 40px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--button-text);
+            font-size: 1.2rem;
+            box-shadow: 0 3px 0 #999, inset 1px 1px 2px white;
+            position: relative;
+        }
+        
+        /* Dekorasi agar terlihat seperti tombol angka */
+        .key span {
+            font-size: 0.8rem;
+            position: absolute;
+            bottom: 2px;
+            opacity: 0.6;
+        }
+
+        /* Indikator Baterai & Sinyal (CSS Pure) */
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 15px;
+        }
+        .bar {
+            width: 3px;
+            background-color: var(--nokia-text);
+        }
+        .bar:nth-child(1) { height: 4px; }
+        .bar:nth-child(2) { height: 7px; }
+        .bar:nth-child(3) { height: 10px; }
+        .bar:nth-child(4) { height: 14px; }
+
+        .battery {
+            width: 24px;
+            height: 12px;
+            border: 2px solid var(--nokia-text);
+            position: relative;
+            display: flex;
+            padding: 1px;
+        }
+        .battery::after {
+            content: '';
+            width: 3px;
+            height: 6px;
+            background-color: var(--nokia-text);
+            position: absolute;
+            right: -4px;
+            top: 1px;
+        }
+        .battery-level {
+            width: 80%;
+            height: 100%;
+            background-color: var(--nokia-text);
+        }
+
+        /* Pesan Suara */
+        .voice-status {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: sans-serif;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="phone-case">
+        <div class="earpiece"></div>
+        
+        <div class="screen-container">
+            <div class="screen">
+                <div class="status-bar">
+                    <div class="signal-bars">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div class="battery">
+                        <div class="battery-level"></div>
+                    </div>
+                </div>
+
+                <div class="main-display">
+                    <div class="time-large" id="clock-display">--:--</div>
+                    <div class="date-small" id="date-display">...</div>
+                </div>
+
+                <div class="screen-footer">
+                    <span>Menu</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol "Navi Key" yang besar khas Nokia -->
+        <div class="nav-area">
+            <button class="navi-key" id="speak-btn" onclick="speakTime()">Bicara</button>
+        </div>
+
+        <!-- Keypad Dekoratif (Non-fungsional tapi visual) -->
+        <div class="keypad">
+            <div class="key">1</div>
+            <div class="key">2 <span>abc</span></div>
+            <div class="key">3 <span>def</span></div>
+            <div class="key">4 <span>ghi</span></div>
+            <div class="key">5 <span>jkl</span></div>
+            <div class="key">6 <span>mno</span></div>
+            <div class="key">7 <span>pqrs</span></div>
+            <div class="key">8 <span>tuv</span></div>
+            <div class="key">9 <span>wxyz</span></div>
+            <div class="key">*</div>
+            <div class="key">0 <span>_</span></div>
+            <div class="key">#</div>
+        </div>
+
+        <div class="voice-status" id="status-msg"></div>
+    </div>
+
+    <script>
+        // --- 1. Logika Jam Digital ---
+        function updateClock() {
+            const now = new Date();
+            
+            // Format Waktu
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock-display').innerText = `${hours}:${minutes}`;
+
+            // Format Tanggal (Bahasa Indonesia)
+            const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('id-ID', options);
+            // Ambil hari dan tanggal saja agar muat di layar kecil
+            const shortDate = dateStr.split(',')[0]; 
+            document.getElementById('date-display').innerText = dateStr;
+        }
+
+        // Jalankan setiap detik
+        setInterval(updateClock, 1000);
+        updateClock(); // Jalankan segera saat load
+
+        // --- 2. Logika Text-to-Speech (Suara) ---
+        let voices = [];
+
+        // Load voices saat browser siap
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+
+        // Event listener untuk memuat suara (karena kadang asinkron di browser)
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+
+        function speakTime() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            
+            let textToSpeak = "";
+
+            // Logika tata bahasa jam Indonesia
+            if (m === 0) {
+                textToSpeak = `Sekarang jam ${h} tepat.`;
+            } else if (m === 30) {
+                textToSpeak = `Sekarang jam ${h} lewat tiga puluh menit.`; // atau setengah...
+            } else {
+                textToSpeak = `Sekarang jam ${h} lewat ${m} menit.`;
+            }
+
+            // Batalkan suara sebelumnya jika user menekan tombol berkali-kali
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            
+            // Cari suara Bahasa Indonesia
+            const indoVoice = voices.find(voice => voice.lang === 'id-ID');
+            
+            if (indoVoice) {
+                utterance.voice = indoVoice;
+                utterance.lang = 'id-ID';
+            } else {
+                // Fallback jika tidak ada suara ID, tetap set lang ID agar engine mencoba logat lokal
+                utterance.lang = 'id-ID';
+                console.log("Suara Bahasa Indonesia native tidak ditemukan, menggunakan default.");
+            }
+
+            // Atur kecepatan dan nada agar terdengar sedikit "robotik" ala fitur aksesibilitas hp jadul
+            utterance.rate = 0.9; 
+            utterance.pitch = 1;
+
+            window.speechSynthesis.speak(utterance);
+
+            // Efek visual tombol ditekan (Animasi CSS sudah ada di :active, ini untuk feedback layar)
+            const btn = document.getElementById('speak-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Sebut...";
+            setTimeout(() => {
+                btn.innerText = originalText;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
